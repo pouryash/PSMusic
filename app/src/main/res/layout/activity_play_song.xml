@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
+    android:theme="@style/ThemeOverlay.MaterialComponents.Dark"
+    tools:context=".PlaySongActivity">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar_platSong"
+        android:layout_width="match_parent"
+        android:gravity="center"
+        android:layout_marginBottom="@dimen/standardMargin_X2"
+        android:layout_height="?attr/actionBarSize">
+
+        <ImageView
+            android:id="@+id/iv_back_playSong"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:padding="@dimen/smallMargin"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            app:srcCompat="@drawable/ic_back_arrow_white"/>
+
+    </androidx.appcompat.widget.Toolbar>
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/standardMargin_X2"
+        android:layout_marginStart="@dimen/standardMargin_X2"
+        android:paddingStart="@dimen/standardMargin_X2"
+        android:paddingEnd="@dimen/standardMargin_X2"
+        android:layout_below="@id/toolbar_platSong">
+
+        <SeekBar
+            android:id="@+id/sb_Sound_PlaySong"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:thumb="@null"
+            android:background="@null"
+            android:progressTint="#ccc"
+            android:layout_marginEnd="@dimen/standardMargin_X2"
+            android:layout_toEndOf="@+id/iv_SoundSeekbar_PlaySong"
+            />
+
+        <ImageView
+            android:id="@+id/iv_SoundSeekbar_PlaySong"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="@dimen/standardMargin"
+            app:srcCompat="@drawable/ic_sound_on"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/rl_SongInfo_PlaySong"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        >
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardV_songImage"
+            android:layout_width="250dp"
+            android:layout_height="250dp"
+            android:layout_centerHorizontal="true"
+            app:cardCornerRadius="10dp"
+            app:cardElevation="4dp">
+
+            <ImageView
+                android:id="@+id/iv_songImage_playSong"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="fitXY"
+                />
+
+        </androidx.cardview.widget.CardView>
+
+        <TextView
+            android:id="@+id/tv_songName_songListAdp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/standardMargin_X2"
+            android:layout_marginEnd="@dimen/standardMargin_X2"
+            android:layout_marginTop="@dimen/standardMargin_X2"
+            tools:text="pourya sharifi"
+            android:layout_below="@id/cardV_songImage"
+            android:layout_centerInParent="true"
+            android:singleLine="true"
+            android:fontFamily="@font/sans_bold"
+            android:textColor="@color/colorWhite"
+            android:textSize="@dimen/standardTextSize_15"
+            />
+        <TextView
+            android:id="@+id/tv_songArtist_playSong"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/standardMargin_X2"
+            android:layout_marginEnd="@dimen/standardMargin_X2"
+            tools:text="pourya sharifi"
+            android:layout_below="@id/tv_songName_songListAdp"
+            android:layout_centerInParent="true"
+            android:singleLine="true"
+            android:fontFamily="@font/sans_bold"
+            android:textColor="@color/colorGray"
+            android:textSize="@dimen/standardTextSize_13"
+            />
+
+    </RelativeLayout>
+
+   <!--<LinearLayout-->
+       <!--android:id="@+id/lL_seekbar"-->
+       <!--android:layout_width="match_parent"-->
+       <!--android:layout_height="wrap_content"-->
+       <!--android:layout_above="@+id/rl_mediaController">-->
+
+
+       <!--<TextView-->
+           <!--android:id="@+id/tv_timePassed_playSong"-->
+           <!--android:layout_width="wrap_content"-->
+           <!--android:layout_height="wrap_content"-->
+           <!--tools:text="05:26"-->
+           <!--android:layout_weight=".1"-->
+           <!--android:layout_marginStart="@dimen/standardMargin"-->
+           <!--android:textSize="@dimen/standardTextSize_12"-->
+           <!--android:textColor="@color/colorWhite"/>-->
+
+       <!--<SeekBar-->
+           <!--android:id="@+id/seekbar_playSong"-->
+           <!--android:layout_width="wrap_content"-->
+           <!--android:layout_height="wrap_content"-->
+           <!--android:layout_marginEnd="@dimen/standardMargin_X2"-->
+           <!--android:layout_marginBottom="@dimen/standardMargin"-->
+           <!--android:layout_weight="33"-->
+           <!--/>-->
+
+       <!--<TextView-->
+           <!--android:id="@+id/tv_duration_playSong"-->
+           <!--android:layout_width="wrap_content"-->
+           <!--android:layout_height="wrap_content"-->
+           <!--tools:text="05:26"-->
+           <!--android:layout_marginEnd="@dimen/standardMargin"-->
+           <!--android:layout_weight=".1"-->
+           <!--android:textSize="@dimen/standardTextSize_12"-->
+           <!--android:textColor="@color/colorWhite"/>-->
+
+   <!--</LinearLayout>-->
+
+
+    <RelativeLayout
+        android:id="@+id/rl_seekbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/rl_mediaController">
+
+
+        <TextView
+            android:id="@+id/tv_timePassed_playSong"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="05:26"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="@dimen/standardMargin"
+            android:textSize="@dimen/standardTextSize_10"
+            android:layout_centerVertical="true"
+            android:textColor="@color/colorWhite"/>
+
+        <SeekBar
+            android:id="@+id/seekbar_playSong"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_toEndOf="@id/tv_timePassed_playSong"
+            android:layout_toStartOf="@id/tv_duration_playSong"
+            android:layout_centerVertical="true"
+            android:layout_marginBottom="@dimen/standardMargin"
+            />
+
+        <TextView
+            android:id="@+id/tv_duration_playSong"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            tools:text="05:26"
+            android:layout_marginEnd="@dimen/standardMargin"
+            android:layout_alignParentEnd="true"
+            android:textSize="@dimen/standardTextSize_10"
+            android:textColor="@color/colorWhite"/>
+
+    </RelativeLayout>
+
+
+    <RelativeLayout
+        android:id="@+id/rl_mediaController"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true">
+<!--TODO fix select background-->
+        <ImageView
+            android:id="@+id/iv_playPayse_playSong"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/ic_play"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="@dimen/smallMargin"
+            android:layout_centerInParent="true"
+            android:layout_marginStart="@dimen/standardMargin_X2"
+            android:layout_marginEnd="@dimen/standardMargin_X2"
+            android:layout_marginBottom="@dimen/standardMargin"
+            android:layout_marginTop="@dimen/standardMargin"
+            />
+
+        <ImageView
+            android:id="@+id/iv_previous_playSong"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="@dimen/smallMargin"
+            app:srcCompat="@drawable/ic_previous_track"
+            android:layout_centerVertical="true"
+            android:layout_toStartOf="@id/iv_playPayse_playSong"/>
+
+        <ImageView
+            android:id="@+id/iv_next_playSong"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="@dimen/smallMargin"
+            app:srcCompat="@drawable/ic_next_track"
+            android:layout_centerVertical="true"
+            android:layout_toEndOf="@id/iv_playPayse_playSong"/>
+
+        <ImageView
+            android:id="@+id/iv_Repeat_PlaySong"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/ic_repeat_one_24px"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="@dimen/smallMargin"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="16dp"
+            />
+
+        <ImageView
+            android:id="@+id/iv_forward_PlaySong"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/smallMargin"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            app:srcCompat="@drawable/ic_forward_30_24px"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="16dp"
+            />
+
+    </RelativeLayout>
+
+</RelativeLayout>

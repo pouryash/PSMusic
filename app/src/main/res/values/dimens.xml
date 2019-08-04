@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <dimen name="smallMargin">4dp</dimen>
+    <dimen name="standardMargin">8dp</dimen>
+    <dimen name="standardMargin_X2">16dp</dimen>
+    <dimen name="standardTextSize_10">10sp</dimen>
+    <dimen name="standardTextSize_11">11sp</dimen>
+    <dimen name="standardTextSize_12">12sp</dimen>
+    <dimen name="standardTextSize_13">13sp</dimen>
+    <dimen name="standardTextSize_14">14sp</dimen>
+    <dimen name="standardTextSize_15">15sp</dimen>
+    <dimen name="standardTextSize_16">16sp</dimen>
+    <dimen name="standardTextSize_17">17sp</dimen>
+    <dimen name="standardTextSize_18">18sp</dimen>
+    <dimen name="standardTextSize_19">19sp</dimen>
+    <dimen name="standardTextSize_20">20sp</dimen>
+
+</resources>

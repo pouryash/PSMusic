@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">PSMusic</string>
+    <string name="searchEditText">Search for songs, or artists</string>
+
+</resources>
