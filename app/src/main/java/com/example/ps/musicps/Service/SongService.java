@@ -13,6 +13,7 @@ import android.widget.RemoteViews;
 
 import com.example.ps.musicps.Commen.Commen;
 import com.example.ps.musicps.PlaySongActivity;
+import com.example.ps.musicps.PlayingSongFragment;
 import com.example.ps.musicps.R;
 import com.example.ps.musicps.SongListActivity;
 
@@ -78,7 +79,7 @@ public class SongService extends Service implements Commen.onMediaPlayerStateCha
                 notificationManager.notify(NOTIFICATION_ID, notification.build());
             }
         };
-        SongListActivity.onSongListActivityStateChanged = new SongListActivity.onSongListActivityStateChanged() {
+        PlayingSongFragment.onSongListActivityStateChanged = new PlayingSongFragment.onSongListActivityStateChanged() {
             @Override
             public void onSongListPlaypauseClicked() {
                 if (Commen.mediaPlayer.isPlaying()) {

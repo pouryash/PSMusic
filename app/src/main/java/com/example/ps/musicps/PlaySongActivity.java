@@ -100,7 +100,7 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
         duration.setText(song.getDuration());
         seekBar.setMax(Commen.mediaPlayer.getDuration());
         timePassed.setText(changeDurationFormat(0));
-        SongListActivity.onPlayingSongCompletion = new SongListActivity.onPlayingSongCompletion() {
+        PlayingSongFragment.onPlayingSongCompletion = new PlayingSongFragment.onPlayingSongCompletion() {
             @Override
             public void onCompletion() {
                 if (drawableCurent.getConstantState() == drawableRepeatAll.getConstantState()) {

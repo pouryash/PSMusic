@@ -62,6 +62,12 @@
         android:layout_below="@+id/toolbar_Search"/>
 
 
-    <!--<include layout="@layout/playing_song" />-->
+    <fragment
+        android:id="@+id/fr_PlayingSong"
+        android:layout_alignParentBottom="true"
+        tools:layout="@layout/fragment_playing_song"
+        android:name="com.example.ps.musicps.PlayingSongFragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 
 </RelativeLayout>

@@ -90,7 +90,6 @@
             android:focusable="true"
             android:padding="@dimen/standardMargin"
             android:layout_marginStart="@dimen/standardMargin_X2"
-            android:background="?android:selectableItemBackground"
             android:layout_marginEnd="@dimen/standardMargin_X2"
             android:layout_marginBottom="@dimen/standardMargin"
             android:layout_marginTop="@dimen/standardMargin"

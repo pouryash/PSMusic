@@ -1,6 +1,8 @@
 package com.example.ps.musicps;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Intent;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.content.res.ResourcesCompat;
@@ -14,6 +16,8 @@ import android.widget.EditText;
 import android.widget.ImageView;
 
 import com.example.ps.musicps.Adapter.SongSearchAdapter;
+import com.example.ps.musicps.Commen.Commen;
+import com.example.ps.musicps.Commen.Const;
 
 public class SearchActivity extends AppCompatActivity {
 
@@ -31,15 +35,21 @@ public class SearchActivity extends AppCompatActivity {
 
 
 
-
-
         initViews();
         setupViews();
 
     }
 
-    private void setupViews() {
 
+
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(SearchActivity.this,SongListActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        startActivity(intent);
+    }
+
+    private void setupViews() {
         recyclerView.setLayoutManager(new LinearLayoutManager(this,RecyclerView.VERTICAL,false));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         adapter = new SongSearchAdapter(SongListActivity.songList, this, new SongSearchAdapter.onSongClicked() {
@@ -70,7 +80,9 @@ public class SearchActivity extends AppCompatActivity {
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                SearchActivity.super.onBackPressed();
+                Intent intent = new Intent(SearchActivity.this,SongListActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                startActivity(intent);
             }
         });
     }
