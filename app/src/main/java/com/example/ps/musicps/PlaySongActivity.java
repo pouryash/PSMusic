@@ -194,11 +194,11 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
 
         if (Uri.parse(song.getSongImageUri()) == Uri.EMPTY) {
             Glide.with(this).asBitmap().load(songBitmapAlbum)
-                    .apply(new RequestOptions().placeholder(R.drawable.no_image))
+                    .apply(new RequestOptions().placeholder(R.mipmap.ic_launcher))
                     .into(songImage);
         } else {
             Glide.with(this).asBitmap().load(Uri.parse(song.getSongImageUri()))
-                    .apply(new RequestOptions().placeholder(R.drawable.no_image))
+                    .apply(new RequestOptions().placeholder(R.mipmap.ic_launcher))
                     .into(songImage);
         }
 
@@ -497,11 +497,13 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
                       playPauseButton.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_pause, null));
                   } else {
                       playPauseButton.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_play, null));
-
                   }
               }
           }
           if (!Commen.isServiceRunning(SongService.class, this)) {
+              if (Commen.song== null){
+                  Commen.getInstance().setupMediaPLayer(PlaySongActivity.this, song, this);
+              }
               startService(new Intent(PlaySongActivity.this, SongService.class));
           }
           SongService.onNotificationServiceStateChangedPlay = this;

@@ -72,7 +72,7 @@ public class SongSearchAdapter extends RecyclerView.Adapter<SongSearchAdapter.So
                 } else {
                     List<Song> filteredList = new ArrayList<>();
                     for (Song row : songList) {
-//TODO textView marque and new searchfilter
+//TODO textView marque
                         // name match condition. this might differ depending on your requirement
                         // here we are looking for name or phone number match
                         if (row.getSongName().toLowerCase().contains(charString.toLowerCase())
@@ -123,8 +123,9 @@ public class SongSearchAdapter extends RecyclerView.Adapter<SongSearchAdapter.So
             String songNameString = song.getSongName();
             String artistNameString = song.getArtistName();
 
-            int indexSongName = songNameString.toLowerCase().indexOf(charString);
-            int indexArtistName = artistNameString.toLowerCase().indexOf(charString);
+            String s = artistNameString.toLowerCase();
+            int indexSongName = songNameString.toLowerCase().indexOf(charString.toLowerCase());
+            int indexArtistName = artistNameString.toLowerCase().indexOf(charString.toLowerCase());
 
             ForegroundColorSpan fcs = new ForegroundColorSpan(Color.rgb(229, 23, 23));
             if (indexSongName > -1) {
@@ -132,10 +133,14 @@ public class SongSearchAdapter extends RecyclerView.Adapter<SongSearchAdapter.So
 
                 sb.setSpan(fcs, indexSongName, indexSongName + charString.length(), 0);
                 songName.setText(sb);
-                artistName.setText(song.getArtistName());
+                if (indexArtistName < 0){
+                    artistName.setText(song.getArtistName());
+                }
             }
             if (indexArtistName > -1) {
-                songName.setText(song.getSongName());
+                if (indexSongName < 0){
+                    songName.setText(song.getSongName());
+                }
                 SpannableStringBuilder sb = new SpannableStringBuilder(artistNameString);
 
                 sb.setSpan(fcs, indexArtistName, indexArtistName + charString.length(), 0);

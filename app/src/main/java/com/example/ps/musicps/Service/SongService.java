@@ -183,17 +183,21 @@ public class SongService extends Service implements Commen.onMediaPlayerStateCha
                 view.setOnClickPendingIntent(R.id.iv_playPayse_notification, playPendingIntent);
                 view.setOnClickPendingIntent(R.id.iv_next_notification, nextPendingIntent);
                 view.setOnClickPendingIntent(R.id.iv_previous_notification, previousPendingIntent);
-                view.setTextViewText(R.id.tv_SongName_notification, Commen.song.getSongName());
-                view.setTextViewText(R.id.tv_appName_notification, "PSMusic");
-                view.setImageViewResource(R.id.iv_playPayse_notification, R.drawable.ic_pause_24px);
+                if (Commen.song!= null){
+                    view.setTextViewText(R.id.tv_SongName_notification, Commen.song.getSongName());
+                    view.setTextViewText(R.id.tv_appName_notification, "PSMusic");
+                    view.setImageViewResource(R.id.iv_playPayse_notification, R.drawable.ic_pause_24px);
+                }
 
                 bigView.setOnClickPendingIntent(R.id.iv_playPayse_notification, playPendingIntent);
                 bigView.setOnClickPendingIntent(R.id.iv_next_notification, nextPendingIntent);
                 bigView.setOnClickPendingIntent(R.id.iv_previous_notification, previousPendingIntent);
-                bigView.setTextViewText(R.id.tv_SongName_notification, Commen.song.getSongName());
-                bigView.setTextViewText(R.id.tv_appName_notification, "PSMusic");
-                bigView.setTextViewText(R.id.tv_ArtistName_notification, Commen.song.getArtistName());
-                bigView.setImageViewResource(R.id.iv_playPayse_notification, R.drawable.ic_pause_24px);
+          if (Commen.song!= null){
+              bigView.setTextViewText(R.id.tv_SongName_notification, Commen.song.getSongName());
+              bigView.setTextViewText(R.id.tv_appName_notification, "PSMusic");
+              bigView.setTextViewText(R.id.tv_ArtistName_notification, Commen.song.getArtistName());
+              bigView.setImageViewResource(R.id.iv_playPayse_notification, R.drawable.ic_pause_24px);
+          }
 
 
                 notification = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL);
