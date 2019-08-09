@@ -133,7 +133,7 @@ public class PlayingSongFragment extends Fragment implements Commen.onMediaPlaye
                     playPauseButtonPlayingSong.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_play_24px, null));
                 }
             }catch (IllegalStateException e){
-                Toast.makeText(getContext(),e.getCause()+"1111",Toast.LENGTH_LONG).show();
+                playPauseButtonPlayingSong.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_play_24px, null));
             }
         } else {
             playPauseButtonPlayingSong.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_play_24px, null));
@@ -146,7 +146,9 @@ public class PlayingSongFragment extends Fragment implements Commen.onMediaPlaye
     public void onStop() {
         if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE)
                 == PackageManager.PERMISSION_GRANTED) {
-            songSharedPrefrenceManager.saveSong(PlaySongActivity.song);
+            if(!PlaySongActivity.isExternalSource){
+                songSharedPrefrenceManager.saveSong(Commen.song);
+            }
         }
         super.onStop();
     }
@@ -165,7 +167,7 @@ public class PlayingSongFragment extends Fragment implements Commen.onMediaPlaye
                     setupPlayingSong(Commen.song, Commen.mediaPlayer);
                 }
 
-            } else if (playingSongName.getText().equals("")) {
+            } else if (playingSongName.getText().equals("") || Commen.song == null) {
                 Commen.song = songSharedPrefrenceManager.getSong();
                 Commen.getInstance().setupMediaPLayer(getContext(), Commen.song, this);
 
@@ -191,7 +193,9 @@ public class PlayingSongFragment extends Fragment implements Commen.onMediaPlaye
 
     @Override
     public void onDestroy() {
-        Commen.mediaPlayer.release();
+        if (!PlaySongActivity.isExternalSource){
+            Commen.mediaPlayer.release();
+        }
         super.onDestroy();
     }
 
@@ -227,24 +231,39 @@ public class PlayingSongFragment extends Fragment implements Commen.onMediaPlaye
 
     @Override
     public void onNextButtonClickedList() {
-        if (PlaySongActivity.song == null) {
-            onGetSong.getSong(Commen.song.getId() + 1);
-            playPauseButtonPlayingSong.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_pause_24px, null));
-        } else {
-            setupPlayingSong(PlaySongActivity.song, Commen.mediaPlayer);
-            playPauseButtonPlayingSong.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_pause_24px, null));
+        if (SongListActivity.songList.size() -1 == Commen.song.getId()){
+            if (PlaySongActivity.song == null) {
+                onGetSong.getSong(0);
+            } else {
+                setupPlayingSong(Commen.song, Commen.mediaPlayer);
+            }
+        }else {
+            if (PlaySongActivity.song == null) {
+                onGetSong.getSong(Commen.song.getId() + 1);
+            } else {
+                setupPlayingSong(Commen.song, Commen.mediaPlayer);
+            }
         }
+        playPauseButtonPlayingSong.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_pause_24px, null));
+
     }
 
     @Override
     public void onPrevioudButtonClickedList() {
-        if (PlaySongActivity.song == null) {
-            onGetSong.getSong(Commen.song.getId() - 1);
-            playPauseButtonPlayingSong.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_pause_24px, null));
-        } else {
-            setupPlayingSong(PlaySongActivity.song, Commen.mediaPlayer);
-            playPauseButtonPlayingSong.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_pause_24px, null));
-        }
+      if (Commen.song.getId() == 0){
+          if (PlaySongActivity.song == null) {
+              onGetSong.getSong(SongListActivity.songList.size()-1);
+          } else {
+              setupPlayingSong(PlaySongActivity.song, Commen.mediaPlayer);
+          }
+      }else {
+          if (PlaySongActivity.song == null) {
+              onGetSong.getSong(Commen.song.getId() - 1);
+          } else {
+              setupPlayingSong(PlaySongActivity.song, Commen.mediaPlayer);
+          }
+      }
+        playPauseButtonPlayingSong.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_pause_24px, null));
     }
 
     @Override

@@ -30,7 +30,7 @@
             android:singleLine="true"
             android:layout_centerVertical="true"
             android:text="PSMusic"
-            android:textColor="@color/colorWhite"
+            android:textColor="@color/colorGray"
             android:textSize="@dimen/standardTextSize_11"
             style="@style/TextAppearance.Compat.Notification.Time"
             />

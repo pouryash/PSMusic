@@ -6,9 +6,11 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
+
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
+
 import android.widget.RemoteViews;
 
 import com.example.ps.musicps.Commen.Commen;
@@ -113,7 +115,9 @@ public class SongService extends Service implements Commen.onMediaPlayerStateCha
                     view.setImageViewResource(R.id.iv_playPayse_notification, R.drawable.ic_pause_24px);
                     bigView.setImageViewResource(R.id.iv_playPayse_notification, R.drawable.ic_pause_24px);
                 }
+                if (onNotificationServiceStateChangedList != null) {
                     onNotificationServiceStateChangedList.onPlayButtonClickedList();
+                }
 
                 if (onNotificationServiceStateChangedPlay != null) {
                     onNotificationServiceStateChangedPlay.onPlayButtonClickedPlaySong();
@@ -124,7 +128,9 @@ public class SongService extends Service implements Commen.onMediaPlayerStateCha
                 if (onNotificationServiceStateChangedPlay != null) {
                     onNotificationServiceStateChangedPlay.onNextButtonClickedPlaySong();
                 }
+                if (onNotificationServiceStateChangedList != null) {
                     onNotificationServiceStateChangedList.onNextButtonClickedList();
+                }
                 view.setTextViewText(R.id.tv_SongName_notification, Commen.song.getSongName());
                 bigView.setTextViewText(R.id.tv_SongName_notification, Commen.song.getSongName());
                 bigView.setTextViewText(R.id.tv_ArtistName_notification, Commen.song.getArtistName());
@@ -136,7 +142,9 @@ public class SongService extends Service implements Commen.onMediaPlayerStateCha
                 if (onNotificationServiceStateChangedPlay != null) {
                     onNotificationServiceStateChangedPlay.onPrevioudButtonClickedPlaySong();
                 }
-                onNotificationServiceStateChangedList.onPrevioudButtonClickedList();
+                if (onNotificationServiceStateChangedList != null) {
+                    onNotificationServiceStateChangedList.onPrevioudButtonClickedList();
+                }
                 view.setTextViewText(R.id.tv_SongName_notification, Commen.song.getSongName());
                 bigView.setTextViewText(R.id.tv_SongName_notification, Commen.song.getSongName());
                 bigView.setTextViewText(R.id.tv_ArtistName_notification, Commen.song.getArtistName());
@@ -147,7 +155,7 @@ public class SongService extends Service implements Commen.onMediaPlayerStateCha
             default:
                 Intent showMusicPlayerActivityIntent = new Intent(this, PlaySongActivity.class);
                 showMusicPlayerActivityIntent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                showMusicPlayerActivityIntent.putExtra("notification",true);
+                showMusicPlayerActivityIntent.putExtra("notification", true);
 
                 Intent playIntent = new Intent(this, SongService.class);
                 playIntent.setAction(ACTION_PLAY);
@@ -209,7 +217,7 @@ public class SongService extends Service implements Commen.onMediaPlayerStateCha
     @Override
     public void onDestroy() {
         Commen.mediaPlayer.release();
-        if (PlaySongActivity.timer != null){
+        if (PlaySongActivity.timer != null) {
             PlaySongActivity.timer.purge();
             PlaySongActivity.timer.cancel();
         }

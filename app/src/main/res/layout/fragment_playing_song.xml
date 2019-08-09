@@ -10,6 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorToolbar"
+        android:theme="@style/ThemeOverlay.MaterialComponents.Dark"
         android:foreground="?attr/selectableItemBackground"
         android:elevation="5dp"
         android:clipToPadding="false"

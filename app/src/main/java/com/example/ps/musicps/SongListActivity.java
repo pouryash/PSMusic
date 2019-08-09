@@ -61,22 +61,21 @@ public class SongListActivity extends RuntimePermissionsActivity implements Song
         setContentView(R.layout.activity_song_list);
 
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
-                == PackageManager.PERMISSION_GRANTED) {
-            mPresenter.setView(this);
-            initView();
-            setupView();
-        } else {
-            SongListActivity.super.requestAppPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}
-                    , READ_EXTERNAL_STORAGE);
-        }
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+                    == PackageManager.PERMISSION_GRANTED) {
+                mPresenter.setView(this);
+                initView();
+                setupView();
+            } else {
+                SongListActivity.super.requestAppPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}
+                        , READ_EXTERNAL_STORAGE);
+            }
 
 
-        playingSongFragment = new PlayingSongFragment();
-        fragmentManager = getSupportFragmentManager();
-        fragmentTransaction = fragmentManager.beginTransaction();
-
-        fragmentTransaction.commit();
+            playingSongFragment = new PlayingSongFragment();
+            fragmentManager = getSupportFragmentManager();
+            fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.commit();
     }
 
     @Override
@@ -94,6 +93,14 @@ public class SongListActivity extends RuntimePermissionsActivity implements Song
 
     @Override
     protected void onResume() {
+        if (PlaySongActivity.isExternalSource){
+
+                Intent intent = new Intent(this , PlaySongActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                startActivity(intent);
+                this.finish();
+
+        }
         super.onResume();
     }
 
@@ -113,8 +120,16 @@ public class SongListActivity extends RuntimePermissionsActivity implements Song
         mPresenter.getSongsList();
         setSupportActionBar(toolbar);
 
+    }
 
-
+    @Override
+    public void onBackPressed() {
+        //TODO if you want to still play on backpressed
+        Intent intent = new Intent(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_HOME);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+//        super.onBackPressed();
     }
 
     private void initView() {
@@ -194,8 +209,11 @@ public class SongListActivity extends RuntimePermissionsActivity implements Song
 
     @Override
     protected void onDestroy() {
-        stopService(new Intent(SongListActivity.this,SongService.class));
-        Commen.mediaPlayer.release();
+        if(!PlaySongActivity.isExternalSource){
+            stopService(new Intent(SongListActivity.this,SongService.class));
+            Commen.mediaPlayer.release();
+        }
+        songList = null;
         super.onDestroy();
     }
 

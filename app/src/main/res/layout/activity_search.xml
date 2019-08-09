@@ -58,7 +58,7 @@
         android:id="@+id/rl_Search"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/rl_playingSong_songList"
+        android:layout_above="@+id/fr_PlayingSong"
         android:layout_below="@+id/toolbar_Search"/>
 
 
