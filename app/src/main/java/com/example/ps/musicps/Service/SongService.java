@@ -5,24 +5,21 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
-import android.media.AudioManager;
+import android.media.AudioFocusRequest;
 import android.os.IBinder;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
-import androidx.core.content.ContextCompat;
 
 import android.widget.RemoteViews;
-import android.widget.Toast;
 
+import com.example.ps.musicps.Commen.AudioFocusControler;
 import com.example.ps.musicps.Commen.Commen;
 import com.example.ps.musicps.PlaySongActivity;
 import com.example.ps.musicps.PlayingSongFragment;
 import com.example.ps.musicps.R;
-import com.example.ps.musicps.SongListActivity;
 
-public class SongService extends Service implements Commen.onMediaPlayerStateChanged,
-        AudioManager.OnAudioFocusChangeListener {
+public class SongService extends Service implements Commen.onMediaPlayerStateChanged{
 
 
     private static final String ACTION_PLAY = "com.example.ps.musicps.PLAY_MUSIC";
@@ -37,7 +34,7 @@ public class SongService extends Service implements Commen.onMediaPlayerStateCha
     RemoteViews bigView;
     NotificationCompat.Builder notification;
     NotificationManager notificationManager;
-    AudioManager am;
+    AudioFocusRequest  focusRequest;
 
 
     @Nullable
@@ -49,8 +46,23 @@ public class SongService extends Service implements Commen.onMediaPlayerStateCha
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        am = (AudioManager) getSystemService(AUDIO_SERVICE);
-        am.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+        AudioFocusControler.getInstance().onAudioFocusChangeService = new AudioFocusControler.onAudioFocusChangeService() {
+            @Override
+            public void onServiceFocusChange() {
+                    view.setImageViewResource(R.id.iv_playPayse_notification, R.drawable.ic_play_24px);
+                    bigView.setImageViewResource(R.id.iv_playPayse_notification, R.drawable.ic_play_24px);
+                    notificationManager.notify(NOTIFICATION_ID, notification.build());
+                    if (onNotificationServiceStateChangedList != null) {
+                        onNotificationServiceStateChangedList.onPlayButtonClickedList();
+                    }
+
+                    if (onNotificationServiceStateChangedPlay != null) {
+                        onNotificationServiceStateChangedPlay.onPlayButtonClickedPlaySong();
+                    }
+                }
+        };
+        AudioFocusControler.getInstance().initAudio();
+
 
         PlaySongActivity.onPlaySongActivityStateChanged = new PlaySongActivity.onPlaySongActivityStateChanged() {
             @Override
@@ -58,9 +70,15 @@ public class SongService extends Service implements Commen.onMediaPlayerStateCha
                 if (Commen.mediaPlayer.isPlaying()) {
                     view.setImageViewResource(R.id.iv_playPayse_notification, R.drawable.ic_pause_24px);
                     bigView.setImageViewResource(R.id.iv_playPayse_notification, R.drawable.ic_pause_24px);
+//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//                        MyApplication.getAudioManager().requestAudioFocus(focusRequest);
+//                    }
                 } else {
                     view.setImageViewResource(R.id.iv_playPayse_notification, R.drawable.ic_play_24px);
                     bigView.setImageViewResource(R.id.iv_playPayse_notification, R.drawable.ic_play_24px);
+//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//                        MyApplication.getAudioManager().abandonAudioFocusRequest(focusRequest);
+//                    }
                 }
                 notificationManager.notify(NOTIFICATION_ID, notification.build());
             }
@@ -228,6 +246,8 @@ public class SongService extends Service implements Commen.onMediaPlayerStateCha
     @Override
     public void onDestroy() {
         Commen.mediaPlayer.release();
+        onNotificationServiceStateChangedList = null;
+        onNotificationServiceStateChangedPlay = null;
         if (PlaySongActivity.timer != null) {
             PlaySongActivity.timer.purge();
             PlaySongActivity.timer.cancel();
@@ -249,22 +269,25 @@ public class SongService extends Service implements Commen.onMediaPlayerStateCha
         stopSelf();
     }
 
-    @Override
-    public void onAudioFocusChange(int i) {
-        if (Commen.mediaPlayer.isPlaying()) {
-            Commen.mediaPlayer.pause();
-            view.setImageViewResource(R.id.iv_playPayse_notification, R.drawable.ic_play_24px);
-            bigView.setImageViewResource(R.id.iv_playPayse_notification, R.drawable.ic_play_24px);
-            notificationManager.notify(NOTIFICATION_ID, notification.build());
-        }
-        if (onNotificationServiceStateChangedList != null) {
-            onNotificationServiceStateChangedList.onPlayButtonClickedList();
-        }
-
-        if (onNotificationServiceStateChangedPlay != null) {
-            onNotificationServiceStateChangedPlay.onPlayButtonClickedPlaySong();
-        }
-    }
+//    @Override
+//    public void onAudioFocusChangeService(int i) {
+//
+//                if (Commen.mediaPlayer.isPlaying()) {
+//                    Commen.mediaPlayer.pause();
+//                    view.setImageViewResource(R.id.iv_playPayse_notification, R.drawable.ic_play_24px);
+//                    bigView.setImageViewResource(R.id.iv_playPayse_notification, R.drawable.ic_play_24px);
+//                    notificationManager.notify(NOTIFICATION_ID, notification.build());
+//                    if (onNotificationServiceStateChangedList != null) {
+//                        onNotificationServiceStateChangedList.onPlayButtonClickedList();
+//                    }
+//
+//                    if (onNotificationServiceStateChangedPlay != null) {
+//                        onNotificationServiceStateChangedPlay.onPlayButtonClickedPlaySong();
+//                    }
+//                }
+//
+//
+//    }
 
 
     public interface onNotificationServiceStateChangedPlay {

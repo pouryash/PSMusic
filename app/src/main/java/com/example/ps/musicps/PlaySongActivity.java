@@ -34,7 +34,9 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.example.ps.musicps.Commen.AudioFocusControler;
 import com.example.ps.musicps.Commen.Commen;
+import com.example.ps.musicps.Commen.MyApplication;
 import com.example.ps.musicps.Commen.VolumeContentObserver;
 import com.example.ps.musicps.MVP.PlaySongMVP;
 import com.example.ps.musicps.MVP.PlaySongPresenter;
@@ -50,7 +52,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.RequiredPlaySongViewOps,
-        Commen.onMediaPlayerStateChanged, SongService.onNotificationServiceStateChangedPlay {
+        Commen.onMediaPlayerStateChanged, SongService.onNotificationServiceStateChangedPlay{
 
     public static Timer timer;
     private final Handler handler = new Handler();
@@ -121,9 +123,9 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
             MediaMetadataRetriever metaRetriver;
             metaRetriver = new MediaMetadataRetriever();
             String path;
-            if (getRealPathFromURI(this, singleSongPathUri) == null){
+            if (getRealPathFromURI(this, singleSongPathUri) == null) {
                 path = getIntent().getData().getPath();
-            }else {
+            } else {
                 path = getRealPathFromURI(this, singleSongPathUri);
             }
             metaRetriver.setDataSource(path);
@@ -176,7 +178,7 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
             int column_index = cursor.getColumnIndex(proj[0]);
             String path = cursor.getString(column_index);
             return path;
-        }catch (Exception e){
+        } catch (Exception e) {
             return null;
         } finally {
             if (cursor != null) {
@@ -185,7 +187,16 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
         }
     }
 
+
     private void setupViews() {
+
+        AudioFocusControler.getInstance().onAudioFocusChangePlay = new AudioFocusControler.onAudioFocusChangePlay() {
+            @Override
+            public void onPlaySongFocusChange() {
+                playPauseButton.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_play, null));
+            }
+        };
+        AudioFocusControler.getInstance().initAudio();
         mVolumeContentObserver = new VolumeContentObserver(new Handler());
         this.getApplicationContext().getContentResolver().registerContentObserver(
                 android.provider.Settings.System.CONTENT_URI, true,
@@ -295,6 +306,7 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
                     playPauseButton.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_play, null));
                 } else {
                     Commen.mediaPlayer.start();
+                    AudioFocusControler.getInstance().initAudio();
                     seekBarProgressUpdater();
                     playPauseButton.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_pause, null));
                 }
@@ -483,36 +495,36 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
 
     @Override
     protected void onResume() {
-      if (Commen.song == null && !PlaySongActivity.isExternalSource && SongListActivity.songList == null){
-          this.finish();
-      }else {
-          if (isExternalSource){
-                  backButton.setEnabled(false);
-                  backButton.setImageAlpha(75);
-                  repeatButton.setEnabled(false);
-                  repeatButton.setImageAlpha(75);
-          }
-          int pos = getIntent().getIntExtra("position", 0);
+        if (Commen.song == null && !PlaySongActivity.isExternalSource) {
+            this.finish();
+        } else {
+            if (isExternalSource) {
+                backButton.setEnabled(false);
+                backButton.setImageAlpha(75);
+                repeatButton.setEnabled(false);
+                repeatButton.setImageAlpha(75);
+            }
+            int pos = getIntent().getIntExtra("position", 0);
 
-          if (!isExternalSource && Commen.song != null) {
-              if (Commen.mediaPlayer != null && (Commen.song.getId() == pos)) {
-                  if (Commen.mediaPlayer.isPlaying()) {
+            if (!isExternalSource && Commen.song != null) {
+                if (Commen.mediaPlayer != null && (Commen.song.getId() == pos)) {
+                    if (Commen.mediaPlayer.isPlaying()) {
 
-                      playPauseButton.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_pause, null));
-                  } else {
-                      playPauseButton.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_play, null));
-                  }
-              }
-          }
-          if (!Commen.isServiceRunning(SongService.class, this)) {
-              if (Commen.song== null){
-                  Commen.getInstance().setupMediaPLayer(PlaySongActivity.this, song, this);
-              }
-              startService(new Intent(PlaySongActivity.this, SongService.class));
-          }
+                        playPauseButton.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_pause, null));
+                    } else {
+                        playPauseButton.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_play, null));
+                    }
+                }
+            }
+            if (!Commen.isServiceRunning(SongService.class, this)) {
+                if (Commen.song == null) {
+                    Commen.getInstance().setupMediaPLayer(PlaySongActivity.this, song, this);
+                }
+                startService(new Intent(PlaySongActivity.this, SongService.class));
+            }
 
-          SongService.onNotificationServiceStateChangedPlay = this;
-      }
+            SongService.onNotificationServiceStateChangedPlay = this;
+        }
         super.onResume();
     }
 
@@ -589,7 +601,7 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
         Intent intent;
         if (isExternalSource) {
 
-            moveTaskToBack (true);
+            moveTaskToBack(true);
 
         } else {
             intent = new Intent(PlaySongActivity.this, SongListActivity.class);
@@ -669,6 +681,7 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
             setupMediaPLayer();
         }
     }
+
 
 
     public interface onPlaySongActivityCompletion {
