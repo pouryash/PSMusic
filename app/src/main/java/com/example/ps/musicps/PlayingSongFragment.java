@@ -4,13 +4,20 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
+import androidx.palette.graphics.Palette;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,13 +28,19 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.Request;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.target.SizeReadyCallback;
+import com.bumptech.glide.request.target.Target;
+import com.bumptech.glide.request.transition.Transition;
 import com.example.ps.musicps.Commen.Commen;
 import com.example.ps.musicps.Commen.SongSharedPrefrenceManager;
 import com.example.ps.musicps.Model.Song;
 import com.example.ps.musicps.Service.SongService;
 
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 
 
 public class PlayingSongFragment extends Fragment implements Commen.onMediaPlayerStateChanged,
@@ -119,12 +132,26 @@ public class PlayingSongFragment extends Fragment implements Commen.onMediaPlaye
         playingSongName = view.findViewById(R.id.tv_songName_playingSong_fragment);
         playingSongArtist = view.findViewById(R.id.tv_artistName_fragment);
     }
-
+    public Palette createPaletteAsync(Bitmap bitmap) {
+        final Palette[] u = new Palette[0];
+        Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
+            public void onGenerated(Palette p) {
+                u[0] = p;
+            }
+        });
+        
+        return u[0];
+    }
     private void setupPlayingSong(Song song, MediaPlayer mediaPlayer) {
 
+//
+//        Palette p = Palette.from(resource).generate();
+//        Palette.Swatch vibrantSwatch = p.getDominantSwatch();
+//        playingSongRoot.setBackgroundColor(vibrantSwatch != null ? vibrantSwatch.getRgb() : 0);
         Glide.with(this).asBitmap().load(Uri.parse(song.getSongImageUri()))
                 .apply(new RequestOptions().placeholder(R.drawable.no_image))
-                .into(playingSongImage);
+                .into(playingSongImage)
+        ;
         if (mediaPlayer != null) {
             try {
                 if (mediaPlayer.isPlaying()) {

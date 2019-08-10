@@ -1,6 +1,7 @@
 package com.example.ps.musicps;
 
 import android.app.Activity;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -10,9 +11,10 @@ import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
+import android.os.Environment;
 import android.os.Handler;
 
-import androidx.annotation.Nullable;
+import androidx.core.content.FileProvider;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -39,11 +41,8 @@ import com.example.ps.musicps.MVP.PlaySongPresenter;
 import com.example.ps.musicps.Model.Song;
 import com.example.ps.musicps.Service.SongService;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileDescriptor;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Locale;
@@ -81,6 +80,8 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
     Drawable drawableRepeatAll;
     Drawable drawableShuffle;
     int positions;
+    Uri singleSongPathUri;
+    File filePath;
     Bitmap songBitmapAlbum;
     PlaySongMVP.ProvidedPlaySongPresenterOps mPresenter = new PlaySongPresenter();
 
@@ -98,7 +99,7 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
             mPresenter.getSong(positions);
         } else {
             try {
-                if ((Commen.mediaPlayer == null || Commen.mediaPlayer.isPlaying()) || !Commen.mediaPlayer.isPlaying()) {
+                if ((Commen.mediaPlayer == null) || !Commen.mediaPlayer.isPlaying()) {
                     setupMediaPLayer();
                 } else {
                     setupViews();
@@ -115,26 +116,28 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
         if (Intent.ACTION_VIEW.equals(getIntent().getAction())) {
             isExternalSource = true;
 
-            Uri uri = getIntent().getData();
+            singleSongPathUri = getIntent().getData();
 
             MediaMetadataRetriever metaRetriver;
             metaRetriver = new MediaMetadataRetriever();
             String path;
-            if (getRealPathFromURI(this, uri) == null){
+            if (getRealPathFromURI(this, singleSongPathUri) == null){
                 path = getIntent().getData().getPath();
             }else {
-                path = getRealPathFromURI(this, uri);
+                path = getRealPathFromURI(this, singleSongPathUri);
             }
             metaRetriver.setDataSource(path);
-            File file = new File(path);
+            filePath = new File(path);
 
 
             byte[] art;
             Uri albumUri = Uri.EMPTY;
             art = metaRetriver.getEmbeddedPicture();
             if (art != null) {
+
                 songBitmapAlbum = BitmapFactory
                         .decodeByteArray(art, 0, art.length);
+
                 String paths = MediaStore.Images.Media.insertImage
                         (this.getContentResolver(), songBitmapAlbum, "Title", null);
                 if (paths != null) {
@@ -145,7 +148,7 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
             }
 
             song = new Song();
-            song.setSongName(file.getName());
+            song.setSongName(filePath.getName());
             song.setArtistName(metaRetriver.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST));
             Integer duration = Integer.parseInt(metaRetriver.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION));
             song.setDuration(changeDurationFormat(duration));
@@ -161,6 +164,7 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
             repeatButton.setImageAlpha(75);
         }
     }
+
 
     public static String getRealPathFromURI(Context context, Uri contentUri) {
         Cursor cursor = null;
@@ -506,6 +510,7 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
               }
               startService(new Intent(PlaySongActivity.this, SongService.class));
           }
+
           SongService.onNotificationServiceStateChangedPlay = this;
       }
         super.onResume();
@@ -583,15 +588,14 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
     public void onBackPressed() {
         Intent intent;
         if (isExternalSource) {
-            intent = new Intent(Intent.ACTION_MAIN);
-            intent.addCategory(Intent.CATEGORY_HOME);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
+
+            moveTaskToBack (true);
+
         } else {
             intent = new Intent(PlaySongActivity.this, SongListActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+            startActivity(intent);
         }
-        startActivity(intent);
 
     }
 

@@ -5,6 +5,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.media.AudioManager;
 import android.os.IBinder;
 
 import androidx.annotation.Nullable;
@@ -12,6 +13,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 
 import android.widget.RemoteViews;
+import android.widget.Toast;
 
 import com.example.ps.musicps.Commen.Commen;
 import com.example.ps.musicps.PlaySongActivity;
@@ -19,7 +21,8 @@ import com.example.ps.musicps.PlayingSongFragment;
 import com.example.ps.musicps.R;
 import com.example.ps.musicps.SongListActivity;
 
-public class SongService extends Service implements Commen.onMediaPlayerStateChanged {
+public class SongService extends Service implements Commen.onMediaPlayerStateChanged,
+        AudioManager.OnAudioFocusChangeListener {
 
 
     private static final String ACTION_PLAY = "com.example.ps.musicps.PLAY_MUSIC";
@@ -34,6 +37,7 @@ public class SongService extends Service implements Commen.onMediaPlayerStateCha
     RemoteViews bigView;
     NotificationCompat.Builder notification;
     NotificationManager notificationManager;
+    AudioManager am;
 
 
     @Nullable
@@ -44,6 +48,9 @@ public class SongService extends Service implements Commen.onMediaPlayerStateCha
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+
+        am = (AudioManager) getSystemService(AUDIO_SERVICE);
+        am.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
 
         PlaySongActivity.onPlaySongActivityStateChanged = new PlaySongActivity.onPlaySongActivityStateChanged() {
             @Override
@@ -183,7 +190,7 @@ public class SongService extends Service implements Commen.onMediaPlayerStateCha
                 view.setOnClickPendingIntent(R.id.iv_playPayse_notification, playPendingIntent);
                 view.setOnClickPendingIntent(R.id.iv_next_notification, nextPendingIntent);
                 view.setOnClickPendingIntent(R.id.iv_previous_notification, previousPendingIntent);
-                if (Commen.song!= null){
+                if (Commen.song != null) {
                     view.setTextViewText(R.id.tv_SongName_notification, Commen.song.getSongName());
                     view.setTextViewText(R.id.tv_appName_notification, "PSMusic");
                     view.setImageViewResource(R.id.iv_playPayse_notification, R.drawable.ic_pause_24px);
@@ -192,12 +199,12 @@ public class SongService extends Service implements Commen.onMediaPlayerStateCha
                 bigView.setOnClickPendingIntent(R.id.iv_playPayse_notification, playPendingIntent);
                 bigView.setOnClickPendingIntent(R.id.iv_next_notification, nextPendingIntent);
                 bigView.setOnClickPendingIntent(R.id.iv_previous_notification, previousPendingIntent);
-          if (Commen.song!= null){
-              bigView.setTextViewText(R.id.tv_SongName_notification, Commen.song.getSongName());
-              bigView.setTextViewText(R.id.tv_appName_notification, "PSMusic");
-              bigView.setTextViewText(R.id.tv_ArtistName_notification, Commen.song.getArtistName());
-              bigView.setImageViewResource(R.id.iv_playPayse_notification, R.drawable.ic_pause_24px);
-          }
+                if (Commen.song != null) {
+                    bigView.setTextViewText(R.id.tv_SongName_notification, Commen.song.getSongName());
+                    bigView.setTextViewText(R.id.tv_appName_notification, "PSMusic");
+                    bigView.setTextViewText(R.id.tv_ArtistName_notification, Commen.song.getArtistName());
+                    bigView.setImageViewResource(R.id.iv_playPayse_notification, R.drawable.ic_pause_24px);
+                }
 
 
                 notification = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL);
@@ -240,6 +247,23 @@ public class SongService extends Service implements Commen.onMediaPlayerStateCha
         notificationManager.notify(NOTIFICATION_ID, notification.build());
         stopForeground(true);
         stopSelf();
+    }
+
+    @Override
+    public void onAudioFocusChange(int i) {
+        if (Commen.mediaPlayer.isPlaying()) {
+            Commen.mediaPlayer.pause();
+            view.setImageViewResource(R.id.iv_playPayse_notification, R.drawable.ic_play_24px);
+            bigView.setImageViewResource(R.id.iv_playPayse_notification, R.drawable.ic_play_24px);
+            notificationManager.notify(NOTIFICATION_ID, notification.build());
+        }
+        if (onNotificationServiceStateChangedList != null) {
+            onNotificationServiceStateChangedList.onPlayButtonClickedList();
+        }
+
+        if (onNotificationServiceStateChangedPlay != null) {
+            onNotificationServiceStateChangedPlay.onPlayButtonClickedPlaySong();
+        }
     }
 
 
