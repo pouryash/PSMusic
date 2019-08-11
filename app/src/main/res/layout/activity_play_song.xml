@@ -78,7 +78,8 @@
                 android:id="@+id/iv_songImage_playSong"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:scaleType="fitXY"
+                tools:src="@drawable/ic_no_album_128"
+                android:scaleType="center"
                 />
 
         </androidx.cardview.widget.CardView>

@@ -2,10 +2,12 @@ package com.example.ps.musicps.Adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.text.SpannableStringBuilder;
@@ -19,7 +21,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.Target;
 import com.example.ps.musicps.Model.Song;
 import com.example.ps.musicps.R;
 
@@ -118,7 +124,19 @@ public class SongSearchAdapter extends RecyclerView.Adapter<SongSearchAdapter.So
 
             //TODO set placeholder by requestoption
             Glide.with(context).asBitmap().load(Uri.parse(song.getSongImageUri()))
-                    .apply(new RequestOptions().placeholder(R.drawable.no_image))
+                    .apply(new RequestOptions().placeholder(R.drawable.ic_no_album).fitCenter())
+                    .listener(new RequestListener<Bitmap>() {
+                        @Override
+                        public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
+                            songImage.setBackgroundColor(Color.parseColor("#d1d9ff"));
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target, DataSource dataSource, boolean isFirstResource) {
+                            return false;
+                        }
+                    })
                     .into(songImage);
             String songNameString = song.getSongName();
             String artistNameString = song.getArtistName();

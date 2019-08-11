@@ -1,20 +1,24 @@
 package com.example.ps.musicps.Service;
 
+import android.Manifest;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.media.AudioFocusRequest;
 import android.os.IBinder;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
 
 import android.widget.RemoteViews;
 
 import com.example.ps.musicps.Commen.AudioFocusControler;
 import com.example.ps.musicps.Commen.Commen;
+import com.example.ps.musicps.Commen.SongSharedPrefrenceManager;
 import com.example.ps.musicps.PlaySongActivity;
 import com.example.ps.musicps.PlayingSongFragment;
 import com.example.ps.musicps.R;
@@ -34,7 +38,7 @@ public class SongService extends Service implements Commen.onMediaPlayerStateCha
     RemoteViews bigView;
     NotificationCompat.Builder notification;
     NotificationManager notificationManager;
-    AudioFocusRequest  focusRequest;
+    private SongSharedPrefrenceManager songSharedPrefrenceManager;
 
 
     @Nullable
@@ -45,6 +49,8 @@ public class SongService extends Service implements Commen.onMediaPlayerStateCha
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+
+        songSharedPrefrenceManager = new SongSharedPrefrenceManager(this);
 
         AudioFocusControler.getInstance().onAudioFocusChangeService = new AudioFocusControler.onAudioFocusChangeService() {
             @Override
@@ -132,11 +138,11 @@ public class SongService extends Service implements Commen.onMediaPlayerStateCha
         switch (intent.getAction()) {
             case ACTION_PLAY:
                 if (Commen.mediaPlayer.isPlaying()) {
-                    Commen.mediaPlayer.pause();
+                    Commen.getInstance().FadeOut(2);
                     view.setImageViewResource(R.id.iv_playPayse_notification, R.drawable.ic_play_24px);
                     bigView.setImageViewResource(R.id.iv_playPayse_notification, R.drawable.ic_play_24px);
                 } else {
-                    Commen.mediaPlayer.start();
+                    Commen.getInstance().FadeIn(2);
                     view.setImageViewResource(R.id.iv_playPayse_notification, R.drawable.ic_pause_24px);
                     bigView.setImageViewResource(R.id.iv_playPayse_notification, R.drawable.ic_pause_24px);
                 }
@@ -245,7 +251,14 @@ public class SongService extends Service implements Commen.onMediaPlayerStateCha
 
     @Override
     public void onDestroy() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED) {
+            if(!PlaySongActivity.isExternalSource){
+                songSharedPrefrenceManager.saveSong(Commen.song);
+            }
+        }
         Commen.mediaPlayer.release();
+        Commen.song = null;
         onNotificationServiceStateChangedList = null;
         onNotificationServiceStateChangedPlay = null;
         if (PlaySongActivity.timer != null) {

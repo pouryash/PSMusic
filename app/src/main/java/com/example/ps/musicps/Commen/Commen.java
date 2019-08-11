@@ -8,6 +8,7 @@ import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Handler;
 
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
@@ -23,6 +24,9 @@ public class Commen {
     private static Commen instance;
     public static MediaPlayer mediaPlayer;
     public static Song song;
+    float volumeOut = 1;
+    float volumeIn = 0;
+    float speed = 0.02f;
 
 
     private Commen(){
@@ -89,6 +93,40 @@ public class Commen {
             }
         }
         return false;
+    }
+
+    public void FadeOut(final float deltaTime)
+    {
+        mediaPlayer.setVolume(volumeOut, volumeOut);
+        volumeOut -= speed* deltaTime;
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (volumeOut != 1 && !(volumeOut < 0)){
+                    FadeOut(deltaTime);
+                }else if (volumeOut == 0 || volumeOut < 0) {
+                    mediaPlayer.pause();
+                    volumeOut = 1;
+                }
+            }
+        },20);
+    }
+
+    public void FadeIn(final float deltaTime)
+    {
+        mediaPlayer.start();
+        mediaPlayer.setVolume(volumeIn, volumeIn);
+        volumeIn += speed* deltaTime;
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (volumeIn != 1 && !(volumeIn > 1)){
+                    FadeIn(deltaTime);
+                }else if (volumeIn == 1 || volumeIn > 1) {
+                    volumeIn = 0;
+                }
+            }
+        },20);
     }
 
     public interface onMediaPlayerStateChanged{

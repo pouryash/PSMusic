@@ -26,14 +26,12 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.Request;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
-import com.bumptech.glide.request.target.SimpleTarget;
-import com.bumptech.glide.request.target.SizeReadyCallback;
 import com.bumptech.glide.request.target.Target;
-import com.bumptech.glide.request.transition.Transition;
 import com.example.ps.musicps.Commen.Commen;
 import com.example.ps.musicps.Commen.SongSharedPrefrenceManager;
 import com.example.ps.musicps.Model.Song;
@@ -111,10 +109,10 @@ public class PlayingSongFragment extends Fragment implements Commen.onMediaPlaye
                 SongService.onNotificationServiceStateChangedList = PlayingSongFragment.this;
 
                 if (Commen.mediaPlayer.isPlaying()) {
-                    Commen.mediaPlayer.pause();
+                    Commen.getInstance().FadeOut(2);
                     playPauseButtonPlayingSong.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_play_24px, null));
                 } else {
-                    Commen.mediaPlayer.start();
+                    Commen.getInstance().FadeIn(2);
                     playPauseButtonPlayingSong.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_pause_24px, null));
                 }
                 if (onSongListActivityStateChanged != null) {
@@ -149,7 +147,19 @@ public class PlayingSongFragment extends Fragment implements Commen.onMediaPlaye
 //        Palette.Swatch vibrantSwatch = p.getDominantSwatch();
 //        playingSongRoot.setBackgroundColor(vibrantSwatch != null ? vibrantSwatch.getRgb() : 0);
         Glide.with(this).asBitmap().load(Uri.parse(song.getSongImageUri()))
-                .apply(new RequestOptions().placeholder(R.drawable.no_image))
+                .apply(new RequestOptions().placeholder(R.drawable.ic_no_album).fitCenter())
+                .listener(new RequestListener<Bitmap>() {
+                    @Override
+                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
+                        playingSongImage.setBackgroundColor(Color.parseColor("#d1d9ff"));
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target, DataSource dataSource, boolean isFirstResource) {
+                        return false;
+                    }
+                })
                 .into(playingSongImage)
         ;
         if (mediaPlayer != null) {
@@ -171,12 +181,6 @@ public class PlayingSongFragment extends Fragment implements Commen.onMediaPlaye
 
     @Override
     public void onStop() {
-        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE)
-                == PackageManager.PERMISSION_GRANTED) {
-            if(!PlaySongActivity.isExternalSource){
-                songSharedPrefrenceManager.saveSong(Commen.song);
-            }
-        }
         super.onStop();
     }
 
@@ -229,7 +233,7 @@ public class PlayingSongFragment extends Fragment implements Commen.onMediaPlaye
     @Override
     public void onMediaPlayerPrepared() {
         if (shouldMediaPlayerStart) {
-            Commen.mediaPlayer.start();
+            Commen.getInstance().FadeIn(2);
         }
         setupPlayingSong(Commen.song, Commen.mediaPlayer);
     }

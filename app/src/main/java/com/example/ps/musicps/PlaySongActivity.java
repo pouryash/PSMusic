@@ -1,20 +1,19 @@
 package com.example.ps.musicps;
 
 import android.app.Activity;
-import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
-import android.os.Environment;
 import android.os.Handler;
 
-import androidx.core.content.FileProvider;
+import androidx.annotation.Nullable;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -33,17 +32,19 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.Target;
 import com.example.ps.musicps.Commen.AudioFocusControler;
 import com.example.ps.musicps.Commen.Commen;
-import com.example.ps.musicps.Commen.MyApplication;
 import com.example.ps.musicps.Commen.VolumeContentObserver;
 import com.example.ps.musicps.MVP.PlaySongMVP;
 import com.example.ps.musicps.MVP.PlaySongPresenter;
 import com.example.ps.musicps.Model.Song;
 import com.example.ps.musicps.Service.SongService;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -63,7 +64,7 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
     public static int curentShuffleSong;
     public static AudioManager audioManager;
     public static SeekBar volumeSeekBar;
-    static boolean isExternalSource;
+    public static boolean isExternalSource;
     VolumeContentObserver mVolumeContentObserver;
     ImageView songImage;
     ImageView playPauseButton;
@@ -209,11 +210,35 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
 
         if (Uri.parse(song.getSongImageUri()) == Uri.EMPTY) {
             Glide.with(this).asBitmap().load(songBitmapAlbum)
-                    .apply(new RequestOptions().placeholder(R.mipmap.ic_launcher))
+                    .apply(new RequestOptions().placeholder(R.drawable.ic_no_album_128))
+                    .listener(new RequestListener<Bitmap>() {
+                        @Override
+                        public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
+                            songImage.setBackgroundColor(Color.parseColor("#d1d9ff"));
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target, DataSource dataSource, boolean isFirstResource) {
+                            return false;
+                        }
+                    })
                     .into(songImage);
         } else {
             Glide.with(this).asBitmap().load(Uri.parse(song.getSongImageUri()))
-                    .apply(new RequestOptions().placeholder(R.mipmap.ic_launcher))
+                    .apply(new RequestOptions().placeholder(R.drawable.ic_no_album_128))
+                    .listener(new RequestListener<Bitmap>() {
+                        @Override
+                        public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
+                            songImage.setBackgroundColor(Color.parseColor("#d1d9ff"));
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target, DataSource dataSource, boolean isFirstResource) {
+                            return false;
+                        }
+                    })
                     .into(songImage);
         }
 
@@ -302,10 +327,16 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
             @Override
             public void onClick(View view) {
                 if (Commen.mediaPlayer.isPlaying()) {
-                    Commen.mediaPlayer.pause();
+
+                    Commen.getInstance().FadeOut(2);
+
+
+
+
                     playPauseButton.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_play, null));
                 } else {
-                    Commen.mediaPlayer.start();
+//                    Commen.mediaPlayer.setVolume(1,1);
+                    Commen.getInstance().FadeIn(2);
                     AudioFocusControler.getInstance().initAudio();
                     seekBarProgressUpdater();
                     playPauseButton.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_pause, null));
@@ -407,7 +438,7 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
             }
         });
 
-        Commen.mediaPlayer.start();
+        Commen.getInstance().FadeIn(2);
         seekBarProgressUpdater();
         if (!isExternalSource) {
             onPlaySongActivityStateChanged.onPlaySongPlaypauseClicked();
@@ -580,10 +611,9 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
     @Override
     protected void onDestroy() {
         stopService(new Intent(PlaySongActivity.this, SongService.class));
-        song = null;
         isExternalSource = false;
         Commen.mediaPlayer.release();
-        Commen.song = null;
+        song = null;
         timer.purge();
         timer.cancel();
         PlaySongActivity.this.getContentResolver().unregisterContentObserver(mVolumeContentObserver);

@@ -1,16 +1,26 @@
 package com.example.ps.musicps.Adapter;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.Uri;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.Target;
 import com.example.ps.musicps.Model.Song;
 import com.example.ps.musicps.R;
 
@@ -71,7 +81,19 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongVH> {
 
             //TODO set placeholder by requestoption
             Glide.with(context).asBitmap().load(Uri.parse(song.getSongImageUri()))
-                    .apply(new RequestOptions().placeholder(R.drawable.no_image))
+                    .apply(new RequestOptions().placeholder(R.drawable.ic_no_album).fitCenter())
+                    .listener(new RequestListener<Bitmap>() {
+                        @Override
+                        public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
+                            songImage.setBackgroundColor(Color.parseColor("#d1d9ff"));
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target, DataSource dataSource, boolean isFirstResource) {
+                            return false;
+                        }
+                    })
                     .into(songImage);
             songName.setText(song.getSongName());
             artistName.setText(song.getArtistName());
