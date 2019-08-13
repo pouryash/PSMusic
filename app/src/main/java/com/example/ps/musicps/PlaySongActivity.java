@@ -46,6 +46,8 @@ import com.example.ps.musicps.Model.Song;
 import com.example.ps.musicps.Service.SongService;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Locale;
@@ -53,7 +55,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.RequiredPlaySongViewOps,
-        Commen.onMediaPlayerStateChanged, SongService.onNotificationServiceStateChangedPlay{
+        Commen.onMediaPlayerStateChanged, SongService.onNotificationServiceStateChangedPlay {
 
     public static Timer timer;
     private final Handler handler = new Handler();
@@ -83,7 +85,7 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
     Drawable drawableRepeatAll;
     Drawable drawableShuffle;
     int positions;
-    Uri singleSongPathUri;
+    Uri singleSongPathUri = Uri.EMPTY;
     File filePath;
     Bitmap songBitmapAlbum;
     PlaySongMVP.ProvidedPlaySongPresenterOps mPresenter = new PlaySongPresenter();
@@ -123,6 +125,7 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
 
             MediaMetadataRetriever metaRetriver;
             metaRetriver = new MediaMetadataRetriever();
+
             String path;
             if (getRealPathFromURI(this, singleSongPathUri) == null) {
                 path = getIntent().getData().getPath();
@@ -139,15 +142,13 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
             if (art != null) {
 
                 songBitmapAlbum = BitmapFactory
-                        .decodeByteArray(art, 0, art.length);
+                        .decodeByteArray(metaRetriver.getEmbeddedPicture(), 0, metaRetriver.getEmbeddedPicture().length);
 
                 String paths = MediaStore.Images.Media.insertImage
                         (this.getContentResolver(), songBitmapAlbum, "Title", null);
                 if (paths != null) {
                     albumUri = Uri.parse(paths);
                 }
-
-
             }
 
             song = new Song();
@@ -331,8 +332,6 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
                     Commen.getInstance().FadeOut(2);
 
 
-
-
                     playPauseButton.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_play, null));
                 } else {
 //                    Commen.mediaPlayer.setVolume(1,1);
@@ -341,7 +340,11 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
                     seekBarProgressUpdater();
                     playPauseButton.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_pause, null));
                 }
-                onPlaySongActivityStateChanged.onPlaySongPlaypauseClicked();
+                if (onPlaySongActivityStateChanged != null){
+
+                    onPlaySongActivityStateChanged.onPlaySongPlaypauseClicked();
+
+                }
             }
         });
 
@@ -357,7 +360,11 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
                 } else {
                     setupMediaPLayer();
                 }
-                onPlaySongActivityStateChanged.onPlaySongNextClicked();
+                if (onPlaySongActivityStateChanged != null ){
+
+                    onPlaySongActivityStateChanged.onPlaySongNextClicked();
+
+                }
             }
         });
 
@@ -385,7 +392,11 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
                 } else {
                     setupMediaPLayer();
                 }
-                onPlaySongActivityStateChanged.onPlaySongPreviousClicked();
+                if (onPlaySongActivityStateChanged != null){
+
+                    onPlaySongActivityStateChanged.onPlaySongPreviousClicked();
+
+                }
             }
         });
 
@@ -440,7 +451,8 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
 
         Commen.getInstance().FadeIn(2);
         seekBarProgressUpdater();
-        if (!isExternalSource) {
+        if (!isExternalSource && onPlaySongActivityStateChanged != null) {
+
             onPlaySongActivityStateChanged.onPlaySongPlaypauseClicked();
         }
         playPauseButton.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_pause, null));
@@ -523,12 +535,32 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
 
     }
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        this.setIntent(intent);
+
+    }
 
     @Override
     protected void onResume() {
+
+        String newIntentUri = "";
+        if (getIntent().getData() != null) {
+            newIntentUri = getIntent().getData().toString();
+        }
+        if (!newIntentUri.equals("")) {
+            getExtrnalSong();
+            setupMediaPLayer();
+            if(onPlaySongActivityStateChanged != null){
+                onPlaySongActivityStateChanged.onPlaySongNextClicked();
+            }
+        }
+
         if (Commen.song == null && !PlaySongActivity.isExternalSource) {
             this.finish();
         } else {
+            // disable some feature on singleSong
             if (isExternalSource) {
                 backButton.setEnabled(false);
                 backButton.setImageAlpha(75);
@@ -553,6 +585,7 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
                 }
                 startService(new Intent(PlaySongActivity.this, SongService.class));
             }
+//when new singleExternal select change data
 
             SongService.onNotificationServiceStateChangedPlay = this;
         }
@@ -611,7 +644,6 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
     @Override
     protected void onDestroy() {
         stopService(new Intent(PlaySongActivity.this, SongService.class));
-        isExternalSource = false;
         Commen.mediaPlayer.release();
         song = null;
         timer.purge();
@@ -670,7 +702,11 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
             } else if (drawableCurent.getConstantState() == drawableShuffle.getConstantState()) {
                 Commen.mediaPlayer.setLooping(false);
             }
-            onPlaySongActivityStateChanged.onPlaySongNextClicked();
+            if (onPlaySongActivityStateChanged != null){
+
+                onPlaySongActivityStateChanged.onPlaySongNextClicked();
+
+            }
         }
 
     }
@@ -711,7 +747,6 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
             setupMediaPLayer();
         }
     }
-
 
 
     public interface onPlaySongActivityCompletion {

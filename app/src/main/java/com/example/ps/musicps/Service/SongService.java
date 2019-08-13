@@ -18,6 +18,7 @@ import android.widget.RemoteViews;
 
 import com.example.ps.musicps.Commen.AudioFocusControler;
 import com.example.ps.musicps.Commen.Commen;
+import com.example.ps.musicps.Commen.MyApplication;
 import com.example.ps.musicps.Commen.SongSharedPrefrenceManager;
 import com.example.ps.musicps.PlaySongActivity;
 import com.example.ps.musicps.PlayingSongFragment;
@@ -256,6 +257,7 @@ public class SongService extends Service implements Commen.onMediaPlayerStateCha
             if(!PlaySongActivity.isExternalSource){
                 songSharedPrefrenceManager.saveSong(Commen.song);
             }
+            PlaySongActivity.isExternalSource = false;
         }
         Commen.mediaPlayer.release();
         Commen.song = null;

@@ -108,7 +108,6 @@ public class SearchActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         Commen.mediaPlayer.release();
-        Commen.song = null;
         super.onDestroy();
     }
 }

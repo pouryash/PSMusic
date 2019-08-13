@@ -102,16 +102,15 @@
 
 
         <ImageView
-            android:id="@+id/iv_previous_notification"
+            android:id="@+id/iv_next_notification"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:clickable="true"
             android:focusable="true"
             android:layout_gravity="center"
             android:padding="@dimen/standardMargin"
-            android:background="?android:selectableItemBackground"
-            android:src="@drawable/ic_previous_track_notification"
-            />
+            android:src="@drawable/ic_next_track_notification" />
+
 
 
         <ImageView
@@ -130,14 +129,18 @@
 
 
         <ImageView
-            android:id="@+id/iv_next_notification"
+            android:id="@+id/iv_previous_notification"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:clickable="true"
             android:focusable="true"
             android:layout_gravity="center"
             android:padding="@dimen/standardMargin"
-            android:src="@drawable/ic_next_track_notification" />
+            android:background="?android:selectableItemBackground"
+            android:src="@drawable/ic_previous_track_notification"
+            />
+
+
 
     </LinearLayout>
 

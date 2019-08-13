@@ -1,8 +1,10 @@
 package com.example.ps.musicps.Commen;
 
+import android.content.Context;
 import android.media.AudioAttributes;
 import android.media.AudioFocusRequest;
 import android.media.AudioManager;
+import android.os.Build;
 
 public class AudioFocusControler implements AudioManager.OnAudioFocusChangeListener {
 
@@ -41,6 +43,14 @@ public class AudioFocusControler implements AudioManager.OnAudioFocusChangeListe
                     .build();
 
             MyApplication.getAudioManager().requestAudioFocus(focusRequest);
+        }
+
+
+        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.O){
+
+          MyApplication.getAudioManager().requestAudioFocus(this,
+                    AudioManager.STREAM_MUSIC,
+                    AudioManager.AUDIOFOCUS_GAIN);
         }
     }
 
