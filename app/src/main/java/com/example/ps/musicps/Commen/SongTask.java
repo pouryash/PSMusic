@@ -7,7 +7,6 @@ import android.database.Cursor;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 
@@ -29,6 +28,7 @@ public class SongTask extends AsyncTask<Void, Void, Void> {
     public SongTask(Context context, SongTask.onSongListFinished onSongListFinished) {
         this.context = context;
         this.onSongListFinished = onSongListFinished;
+
     }
 
     @Override
@@ -75,7 +75,7 @@ public class SongTask extends AsyncTask<Void, Void, Void> {
             cur.close();
         }
 
-//        getLocalSongList(Environment.getExternalStorageDirectory().getPath());
+//       getLocalSongList(Environment.getExternalStorageDirectory().getPath());
         return null;
     }
 
@@ -89,6 +89,7 @@ public class SongTask extends AsyncTask<Void, Void, Void> {
         super.onPostExecute(aVoid);
 
         onSongListFinished.onSongListFinished(songList);
+
     }
 
     public List<Song> getLocalSongList(String rootPath) {
@@ -109,25 +110,26 @@ public class SongTask extends AsyncTask<Void, Void, Void> {
                     MediaMetadataRetriever metaRetriver;
                     metaRetriver = new MediaMetadataRetriever();
                     metaRetriver.setDataSource(file.getAbsolutePath());
-//                    byte[] art;
-//                    art = metaRetriver.getEmbeddedPicture();
-//                    Bitmap songImage = BitmapFactory
-//                            .decodeByteArray(art, 0, art.length);
+                    byte[] art;
+                    art = metaRetriver.getEmbeddedPicture();
 
                     Song song = new Song();
-//                    song.setSongImageBitmap(songImage);
-//                    song.setArtist(metaRetriver.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST));
-                    song.setTrackFile(file.getAbsolutePath());
+
+
+                    song.setTrackFile(file.getPath());
                     song.setSongName(file.getName());
                     int m = Integer.parseInt(metaRetriver.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION));
-                    int minutes = (int) (m % (1000 * 60 * 60)) / (1000 * 60);
-                    int seconds = (int) ((m % (1000 * 60 * 60)) % (1000 * 60) / 1000);
-                    if (!(seconds > 9)) {
-                        song.setDuration(minutes + ":0" + seconds);
-                    } else {
-                        song.setDuration(minutes + ":" + seconds);
-                    }
+                    int seconds = (int) m / 1000;
+                    int minutes = (int) seconds / 60;
+                    seconds %= 60;
+                    String s = String.format(Locale.ENGLISH, "%02d", minutes) +
+                            ":" + String.format(Locale.ENGLISH, "%02d", seconds);
+                    song.setDuration(s);
+                    song.setArtistName(metaRetriver.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST));
                     song.setAlbumName(metaRetriver.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM));
+                    song.setId(list.size());
+
+
                     list.add(song);
                 }
             }

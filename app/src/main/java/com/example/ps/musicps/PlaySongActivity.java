@@ -23,8 +23,10 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.content.res.AppCompatResources;
 
 import android.provider.MediaStore;
+import android.util.Base64;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.SeekBar;
@@ -80,11 +82,13 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
     ImageView backButton;
     ImageView repeatButton;
     ImageView forwardButton;
+    ImageView imageVolume;
     Drawable drawableCurent;
     Drawable drawableRepeatOne;
     Drawable drawableRepeatAll;
     Drawable drawableShuffle;
     int positions;
+    byte[] art;
     Uri singleSongPathUri = Uri.EMPTY;
     File filePath;
     Bitmap songBitmapAlbum;
@@ -136,13 +140,14 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
             filePath = new File(path);
 
 
-            byte[] art;
+            art = metaRetriver.getEmbeddedPicture();
+
             Uri albumUri = Uri.EMPTY;
             art = metaRetriver.getEmbeddedPicture();
             if (art != null) {
 
                 songBitmapAlbum = BitmapFactory
-                        .decodeByteArray(metaRetriver.getEmbeddedPicture(), 0, metaRetriver.getEmbeddedPicture().length);
+                        .decodeByteArray(art, 0, metaRetriver.getEmbeddedPicture().length);
 
                 String paths = MediaStore.Images.Media.insertImage
                         (this.getContentResolver(), songBitmapAlbum, "Title", null);
@@ -209,8 +214,8 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
                 .getStreamVolume(AudioManager.STREAM_MUSIC));
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
 
-        if (Uri.parse(song.getSongImageUri()) == Uri.EMPTY) {
-            Glide.with(this).asBitmap().load(songBitmapAlbum)
+        if (Uri.parse(song.getSongImageUri()).toString() == "") {
+            Glide.with(this).asBitmap().load(art)
                     .apply(new RequestOptions().placeholder(R.drawable.ic_no_album_128))
                     .listener(new RequestListener<Bitmap>() {
                         @Override
@@ -340,7 +345,7 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
                     seekBarProgressUpdater();
                     playPauseButton.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_pause, null));
                 }
-                if (onPlaySongActivityStateChanged != null){
+                if (onPlaySongActivityStateChanged != null) {
 
                     onPlaySongActivityStateChanged.onPlaySongPlaypauseClicked();
 
@@ -360,7 +365,7 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
                 } else {
                     setupMediaPLayer();
                 }
-                if (onPlaySongActivityStateChanged != null ){
+                if (onPlaySongActivityStateChanged != null) {
 
                     onPlaySongActivityStateChanged.onPlaySongNextClicked();
 
@@ -392,7 +397,7 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
                 } else {
                     setupMediaPLayer();
                 }
-                if (onPlaySongActivityStateChanged != null){
+                if (onPlaySongActivityStateChanged != null) {
 
                     onPlaySongActivityStateChanged.onPlaySongPreviousClicked();
 
@@ -506,6 +511,8 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
 
     private void initViews() {
 
+        volumeSeekBar = findViewById(R.id.sb_Sound_PlaySong);
+        imageVolume = findViewById(R.id.iv_SoundSeekbar_PlaySong);
         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         volumeSeekBar = findViewById(R.id.sb_Sound_PlaySong);
         drawableRepeatOne = AppCompatResources.getDrawable(PlaySongActivity.this,
@@ -536,6 +543,22 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
     }
 
     @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_UP) {
+
+            if (volumeSeekBar.getVisibility() == View.VISIBLE) {
+                volumeSeekBar.setVisibility(View.GONE);
+                imageVolume.setVisibility(View.GONE);
+            } else {
+                volumeSeekBar.setVisibility(View.VISIBLE);
+                imageVolume.setVisibility(View.VISIBLE);
+            }
+
+        }
+        return true;
+    }
+
+    @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         this.setIntent(intent);
@@ -552,7 +575,7 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
         if (!newIntentUri.equals("")) {
             getExtrnalSong();
             setupMediaPLayer();
-            if(onPlaySongActivityStateChanged != null){
+            if (onPlaySongActivityStateChanged != null) {
                 onPlaySongActivityStateChanged.onPlaySongNextClicked();
             }
         }
@@ -702,7 +725,7 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
             } else if (drawableCurent.getConstantState() == drawableShuffle.getConstantState()) {
                 Commen.mediaPlayer.setLooping(false);
             }
-            if (onPlaySongActivityStateChanged != null){
+            if (onPlaySongActivityStateChanged != null) {
 
                 onPlaySongActivityStateChanged.onPlaySongNextClicked();
 

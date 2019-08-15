@@ -31,6 +31,15 @@
        android:layout_height="wrap_content"
        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
+
+       <ImageView
+           android:id="@+id/iv_No_Items"
+           android:layout_width="125dp"
+           android:layout_height="125dp"
+           android:visibility="gone"
+           app:srcCompat="@drawable/ic_search_in_folder"
+           android:layout_centerInParent="true"/>
+
        <androidx.recyclerview.widget.RecyclerView
            android:id="@+id/rv_songList"
            android:layout_width="match_parent"

@@ -15,5 +15,15 @@
     <dimen name="standardTextSize_18">18sp</dimen>
     <dimen name="standardTextSize_19">19sp</dimen>
     <dimen name="standardTextSize_20">20sp</dimen>
+    <dimen name="standardTextSize_21">20sp</dimen>
+    <dimen name="standardTextSize_22">20sp</dimen>
+    <dimen name="standardTextSize_23">20sp</dimen>
+    <dimen name="standardTextSize_2">20sp</dimen>
+    <dimen name="standardTextSize_25">20sp</dimen>
+    <dimen name="standardTextSize_26">20sp</dimen>
+    <dimen name="standardTextSize_27">20sp</dimen>
+    <dimen name="standardTextSize_28">20sp</dimen>
+    <dimen name="standardTextSize_29">20sp</dimen>
+    <dimen name="standardTextSize_30">20sp</dimen>
 
 </resources>

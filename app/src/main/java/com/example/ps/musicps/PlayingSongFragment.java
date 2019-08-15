@@ -37,6 +37,7 @@ import com.example.ps.musicps.Commen.SongSharedPrefrenceManager;
 import com.example.ps.musicps.Model.Song;
 import com.example.ps.musicps.Service.SongService;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
@@ -160,8 +161,7 @@ public class PlayingSongFragment extends Fragment implements Commen.onMediaPlaye
                         return false;
                     }
                 })
-                .into(playingSongImage)
-        ;
+                .into(playingSongImage);
         if (mediaPlayer != null) {
             try {
                 if (mediaPlayer.isPlaying()) {
@@ -199,8 +199,12 @@ public class PlayingSongFragment extends Fragment implements Commen.onMediaPlaye
                 }
 
             } else if (playingSongName.getText().equals("") || Commen.song == null) {
-                Commen.song = songSharedPrefrenceManager.getSong();
-                Commen.getInstance().setupMediaPLayer(getContext(), Commen.song, this);
+                File file = new File(songSharedPrefrenceManager.getSong().getTrackFile());
+                if (file.exists()){
+
+                    Commen.song = songSharedPrefrenceManager.getSong();
+                    Commen.getInstance().setupMediaPLayer(getContext(), Commen.song, this);
+                }
 
                 SongListActivity.isPlaySongActivityEnabled = false;
             }
@@ -307,6 +311,11 @@ public class PlayingSongFragment extends Fragment implements Commen.onMediaPlaye
 
     @Override
     public void onListReciveed(ArrayList<Song> songs) {
+        File file = new File(songSharedPrefrenceManager.getSong().getTrackFile());
+        if (!file.exists()){
+            Commen.song = songs.get(0);
+            Commen.getInstance().setupMediaPLayer(getContext(), Commen.song, this);
+        }
         if (!songSharedPrefrenceManager.getFirstIn()) {
             songSharedPrefrenceManager.setFirstIn();
             Commen.song = songs.get(0);
