@@ -23,7 +23,6 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.content.res.AppCompatResources;
 
 import android.provider.MediaStore;
-import android.util.Base64;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -48,8 +47,6 @@ import com.example.ps.musicps.Model.Song;
 import com.example.ps.musicps.Service.SongService;
 
 import java.io.File;
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Locale;
@@ -92,6 +89,9 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
     Uri singleSongPathUri = Uri.EMPTY;
     File filePath;
     Bitmap songBitmapAlbum;
+    boolean isInLongTouch;
+    boolean canClicked = true;
+    int forwardPosition;
     PlaySongMVP.ProvidedPlaySongPresenterOps mPresenter = new PlaySongPresenter();
 
 
@@ -194,6 +194,83 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
         }
     }
 
+    public void longTouchForward() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (isInLongTouch) {
+                    if (forwardPosition + Commen.mediaPlayer.getCurrentPosition() >= Commen.mediaPlayer.getDuration()) {
+                        if (!isExternalSource) {
+                            if (Commen.song.getId() == SongListActivity.songList.size() - 1) {
+                                mPresenter.getSong(0);
+                            } else {
+                                mPresenter.getSong(Commen.song.getId() + 1);
+                            }
+                        } else {
+                            setupMediaPLayer();
+                        }
+                        if (onPlaySongActivityStateChanged != null) {
+
+                            onPlaySongActivityStateChanged.onPlaySongNextClicked();
+
+                        }
+                    } else {
+                        Commen.mediaPlayer.seekTo(Commen.mediaPlayer.getCurrentPosition() + forwardPosition);
+                        seekBar.setProgress(Commen.mediaPlayer.getCurrentPosition());
+                        timePassed.setText(changeDurationFormat(Commen.mediaPlayer.getCurrentPosition()));
+                    }
+
+                    if (forwardPosition >= 20000) {
+                        forwardPosition = 20000;
+                    } else {
+                        forwardPosition = forwardPosition + 2000;
+                    }
+                    if (isInLongTouch) {
+                        longTouchForward();
+                    }
+                }
+            }
+        }, 500);
+    }
+
+    public void longTouchBackward() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (isInLongTouch) {
+                    if (Commen.mediaPlayer.getCurrentPosition() -forwardPosition <= 0) {
+                        if (!isExternalSource) {
+                            if (Commen.song.getId() == 0) {
+                                mPresenter.getSong(SongListActivity.songList.size() - 1);
+                            } else {
+                                mPresenter.getSong(Commen.song.getId() - 1);
+                            }
+                        } else {
+                            setupMediaPLayer();
+                        }
+                        if (onPlaySongActivityStateChanged != null) {
+
+                            onPlaySongActivityStateChanged.onPlaySongPreviousClicked();
+
+                        }
+                    } else {
+                        Commen.mediaPlayer.seekTo(Commen.mediaPlayer.getCurrentPosition() - forwardPosition);
+                        seekBar.setProgress(Commen.mediaPlayer.getCurrentPosition());
+                        timePassed.setText(changeDurationFormat(Commen.mediaPlayer.getCurrentPosition()));
+                    }
+
+                    if (forwardPosition >= 20000) {
+                        forwardPosition = 20000;
+                    } else {
+                        forwardPosition = forwardPosition + 2000;
+                    }
+                    if (isInLongTouch) {
+                        longTouchBackward();
+                    }
+                }
+            }
+        }, 500);
+    }
 
     private void setupViews() {
 
@@ -356,52 +433,89 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
         nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!isExternalSource) {
-                    if (Commen.song.getId() == SongListActivity.songList.size() - 1) {
-                        mPresenter.getSong(0);
+                if (canClicked) {
+                    if (!isExternalSource) {
+                        if (Commen.song.getId() == SongListActivity.songList.size() - 1) {
+                            mPresenter.getSong(0);
+                        } else {
+                            mPresenter.getSong(Commen.song.getId() + 1);
+                        }
                     } else {
-                        mPresenter.getSong(Commen.song.getId() + 1);
+                        setupMediaPLayer();
                     }
-                } else {
-                    setupMediaPLayer();
-                }
-                if (onPlaySongActivityStateChanged != null) {
+                    if (onPlaySongActivityStateChanged != null) {
 
-                    onPlaySongActivityStateChanged.onPlaySongNextClicked();
+                        onPlaySongActivityStateChanged.onPlaySongNextClicked();
 
+                    }
                 }
+                canClicked = true;
+            }
+        });
+        nextButton.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                isInLongTouch = true;
+                forwardPosition = 2000;
+                longTouchForward();
+                return false;
+            }
+        });
+        nextButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                    if (isInLongTouch) {
+                        canClicked = false;
+                        isInLongTouch = false;
+                    }
+                }
+                return false;
             }
         });
 
-//        nextButton.setOnLongClickListener(new View.OnLongClickListener() {
-//            @Override
-//            public boolean onLongClick(View view) {
-//                Commen.mediaPlayer.seekTo(Commen.mediaPlayer.getCurrentPosition()+20000);
-//
-//                seekBar.setProgress(Commen.mediaPlayer.getCurrentPosition());
-//                timePassed.setText(changeDurationFormat(Commen.mediaPlayer.getCurrentPosition()));
-//                return false;
-//            }
-//        });
-        //TODO fix on long touch
+        previousButton.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                isInLongTouch = true;
+                forwardPosition = 2000;
+                longTouchBackward();
+                return false;
+            }
+        });
+        previousButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                    if (isInLongTouch) {
+                        canClicked = false;
+                        isInLongTouch = false;
+                    }
+                }
+                return false;
+            }
+        });
 
         previousButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!isExternalSource) {
-                    if (Commen.song.getId() == 0) {
-                        mPresenter.getSong(SongListActivity.songList.size() - 1);
+                if (canClicked) {
+                    if (!isExternalSource) {
+                        if (Commen.song.getId() == 0) {
+                            mPresenter.getSong(SongListActivity.songList.size() - 1);
+                        } else {
+                            mPresenter.getSong(Commen.song.getId() - 1);
+                        }
                     } else {
-                        mPresenter.getSong(Commen.song.getId() - 1);
+                        setupMediaPLayer();
                     }
-                } else {
-                    setupMediaPLayer();
-                }
-                if (onPlaySongActivityStateChanged != null) {
+                    if (onPlaySongActivityStateChanged != null) {
 
-                    onPlaySongActivityStateChanged.onPlaySongPreviousClicked();
+                        onPlaySongActivityStateChanged.onPlaySongPreviousClicked();
 
+                    }
                 }
+                canClicked = true;
             }
         });
 
@@ -544,6 +658,7 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+
         if (event.getAction() == MotionEvent.ACTION_UP) {
 
             if (volumeSeekBar.getVisibility() == View.VISIBLE) {
@@ -555,6 +670,7 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
             }
 
         }
+
         return true;
     }
 
@@ -704,6 +820,7 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
     //TODO use one Commen.getinstance.setupMediaplayer
     @Override
     public void onMediaPlayerCompletion() {
+
         if (drawableCurent.getConstantState() == drawableRepeatAll.getConstantState()) {
             if ((SongListActivity.songList.size() - 1) == Commen.song.getId()) {
                 playPauseButton.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_play, null));

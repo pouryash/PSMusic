@@ -33,7 +33,7 @@
           android:layout_centerVertical="true"
           android:text="PSMusic"
           android:textColor="@color/colorGray"
-          android:textSize="@dimen/standardTextSize_11"
+          android:textSize="@dimen/standardTextSize_13"
           style="@style/TextAppearance.Compat.Notification.Time"
           />
 
@@ -57,7 +57,7 @@
         android:scrollHorizontally="true"
         android:layout_marginBottom="@dimen/smallMargin"
         android:textColor="@color/colorWhite"
-        android:textSize="@dimen/standardTextSize_13"
+        android:textSize="@dimen/standardTextSize_14"
         android:layout_marginStart="@dimen/standardMargin"
         style="@style/TextAppearance.Compat.Notification.Title"
         />
