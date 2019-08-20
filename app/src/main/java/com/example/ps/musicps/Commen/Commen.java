@@ -1,26 +1,36 @@
 package com.example.ps.musicps.Commen;
 
+import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
+import android.location.LocationManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
+import android.provider.Settings;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.ps.musicps.Model.Song;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class Commen {
 
+    private static final int WRITE_SETTINGS_REQUEST = 10;
     private static Commen instance;
     public static MediaPlayer mediaPlayer;
     public static Song song;
@@ -29,7 +39,7 @@ public class Commen {
     float speed = 0.02f;
 
 
-    private Commen(){
+    private Commen() {
 
     }
 
@@ -37,13 +47,12 @@ public class Commen {
         instance = new Commen();
     }
 
-    public static Commen getInstance(){
+    public static Commen getInstance() {
         return instance;
     }
 
 
-
-    public void setupMediaPLayer(Context context,Song song, final onMediaPlayerStateChanged onMediaPlayerStateChanged) {
+    public void setupMediaPLayer(Context context, Song song, final onMediaPlayerStateChanged onMediaPlayerStateChanged) {
         Commen.song = song;
         mediaPlayer = new MediaPlayer();
         try {
@@ -85,7 +94,7 @@ public class Commen {
         return bitmap;
     }
 
-    public static boolean isServiceRunning(Class<?> serviceClass , Context context) {
+    public static boolean isServiceRunning(Class<?> serviceClass, Context context) {
         ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
             if (serviceClass.getName().equals(service.service.getClassName())) {
@@ -95,42 +104,85 @@ public class Commen {
         return false;
     }
 
-    public void FadeOut(final float deltaTime)
-    {
+    public void FadeOut(final float deltaTime) {
         mediaPlayer.setVolume(volumeOut, volumeOut);
-        volumeOut -= speed* deltaTime;
+        volumeOut -= speed * deltaTime;
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                if (volumeOut != 1 && !(volumeOut < 0)){
+                if (volumeOut != 1 && !(volumeOut < 0)) {
                     FadeOut(deltaTime);
-                }else if (volumeOut == 0 || volumeOut < 0) {
+                } else if (volumeOut == 0 || volumeOut < 0) {
                     mediaPlayer.pause();
                     volumeOut = 1;
                 }
             }
-        },20);
+        }, 20);
     }
 
-    public void FadeIn(final float deltaTime)
-    {
+    public void FadeIn(final float deltaTime) {
         mediaPlayer.start();
         mediaPlayer.setVolume(volumeIn, volumeIn);
-        volumeIn += speed* deltaTime;
+        volumeIn += speed * deltaTime;
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                if (volumeIn != 1 && !(volumeIn > 1)){
+                if (volumeIn != 1 && !(volumeIn > 1)) {
                     FadeIn(deltaTime);
-                }else if (volumeIn == 1 || volumeIn > 1) {
+                } else if (volumeIn == 1 || volumeIn > 1) {
                     volumeIn = 0;
                 }
             }
-        },20);
+        }, 20);
     }
 
-    public interface onMediaPlayerStateChanged{
+
+    public static List<Song> notifyListchanged(int pos,List<Song> songs) {
+        List<Song> songList = new ArrayList<>();
+
+        for (Song song : songs) {
+            if (song.getId() >= pos + 1){
+                int id = song.getId();
+                song.setId(id - 1);
+                songList.add(song);
+            }else {
+                songList.add(song);
+            }
+        }
+        return songList;
+    }
+
+    public void writeSettingEnabled(Activity context){
+
+        if (!Settings.System.canWrite(context)){
+            writeSettingAlertMessage(context);
+
+        }
+    }
+
+
+    public void writeSettingAlertMessage(final Activity context) {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setMessage("We need write Setting permision, do you want to enable it?")
+                .setCancelable(false)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, final int id) {
+                        Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
+                        context.startActivityForResult(intent,WRITE_SETTINGS_REQUEST);
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, final int id) {
+                        dialog.cancel();
+                    }
+                });
+        final AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    public interface onMediaPlayerStateChanged {
         void onMediaPlayerPrepared();
+
         void onMediaPlayerCompletion();
     }
 }

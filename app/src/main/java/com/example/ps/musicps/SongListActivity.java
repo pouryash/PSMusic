@@ -6,10 +6,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.ColorDrawable;
-import android.net.Uri;
+import android.media.MediaScannerConnection;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatDelegate;
@@ -21,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.Toolbar;
 
 import android.os.Handler;
+import android.view.ContextMenu;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -38,13 +38,12 @@ import com.example.ps.musicps.MVP.SongsListMVP;
 import com.example.ps.musicps.MVP.SongsListPresenter;
 import com.example.ps.musicps.Model.Song;
 import com.example.ps.musicps.Service.SongService;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.snackbar.Snackbar;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
-public class SongListActivity extends RuntimePermissionsActivity implements SongAdapter.onSongClicked,
+public class SongListActivity extends RuntimePermissionsActivity implements SongAdapter.onSongAdapter,
         SongsListMVP.RequiredSongsListViewOps {
 
     private static final int READ_EXTERNAL_STORAGE = 1;
@@ -76,7 +75,8 @@ public class SongListActivity extends RuntimePermissionsActivity implements Song
             initView();
             setupView();
         } else {
-            SongListActivity.super.requestAppPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}
+            SongListActivity.super.requestAppPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE}
                     , READ_EXTERNAL_STORAGE);
         }
 
@@ -114,6 +114,20 @@ public class SongListActivity extends RuntimePermissionsActivity implements Song
     }
 
     private void setupView() {
+        //when song removed from search activity
+
+        SearchActivity.onSearchedItemRemoved = new SearchActivity.onSearchedItemRemoved() {
+            @Override
+            public void onRemoved(int position, boolean isCurentSong) {
+                songAdapter.notifyItemRemoved(position);
+                songAdapter.notifyItemRangeRemoved(position,songList.size()-1);
+                if (isCurentSong){
+                    onDataRecived.onSongRecived(songList.get(0) , true);
+                    //when curent song deleted and then open first song by PlayingSongFragment
+                    PlaySongActivity.song = songList.get(0);
+                }
+            }
+        };
         PlayingSongFragment.onGetSong = new PlayingSongFragment.onGetSong() {
             @Override
             public void getSong(int Position) {
@@ -233,7 +247,7 @@ public class SongListActivity extends RuntimePermissionsActivity implements Song
     @Override
     public void onSongRecived(Song song) {
 
-        onDataRecived.onSongRecived(song);
+        onDataRecived.onSongRecived(song ,false);
     }
 
     @Override
@@ -257,9 +271,27 @@ public class SongListActivity extends RuntimePermissionsActivity implements Song
             startActivity(intent);
         } else {
             Toast.makeText(getActivityContext(), "this file not exists!", Toast.LENGTH_LONG).show();
+//            MediaScannerConnection.scanFile(
+//                    this,
+//                    new String[]{songList.get(pos).getTrackFile(), null},
+//                    null, null);
+//            songList.remove(pos);
+//            songAdapter.notifyItemRemoved(pos);
+//            songAdapter.notifyItemRangeRemoved(pos,songAdapter.getItemCount());
         }
         isPlaySongActivityEnabled = true;
 
+    }
+
+    @Override
+    public void onSongRemoved(int pos,boolean isCurent) {
+//this is caled when song removed and check if is curent playing song removed
+        songList = (ArrayList<Song>) Commen.notifyListchanged(pos , songList);
+        if (isCurent){
+            onDataRecived.onSongRecived(songList.get(0) , true);
+            //when curent song deleted and then open first song by PlayingSongFragment
+            PlaySongActivity.song = songList.get(0);
+        }
     }
 
     @Override
@@ -279,7 +311,7 @@ public class SongListActivity extends RuntimePermissionsActivity implements Song
 
 
     public interface onDataRecived {
-        void onSongRecived(Song song);
+        void onSongRecived(Song song , boolean isSongRemoved);
 
         void onListReciveed(ArrayList<Song> songs);
     }

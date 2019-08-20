@@ -91,7 +91,7 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
     Bitmap songBitmapAlbum;
     boolean isInLongTouch;
     boolean canClicked = true;
-    int forwardPosition;
+    int longTouchPosition;
     PlaySongMVP.ProvidedPlaySongPresenterOps mPresenter = new PlaySongPresenter();
 
 
@@ -199,7 +199,7 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
             @Override
             public void run() {
                 if (isInLongTouch) {
-                    if (forwardPosition + Commen.mediaPlayer.getCurrentPosition() >= Commen.mediaPlayer.getDuration()) {
+                    if (longTouchPosition + Commen.mediaPlayer.getCurrentPosition() >= Commen.mediaPlayer.getDuration()) {
                         if (!isExternalSource) {
                             if (Commen.song.getId() == SongListActivity.songList.size() - 1) {
                                 mPresenter.getSong(0);
@@ -215,15 +215,15 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
 
                         }
                     } else {
-                        Commen.mediaPlayer.seekTo(Commen.mediaPlayer.getCurrentPosition() + forwardPosition);
+                        Commen.mediaPlayer.seekTo(Commen.mediaPlayer.getCurrentPosition() + longTouchPosition);
                         seekBar.setProgress(Commen.mediaPlayer.getCurrentPosition());
                         timePassed.setText(changeDurationFormat(Commen.mediaPlayer.getCurrentPosition()));
                     }
 
-                    if (forwardPosition >= 20000) {
-                        forwardPosition = 20000;
+                    if (longTouchPosition >= 20000) {
+                        longTouchPosition = 20000;
                     } else {
-                        forwardPosition = forwardPosition + 2000;
+                        longTouchPosition = longTouchPosition + 2000;
                     }
                     if (isInLongTouch) {
                         longTouchForward();
@@ -238,7 +238,7 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
             @Override
             public void run() {
                 if (isInLongTouch) {
-                    if (Commen.mediaPlayer.getCurrentPosition() -forwardPosition <= 0) {
+                    if (Commen.mediaPlayer.getCurrentPosition() - longTouchPosition <= 0) {
                         if (!isExternalSource) {
                             if (Commen.song.getId() == 0) {
                                 mPresenter.getSong(SongListActivity.songList.size() - 1);
@@ -254,15 +254,15 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
 
                         }
                     } else {
-                        Commen.mediaPlayer.seekTo(Commen.mediaPlayer.getCurrentPosition() - forwardPosition);
+                        Commen.mediaPlayer.seekTo(Commen.mediaPlayer.getCurrentPosition() - longTouchPosition);
                         seekBar.setProgress(Commen.mediaPlayer.getCurrentPosition());
                         timePassed.setText(changeDurationFormat(Commen.mediaPlayer.getCurrentPosition()));
                     }
 
-                    if (forwardPosition >= 20000) {
-                        forwardPosition = 20000;
+                    if (longTouchPosition >= 20000) {
+                        longTouchPosition = 20000;
                     } else {
-                        forwardPosition = forwardPosition + 2000;
+                        longTouchPosition = longTouchPosition + 2000;
                     }
                     if (isInLongTouch) {
                         longTouchBackward();
@@ -456,7 +456,7 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
             @Override
             public boolean onLongClick(View view) {
                 isInLongTouch = true;
-                forwardPosition = 2000;
+                longTouchPosition = 2000;
                 longTouchForward();
                 return false;
             }
@@ -478,7 +478,7 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
             @Override
             public boolean onLongClick(View view) {
                 isInLongTouch = true;
-                forwardPosition = 2000;
+                longTouchPosition = 2000;
                 longTouchBackward();
                 return false;
             }
@@ -568,7 +568,9 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
             }
         });
 
-        Commen.getInstance().FadeIn(2);
+        if (!Commen.mediaPlayer.isPlaying()){
+            Commen.getInstance().FadeIn(2);
+        }
         seekBarProgressUpdater();
         if (!isExternalSource && onPlaySongActivityStateChanged != null) {
 
@@ -710,11 +712,18 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
 
             if (!isExternalSource && Commen.song != null) {
                 if (Commen.mediaPlayer != null && (Commen.song.getId() == pos)) {
-                    if (Commen.mediaPlayer.isPlaying()) {
-
-                        playPauseButton.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_pause, null));
-                    } else {
-                        playPauseButton.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_play, null));
+                    try {
+                        setupViews();
+                        if (Commen.mediaPlayer.isPlaying()) {
+                            playPauseButton.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_pause, null));
+                        } else {
+                            playPauseButton.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_play, null));
+                        }
+                    } catch (Exception e) {
+                        //this try catch is for when delete curent playing file and then play first song
+                        if (Commen.mediaPlayer == null){
+                            setupMediaPLayer();
+                        }
                     }
                 }
             }
@@ -766,7 +775,11 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
 
     private void setupMediaPLayer() {
 
-        if (song.getTrackFile() != null) {
+        if (Commen.song != null) {
+
+            if (song == null){
+                song = Commen.song;
+            }
 
             if (Commen.mediaPlayer != null) {
                 Commen.mediaPlayer.release();

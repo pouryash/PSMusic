@@ -34,6 +34,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
 import com.example.ps.musicps.Commen.Commen;
 import com.example.ps.musicps.Commen.SongSharedPrefrenceManager;
+import com.example.ps.musicps.MVP.SongsListMVP;
 import com.example.ps.musicps.Model.Song;
 import com.example.ps.musicps.Service.SongService;
 
@@ -141,7 +142,7 @@ public class PlayingSongFragment extends Fragment implements Commen.onMediaPlaye
         
         return u[0];
     }
-    private void setupPlayingSong(Song song, MediaPlayer mediaPlayer) {
+    public void setupPlayingSong(Song song, MediaPlayer mediaPlayer) {
 
 //
 //        Palette p = Palette.from(resource).generate();
@@ -302,11 +303,14 @@ public class PlayingSongFragment extends Fragment implements Commen.onMediaPlaye
     }
 
     @Override
-    public void onSongRecived(Song song) {
+    public void onSongRecived(Song song , boolean isSongRemoved) {
+        if (!isSongRemoved){
+            shouldMediaPlayerStart = true;
+        }
         Commen.song = song;
         Commen.mediaPlayer.release();
         Commen.getInstance().setupMediaPLayer(getContext(), Commen.song, this);
-        shouldMediaPlayerStart = true;
+
     }
 
     @Override

@@ -18,7 +18,15 @@ public class Song implements Parcelable {
     private String albumName;
     private String duration;
     private String songImageUri;
+    private int ContentID;
 
+    public int getContentID() {
+        return ContentID;
+    }
+
+    public void setContentID(int contentID) {
+        ContentID = contentID;
+    }
 
     public static final Creator<Song> CREATOR = new Creator<Song>() {
         @Override

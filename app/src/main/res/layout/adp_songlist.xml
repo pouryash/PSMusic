@@ -9,6 +9,7 @@
     android:paddingEnd="@dimen/standardMargin"
     android:layout_marginBottom="@dimen/smallMargin"
     android:background="?attr/selectableItemBackground"
+    tools:background="#000"
     android:clickable="true"
     android:focusable="true"
     android:padding="@dimen/smallMargin"
@@ -39,6 +40,7 @@
         android:layout_marginTop="@dimen/smallMargin"
         android:layout_toEndOf="@+id/cardV_songListAdp"
         android:fontFamily="@font/sans"
+        android:layout_toStartOf="@id/iv_more_songListAdp"
         android:maxWidth="260dp"
         android:singleLine="true"
         android:textColor="@color/colorWhite"
@@ -51,6 +53,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/tv_songName_songListAdp"
         android:layout_marginStart="@dimen/standardMargin"
+        android:layout_toStartOf="@id/iv_more_songListAdp"
         android:layout_toEndOf="@+id/cardV_songListAdp"
         android:fontFamily="@font/sans"
         android:maxWidth="260dp"
@@ -61,7 +64,8 @@
 
     <TextView
         android:id="@+id/tv_songDuration_songListAdp"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_toStartOf="@id/iv_more_songListAdp"
         android:layout_height="wrap_content"
         android:layout_below="@+id/tv_artistName_songListAdp"
         android:layout_alignBottom="@id/cardV_songListAdp"
@@ -73,5 +77,16 @@
         android:textColor="@color/colorGray"
         android:textSize="@dimen/standardTextSize_12"
         tools:text="02:24" />
+
+    <ImageView
+        android:id="@+id/iv_more_songListAdp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/smallMargin"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="@dimen/smallMargin"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        app:srcCompat="@drawable/ic_more_24dp" />
 
 </RelativeLayout>

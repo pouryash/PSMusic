@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import javax.sql.StatementEvent;
+
 public class SongTask extends AsyncTask<Void, Void, Void> {
 
 //TODO add progressbar
@@ -54,6 +56,7 @@ public class SongTask extends AsyncTask<Void, Void, Void> {
                     song.setTrackFile(cur.getString(cur.getColumnIndex(MediaStore.Audio.Media.DATA)));
                     song.setSongName(cur.getString(cur.getColumnIndex(MediaStore.Audio.Media.TITLE)));
                     int m = Integer.parseInt(cur.getString(cur.getColumnIndex(MediaStore.Audio.Media.DURATION)));
+                    song.setContentID(Integer.parseInt(cur.getString(cur.getColumnIndex(MediaStore.Audio.Media._ID))));
 //                        int hours = (int) ((m / (1000 * 60 * 60)) % 24);
 //                        int minutes = (int) (m % (1000 * 60 * 60) / (1000 * 60));
 //                        int seconds = (int) ((m % (1000 * 60 * 60)) % (1000 * 60) / 1000);
