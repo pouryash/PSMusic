@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardCornerRadius="10dp"
+    android:layout_marginStart="@dimen/standardMargin"
+    android:layout_marginEnd="@dimen/standardMargin"
+    android:layout_marginBottom="@dimen/standardMargin_X2"
+    app:cardElevation="5dp"
+    android:orientation="vertical">
+
+
+   <RelativeLayout
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content">
+
+
+       <TextView
+           android:id="@+id/tv_Message_AlertDialog"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_marginStart="@dimen/standardMargin_X2"
+           android:layout_marginTop="@dimen/standardMargin_X2"
+           android:layout_marginBottom="@dimen/standardMargin_X2"
+           android:text="Scan for song"
+           android:textColor="@color/colorBlack"
+           android:textSize="@dimen/standardTextSize_20" />
+
+
+       <LinearLayout
+           android:id="@+id/lin_Buttons"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:layout_below="@id/tv_Message_AlertDialog"
+           android:layout_marginTop="@dimen/standardMargin_X2"
+           android:layout_marginBottom="@dimen/standardMargin_X2"
+           android:orientation="horizontal" >
+
+
+           <TextView
+               android:id="@+id/tv_AlertDialog_No"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:gravity="center"
+               android:padding="@dimen/standardMargin"
+               android:background="?attr/selectableItemBackground"
+               android:layout_gravity="center"
+               android:layout_margin="@dimen/smallMargin"
+               android:text="No"
+               android:clickable="true"
+               android:focusable="true"
+               android:textStyle="bold"
+               android:layout_marginBottom="@dimen/standardMargin_X2"
+               android:textColor="@color/colorAccent"
+               android:textSize="@dimen/standardTextSize_18"
+               android:layout_weight="1"
+               />
+
+           <RelativeLayout
+               android:background="#ccc"
+               android:orientation="vertical"
+               android:layout_width="1dp"
+               android:layout_height="match_parent"/>
+
+           <TextView
+               android:layout_weight="1"
+               android:id="@+id/tv_AlertDialog_Yes"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:gravity="center"
+               android:padding="@dimen/standardMargin"
+               android:background="?attr/selectableItemBackground"
+               android:layout_gravity="center"
+               android:layout_margin="@dimen/smallMargin"
+               android:text="Yes"
+               android:clickable="true"
+               android:focusable="true"
+               android:textStyle="bold"
+               android:layout_marginBottom="@dimen/standardMargin_X2"
+               android:textColor="@color/colorAccent"
+               android:textSize="@dimen/standardTextSize_18"
+               />
+
+       </LinearLayout>
+
+
+   </RelativeLayout>
+
+</androidx.cardview.widget.CardView>

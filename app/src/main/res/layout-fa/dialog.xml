@@ -20,8 +20,8 @@
             android:id="@+id/tv_title_dialog"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginStart="36dp"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="36dp"
             android:layout_marginTop="@dimen/standardMargin_X2"
             android:layout_marginBottom="@dimen/standardMargin_X2"
             android:text="Scan for song"
@@ -48,7 +48,7 @@
             android:layout_centerHorizontal="true"
             android:layout_below="@id/pb_dialog"
             android:textColor="@color/colorBlack"
-            android:textSize="@dimen/standardTextSize_12"
+            android:textSize="@dimen/standardTextSize_14"
             />
 
 
@@ -69,7 +69,7 @@
             android:layout_centerHorizontal="true"
             android:layout_below="@id/tv_scan_dialog"
             android:textColor="@color/colorAccent"
-            android:textSize="@dimen/standardTextSize_15"
+            android:textSize="@dimen/standardTextSize_16"
             />
 
     </RelativeLayout>

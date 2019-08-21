@@ -20,7 +20,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.Toolbar;
 
 import android.os.Handler;
-import android.view.ContextMenu;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,17 +27,21 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.example.ps.musicps.Adapter.SongAdapter;
 import com.example.ps.musicps.Commen.Commen;
 import com.example.ps.musicps.Commen.CustomeDialogClass;
 import com.example.ps.musicps.Commen.RuntimePermissionsActivity;
+import com.example.ps.musicps.Commen.SongSharedPrefrenceManager;
 import com.example.ps.musicps.MVP.SongsListMVP;
 import com.example.ps.musicps.MVP.SongsListPresenter;
 import com.example.ps.musicps.Model.Song;
 import com.example.ps.musicps.Service.SongService;
 import com.google.android.material.snackbar.Snackbar;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +59,6 @@ public class SongListActivity extends RuntimePermissionsActivity implements Song
     Toolbar toolbar;
     ImageView noItems;
     View fView;
-    CoordinatorLayout coordinatorLayoutRoot;
     PlayingSongFragment playingSongFragment;
     FragmentManager fragmentManager;
     FragmentTransaction fragmentTransaction;
@@ -76,7 +78,7 @@ public class SongListActivity extends RuntimePermissionsActivity implements Song
             setupView();
         } else {
             SongListActivity.super.requestAppPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE}
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE}
                     , READ_EXTERNAL_STORAGE);
         }
 
@@ -120,11 +122,16 @@ public class SongListActivity extends RuntimePermissionsActivity implements Song
             @Override
             public void onRemoved(int position, boolean isCurentSong) {
                 songAdapter.notifyItemRemoved(position);
-                songAdapter.notifyItemRangeRemoved(position,songList.size()-1);
-                if (isCurentSong){
-                    onDataRecived.onSongRecived(songList.get(0) , true);
-                    //when curent song deleted and then open first song by PlayingSongFragment
-                    PlaySongActivity.song = songList.get(0);
+                songAdapter.notifyItemRangeRemoved(position, songList.size() - 1);
+                if (isCurentSong) {
+                  if (songList.size() > 0){
+                      onDataRecived.onSongRecived(songList.get(0), true);
+                      //when curent song deleted and then open first song by PlayingSongFragment
+                      PlaySongActivity.song = songList.get(0);
+                  }else {
+                      fView.setVisibility(View.GONE);
+                      noItems.setVisibility(View.VISIBLE);
+                  }
                 }
             }
         };
@@ -157,7 +164,6 @@ public class SongListActivity extends RuntimePermissionsActivity implements Song
 
     private void initView() {
 
-        coordinatorLayoutRoot = findViewById(R.id.cl_Lsit_Root);
         fView = findViewById(R.id.fr_PlayingSong);
         noItems = findViewById(R.id.iv_No_Items);
         recyclerView = findViewById(R.id.rv_songList);
@@ -176,8 +182,9 @@ public class SongListActivity extends RuntimePermissionsActivity implements Song
         switch (item.getItemId()) {
             case R.id.menu_search:
                 if (fView.getVisibility() != View.VISIBLE) {
-                    Snackbar.make(coordinatorLayoutRoot, "There is no song on your phone. Try again later!",
-                            Snackbar.LENGTH_LONG).show();
+                    Toast.makeText(this, "There is no song on your phone. Try again later!",
+                            Toast.LENGTH_LONG).show();
+
                 } else {
                     startActivity(new Intent(SongListActivity.this, SearchActivity.class));
                 }
@@ -196,11 +203,13 @@ public class SongListActivity extends RuntimePermissionsActivity implements Song
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        if (customeDialog.isShowing()){
+                        if (customeDialog.isShowing()) {
                             mPresenter.getSongsList();
                         }
                     }
-                },1500);
+                }, 1500);
+
+
                 break;
         }
         return true;
@@ -221,6 +230,9 @@ public class SongListActivity extends RuntimePermissionsActivity implements Song
         toast.show();
         String displayedText = ((TextView) ((LinearLayout) toast.getView()).getChildAt(0)).getText().toString();
         if (displayedText.equals("opss no song found!")) {
+            if (customeDialog != null && customeDialog.isShowing()) {
+                customeDialog.dismiss();
+            }
             fView.setVisibility(View.GONE);
             noItems.setVisibility(View.VISIBLE);
         }
@@ -229,11 +241,19 @@ public class SongListActivity extends RuntimePermissionsActivity implements Song
     @Override
     public void onSongListFinished(ArrayList<Song> songs) {
         songList = songs;
-        if (customeDialog!= null && customeDialog.isShowing()){
+        if (customeDialog != null && customeDialog.isShowing()) {
             customeDialog.dismiss();
-            songAdapter.notifyDataSetChanged();
-            Toast.makeText(getActivityContext(),"Scan for Song is Completed",Toast.LENGTH_LONG).show();
-        }else {
+            recyclerView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
+            songAdapter = new SongAdapter(songs, this, this);
+            recyclerView.setAdapter(songAdapter);
+            recyclerView.setItemAnimator(new DefaultItemAnimator());
+            fView.setVisibility(View.VISIBLE);
+            noItems.setVisibility(View.GONE);
+            PlayingSongFragment.songSharedPrefrenceManager.saveSong(songList.get(0));
+            PlayingSongFragment.songSharedPrefrenceManager.setFirstIn(true);
+            onDataRecived.onListReciveed(songList);
+            Toast.makeText(getActivityContext(), "Scan for Song is Completed", Toast.LENGTH_LONG).show();
+        } else {
             recyclerView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
             songAdapter = new SongAdapter(songs, this, this);
             recyclerView.setAdapter(songAdapter);
@@ -247,7 +267,7 @@ public class SongListActivity extends RuntimePermissionsActivity implements Song
     @Override
     public void onSongRecived(Song song) {
 
-        onDataRecived.onSongRecived(song ,false);
+        onDataRecived.onSongRecived(song, false);
     }
 
     @Override
@@ -271,6 +291,7 @@ public class SongListActivity extends RuntimePermissionsActivity implements Song
             startActivity(intent);
         } else {
             Toast.makeText(getActivityContext(), "this file not exists!", Toast.LENGTH_LONG).show();
+//
 //            MediaScannerConnection.scanFile(
 //                    this,
 //                    new String[]{songList.get(pos).getTrackFile(), null},
@@ -278,20 +299,41 @@ public class SongListActivity extends RuntimePermissionsActivity implements Song
 //            songList.remove(pos);
 //            songAdapter.notifyItemRemoved(pos);
 //            songAdapter.notifyItemRangeRemoved(pos,songAdapter.getItemCount());
+//            songAdapter.notifyDataSetChanged();
         }
         isPlaySongActivityEnabled = true;
 
     }
 
     @Override
-    public void onSongRemoved(int pos,boolean isCurent) {
+    public void onSongRemoved(int pos, boolean isCurent, List<Song> list) {
 //this is caled when song removed and check if is curent playing song removed
-        songList = (ArrayList<Song>) Commen.notifyListchanged(pos , songList);
-        if (isCurent){
-            onDataRecived.onSongRecived(songList.get(0) , true);
-            //when curent song deleted and then open first song by PlayingSongFragment
-            PlaySongActivity.song = songList.get(0);
+        songAdapter.notifyDataSetChanged();
+        songList = (ArrayList<Song>) Commen.notifyListchanged(pos, songList);
+        if (isCurent) {
+            if (list.size() > 0) {
+                onDataRecived.onSongRecived(songList.get(0), true);
+                //when curent song deleted and then open first song by PlayingSongFragment
+                PlaySongActivity.song = songList.get(0);
+            } else if (list.size() == 0) {
+                //this is for when delete last song
+                fView.setVisibility(View.GONE);
+                noItems.setVisibility(View.VISIBLE);
+            }
         }
+        //this is for when delete first Song multiple(wiich is in curent song fragment)
+        if (list.size() < songList.size()) {
+            if (list.size() > 0) {
+                onDataRecived.onSongRecived(list.get(0), true);
+                PlaySongActivity.song = list.get(0);
+            }
+        }
+        if (list.size() == 0) {
+            //this is for when delete last song
+            fView.setVisibility(View.GONE);
+            noItems.setVisibility(View.VISIBLE);
+        }
+        songList = (ArrayList<Song>) list;
     }
 
     @Override
@@ -311,7 +353,7 @@ public class SongListActivity extends RuntimePermissionsActivity implements Song
 
 
     public interface onDataRecived {
-        void onSongRecived(Song song , boolean isSongRemoved);
+        void onSongRecived(Song song, boolean shouldPlay);
 
         void onListReciveed(ArrayList<Song> songs);
     }

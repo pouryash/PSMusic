@@ -60,9 +60,9 @@ public class SongSharedPrefrenceManager {
         return song;
     }
 
-    public void setFirstIn() {
+    public void setFirstIn(boolean firstIn) {
         SharedPreferences.Editor editor = firstInSharedPreferences.edit();
-        editor.putBoolean(KEY_FIRST_IN, true);
+        editor.putBoolean(KEY_FIRST_IN, firstIn);
         editor.apply();
     }
 

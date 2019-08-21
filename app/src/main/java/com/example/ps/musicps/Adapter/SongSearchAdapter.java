@@ -170,7 +170,7 @@ public class SongSearchAdapter extends RecyclerView.Adapter<SongSearchAdapter.So
                                 dialog.setTitle("Delete Song")
                                         .setMessage("Do you want to delete this Song?")
                                         .setCancelable(false)
-                                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                        .setPositiveButton("yes", new DialogInterface.OnClickListener() {
                                             @Override
                                             public void onClick(DialogInterface dialogInterface, int i) {
 
@@ -181,6 +181,7 @@ public class SongSearchAdapter extends RecyclerView.Adapter<SongSearchAdapter.So
                                                             context,
                                                             new String[]{fdelete.getAbsolutePath(), null},
                                                             null, null);
+                                                    songList.remove(position);
                                                     songListFiltered.remove(position);
                                                     notifyItemRemoved(position);
                                                     notifyItemRangeRemoved(position, songList.size());
@@ -192,16 +193,16 @@ public class SongSearchAdapter extends RecyclerView.Adapter<SongSearchAdapter.So
                                                     Toast.makeText(context, "Unable to delete this Song", Toast.LENGTH_LONG).show();
                                                 }
                                                 if (isRemoved) {
-                                                    if (Commen.song.getId() == position) {
-                                                        onSearchAdpSong.onSongRemoved(song.getId(),true);
+                                                    if (Commen.song.getId() == song.getId()) {
+                                                        onSearchAdpSong.onSongRemoved(song.getId(),true ,songList);
                                                     } else {
-                                                        onSearchAdpSong.onSongRemoved(song.getId(),false);
+                                                        onSearchAdpSong.onSongRemoved(song.getId(),false , songList);
                                                     }
                                                     isRemoved = false;
 
                                                 }
                                             }
-                                        }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                        }).setNegativeButton("no", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialogInterface, int i) {
                                         dialogInterface.dismiss();
@@ -299,7 +300,7 @@ public class SongSearchAdapter extends RecyclerView.Adapter<SongSearchAdapter.So
 
 
             Glide.with(context).asBitmap().load(Uri.parse(song.getSongImageUri()))
-                    .apply(new RequestOptions().placeholder(R.drawable.ic_no_album).fitCenter())
+                    .apply(new RequestOptions().placeholder(R.drawable.ic_no_album))
                     .listener(new RequestListener<Bitmap>() {
                         @Override
                         public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
@@ -353,6 +354,6 @@ public class SongSearchAdapter extends RecyclerView.Adapter<SongSearchAdapter.So
 
     public interface onSearchAdpSong {
         void onSongClicked(int pos);
-        void onSongRemoved(int pos, boolean isCurentSong);
+        void onSongRemoved(int pos, boolean isCurentSong , List<Song> list);
     }
 }

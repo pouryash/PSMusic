@@ -60,11 +60,11 @@ public class SongService extends Service implements Commen.onMediaPlayerStateCha
                     bigView.setImageViewResource(R.id.iv_playPayse_notification, R.drawable.ic_play_24px);
                     notificationManager.notify(NOTIFICATION_ID, notification.build());
                     if (onNotificationServiceStateChangedList != null) {
-                        onNotificationServiceStateChangedList.onPlayButtonClickedList();
+                        onNotificationServiceStateChangedList.onPlayButtonClickedList(false);
                     }
 
                     if (onNotificationServiceStateChangedPlay != null) {
-                        onNotificationServiceStateChangedPlay.onPlayButtonClickedPlaySong();
+                        onNotificationServiceStateChangedPlay.onPlayButtonClickedPlaySong(false);
                     }
                 }
         };
@@ -73,8 +73,8 @@ public class SongService extends Service implements Commen.onMediaPlayerStateCha
 
         PlaySongActivity.onPlaySongActivityStateChanged = new PlaySongActivity.onPlaySongActivityStateChanged() {
             @Override
-            public void onPlaySongPlaypauseClicked() {
-                if (Commen.mediaPlayer.isPlaying()) {
+            public void onPlaySongPlaypauseClicked(boolean isPlaying) {
+                if (isPlaying) {
                     view.setImageViewResource(R.id.iv_playPayse_notification, R.drawable.ic_pause_24px);
                     bigView.setImageViewResource(R.id.iv_playPayse_notification, R.drawable.ic_pause_24px);
 //                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -115,8 +115,8 @@ public class SongService extends Service implements Commen.onMediaPlayerStateCha
         };
         PlayingSongFragment.onSongListActivityStateChanged = new PlayingSongFragment.onSongListActivityStateChanged() {
             @Override
-            public void onSongListPlaypauseClicked() {
-                if (Commen.mediaPlayer.isPlaying()) {
+            public void onSongListPlaypauseClicked(boolean isPlaying) {
+                if (isPlaying) {
                     view.setImageViewResource(R.id.iv_playPayse_notification, R.drawable.ic_pause_24px);
                     bigView.setImageViewResource(R.id.iv_playPayse_notification, R.drawable.ic_pause_24px);
                 } else {
@@ -142,18 +142,26 @@ public class SongService extends Service implements Commen.onMediaPlayerStateCha
                     Commen.getInstance().FadeOut(2);
                     view.setImageViewResource(R.id.iv_playPayse_notification, R.drawable.ic_play_24px);
                     bigView.setImageViewResource(R.id.iv_playPayse_notification, R.drawable.ic_play_24px);
+                    if (onNotificationServiceStateChangedList != null) {
+                        onNotificationServiceStateChangedList.onPlayButtonClickedList(false);
+                    }
+
+                    if (onNotificationServiceStateChangedPlay != null) {
+                        onNotificationServiceStateChangedPlay.onPlayButtonClickedPlaySong(false);
+                    }
                 } else {
                     Commen.getInstance().FadeIn(2);
                     view.setImageViewResource(R.id.iv_playPayse_notification, R.drawable.ic_pause_24px);
                     bigView.setImageViewResource(R.id.iv_playPayse_notification, R.drawable.ic_pause_24px);
-                }
-                if (onNotificationServiceStateChangedList != null) {
-                    onNotificationServiceStateChangedList.onPlayButtonClickedList();
+                    if (onNotificationServiceStateChangedList != null) {
+                        onNotificationServiceStateChangedList.onPlayButtonClickedList(true);
+                    }
+
+                    if (onNotificationServiceStateChangedPlay != null) {
+                        onNotificationServiceStateChangedPlay.onPlayButtonClickedPlaySong(true);
+                    }
                 }
 
-                if (onNotificationServiceStateChangedPlay != null) {
-                    onNotificationServiceStateChangedPlay.onPlayButtonClickedPlaySong();
-                }
                 notificationManager.notify(NOTIFICATION_ID, notification.build());
                 break;
             case ACTION_NEXT:
@@ -304,9 +312,9 @@ public class SongService extends Service implements Commen.onMediaPlayerStateCha
 //
 //    }
 
-
+// i use isPlaying param becausse fadin and fadeout , stop and atart mediaplayer in period of time
     public interface onNotificationServiceStateChangedPlay {
-        void onPlayButtonClickedPlaySong();
+        void onPlayButtonClickedPlaySong(boolean isPlaying);
 
         void onNextButtonClickedPlaySong();
 
@@ -314,7 +322,7 @@ public class SongService extends Service implements Commen.onMediaPlayerStateCha
     }
 
     public interface onNotificationServiceStateChangedList {
-        void onPlayButtonClickedList();
+        void onPlayButtonClickedList(boolean isPlaying);
 
         void onNextButtonClickedList();
 

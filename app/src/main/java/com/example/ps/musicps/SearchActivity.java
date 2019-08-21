@@ -73,10 +73,11 @@ public class SearchActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onSongRemoved(int pos,boolean isCurentSong) {
-                songList.remove(pos);
+            public void onSongRemoved(int pos,boolean isCurentSong ,List<Song> list) {
+                songList = list;
                 songList = Commen.notifyListchanged(pos,songList);
                 onSearchedItemRemoved.onRemoved(pos,isCurentSong);
+
             }
         });
         recyclerView.setAdapter(adapter);

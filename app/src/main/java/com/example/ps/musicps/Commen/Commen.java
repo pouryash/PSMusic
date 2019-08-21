@@ -30,6 +30,7 @@ import java.util.List;
 
 public class Commen {
 
+    public static boolean IS_PLAYING;
     private static final int WRITE_SETTINGS_REQUEST = 10;
     private static Commen instance;
     public static MediaPlayer mediaPlayer;
@@ -105,6 +106,7 @@ public class Commen {
     }
 
     public void FadeOut(final float deltaTime) {
+        IS_PLAYING = false;
         mediaPlayer.setVolume(volumeOut, volumeOut);
         volumeOut -= speed * deltaTime;
         new Handler().postDelayed(new Runnable() {
@@ -121,6 +123,7 @@ public class Commen {
     }
 
     public void FadeIn(final float deltaTime) {
+        IS_PLAYING = true;
         mediaPlayer.start();
         mediaPlayer.setVolume(volumeIn, volumeIn);
         volumeIn += speed * deltaTime;
@@ -136,42 +139,40 @@ public class Commen {
         }, 20);
     }
 
-
-    public static List<Song> notifyListchanged(int pos,List<Song> songs) {
+    public static List<Song> notifyListchanged(int pos, List<Song> songs) {
         List<Song> songList = new ArrayList<>();
 
         for (Song song : songs) {
-            if (song.getId() >= pos + 1){
+            if (song.getId() >= pos + 1) {
                 int id = song.getId();
                 song.setId(id - 1);
                 songList.add(song);
-            }else {
+            } else {
                 songList.add(song);
             }
         }
         return songList;
     }
 
-    public void writeSettingEnabled(Activity context){
+    public void writeSettingEnabled(Activity context) {
 
-        if (!Settings.System.canWrite(context)){
+        if (!Settings.System.canWrite(context)) {
             writeSettingAlertMessage(context);
 
         }
     }
 
-
     public void writeSettingAlertMessage(final Activity context) {
         final AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setMessage("We need write Setting permision, do you want to enable it?")
                 .setCancelable(false)
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                .setPositiveButton("yes", new DialogInterface.OnClickListener() {
                     public void onClick(final DialogInterface dialog, final int id) {
                         Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
-                        context.startActivityForResult(intent,WRITE_SETTINGS_REQUEST);
+                        context.startActivityForResult(intent, WRITE_SETTINGS_REQUEST);
                     }
                 })
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                .setNegativeButton("no", new DialogInterface.OnClickListener() {
                     public void onClick(final DialogInterface dialog, final int id) {
                         dialog.cancel();
                     }

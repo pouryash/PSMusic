@@ -2,15 +2,13 @@ package com.example.ps.musicps.Adapter;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.media.MediaScannerConnection;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -22,13 +20,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.os.Build;
 import android.provider.MediaStore;
 import android.provider.Settings;
-import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
@@ -41,16 +39,11 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
 import com.example.ps.musicps.Commen.Commen;
+import com.example.ps.musicps.Commen.CustomeAlertDialogClass;
 import com.example.ps.musicps.Model.Song;
-import com.example.ps.musicps.PlaySongActivity;
 import com.example.ps.musicps.R;
-import com.example.ps.musicps.SearchActivity;
-import com.example.ps.musicps.Service.SongService;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
 import java.util.List;
 
 public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongVH> {
@@ -133,48 +126,56 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongVH> {
                             final File fdelete = new File(song.getTrackFile());
 
                             if (fdelete.exists()) {
-                                AlertDialog.Builder dialog = new AlertDialog.Builder(context);
 
-                                dialog.setTitle("Delete Song")
-                                        .setMessage("Do you want to delete this Song?")
-                                        .setCancelable(false)
-                                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialogInterface, int i) {
-
-                                                if (fdelete.delete()) {
-
-                                                    Toast.makeText(context, "song is sucsessfuly deleted", Toast.LENGTH_LONG).show();
-                                                    MediaScannerConnection.scanFile(
-                                                            context,
-                                                            new String[]{fdelete.getAbsolutePath(), null},
-                                                            null, null);
-                                                    songList.remove(position);
-                                                    notifyItemRemoved(position);
-                                                    notifyItemRangeRemoved(position, songList.size());
-                                                    notifyDataSetChanged();
-                                                    isRemoved = true;
-
-                                                } else {
-                                                    context.deleteFile(fdelete.getName());
-                                                    Toast.makeText(context, "Unable to delete this Song", Toast.LENGTH_LONG).show();
-                                                }
-                                                if (isRemoved) {
-                                                    if (Commen.song.getId() == position) {
-                                                        onSongAdapter.onSongRemoved(position, true);
-                                                    } else {
-                                                        onSongAdapter.onSongRemoved(position, false);
-                                                    }
-                                                    isRemoved = false;
-
-                                                }
-                                            }
-                                        }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                CustomeAlertDialogClass customeAlertDialog = new
+                                        CustomeAlertDialogClass((Activity) context,
+                                        "Do you want to delete this Song?",
+                                        new CustomeAlertDialogClass.onAlertDialogCliscked() {
                                     @Override
-                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                        dialogInterface.dismiss();
+                                    public void onPosetive() {
+                                        if (fdelete.delete()) {
+
+                                            Toast.makeText(context, "song is sucsessfuly deleted", Toast.LENGTH_LONG).show();
+                                            MediaScannerConnection.scanFile(
+                                                    context,
+                                                    new String[]{fdelete.getAbsolutePath(), null},
+                                                    null, null);
+                                            songList.remove(position);
+                                            notifyItemRemoved(position);
+                                            notifyItemRangeRemoved(position, songList.size());
+                                            notifyDataSetChanged();
+                                            isRemoved = true;
+
+                                        } else {
+                                            context.deleteFile(fdelete.getName());
+                                            Toast.makeText(context, "Unable to delete this Song", Toast.LENGTH_LONG).show();
+                                        }
+                                        if (isRemoved) {
+                                            if (Commen.song.getId() == position) {
+                                                onSongAdapter.onSongRemoved(position, true , songList);
+                                            } else {
+                                                onSongAdapter.onSongRemoved(position, false,songList);
+                                            }
+                                            isRemoved = false;
+
+                                        }
                                     }
-                                }).show();
+
+                                    @Override
+                                    public void onNegetive() {
+
+                                    }
+                                });
+                                WindowManager.LayoutParams lp = customeAlertDialog.getWindow().getAttributes();
+                                lp.dimAmount = 0.7f;
+                                lp.gravity = Gravity.BOTTOM;
+                                customeAlertDialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+                                customeAlertDialog.show();
+                                customeAlertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+                                customeAlertDialog.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+                                customeAlertDialog.setCanceledOnTouchOutside(false);
+
+
                             }
 
                             break;
@@ -267,7 +268,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongVH> {
 
             //TODO set placeholder by requestoption
             Glide.with(context).asBitmap().load(Uri.parse(song.getSongImageUri()))
-                    .apply(new RequestOptions().placeholder(R.drawable.ic_no_album).fitCenter())
+                    .apply(new RequestOptions().placeholder(R.drawable.ic_no_album))
                     .listener(new RequestListener<Bitmap>() {
                         @Override
                         public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
@@ -293,27 +294,10 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongVH> {
         }
 
     }
-    public static String getRealPathFromURI(Context context, Uri contentUri) {
-        Cursor cursor = null;
 
-        try {
-            String[] proj = {MediaStore.Images.Media.DATA};
-            cursor = context.getContentResolver().query(contentUri, proj, null, null, null);
-            cursor.moveToFirst();
-            int column_index = cursor.getColumnIndex(proj[0]);
-            String path = cursor.getString(column_index);
-            return path;
-        } catch (Exception e) {
-            return null;
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-        }
-    }
     public interface onSongAdapter {
         void onSongClicked(int pos);
 
-        void onSongRemoved(int pos, boolean isCurent);
+        void onSongRemoved(int pos, boolean isCurent , List<Song> list);
     }
 }
