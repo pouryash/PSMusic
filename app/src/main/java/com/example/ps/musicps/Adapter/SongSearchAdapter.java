@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.media.MediaScannerConnection;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -24,10 +25,12 @@ import android.text.style.ForegroundColorSpan;
 import android.util.Base64;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
@@ -42,6 +45,7 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
 import com.example.ps.musicps.Commen.Commen;
+import com.example.ps.musicps.Commen.CustomeAlertDialogClass;
 import com.example.ps.musicps.Model.Song;
 import com.example.ps.musicps.PlaySongActivity;
 import com.example.ps.musicps.R;
@@ -165,49 +169,60 @@ public class SongSearchAdapter extends RecyclerView.Adapter<SongSearchAdapter.So
                             final File fdelete = new File(song.getTrackFile());
 
                             if (fdelete.exists()) {
-                                AlertDialog.Builder dialog = new AlertDialog.Builder(context);
 
-                                dialog.setTitle("Delete Song")
-                                        .setMessage("Do you want to delete this Song?")
-                                        .setCancelable(false)
-                                        .setPositiveButton("yes", new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialogInterface, int i) {
-
-                                                if (fdelete.delete()) {
-
-                                                    Toast.makeText(context, "song is sucsessfuly deleted", Toast.LENGTH_LONG).show();
-                                                    MediaScannerConnection.scanFile(
-                                                            context,
-                                                            new String[]{fdelete.getAbsolutePath(), null},
-                                                            null, null);
-                                                    songList.remove(position);
-                                                    songListFiltered.remove(position);
-                                                    notifyItemRemoved(position);
-                                                    notifyItemRangeRemoved(position, songList.size());
-                                                    notifyDataSetChanged();
-                                                    isRemoved = true;
-
-                                                } else {
-                                                    context.deleteFile(fdelete.getName());
-                                                    Toast.makeText(context, "Unable to delete this Song", Toast.LENGTH_LONG).show();
-                                                }
-                                                if (isRemoved) {
-                                                    if (Commen.song.getId() == song.getId()) {
-                                                        onSearchAdpSong.onSongRemoved(song.getId(),true ,songList);
-                                                    } else {
-                                                        onSearchAdpSong.onSongRemoved(song.getId(),false , songList);
-                                                    }
-                                                    isRemoved = false;
-
-                                                }
-                                            }
-                                        }).setNegativeButton("no", new DialogInterface.OnClickListener() {
+                                CustomeAlertDialogClass customeAlertDialog = new
+                                        CustomeAlertDialogClass((Activity) context,
+                                        "Do you want to delete this Song?", new CustomeAlertDialogClass.onAlertDialogCliscked() {
                                     @Override
-                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                        dialogInterface.dismiss();
+                                    public void onPosetive() {
+
+                                        if (fdelete.delete()) {
+
+                                            Toast.makeText(context, "song is sucsessfuly deleted", Toast.LENGTH_LONG).show();
+                                            MediaScannerConnection.scanFile(
+                                                    context,
+                                                    new String[]{fdelete.getAbsolutePath(), null},
+                                                    null, null);
+                                            songList.remove(position);
+                                            songListFiltered.remove(position);
+                                            notifyItemRemoved(position);
+                                            notifyItemRangeRemoved(position, songList.size());
+                                            notifyDataSetChanged();
+                                            isRemoved = true;
+
+                                        } else {
+                                            context.deleteFile(fdelete.getName());
+                                            Toast.makeText(context, "Unable to delete this Song", Toast.LENGTH_LONG).show();
+                                        }
+                                        if (isRemoved) {
+                                            if (Commen.IS_PLAYING){
+                                                Commen.mediaPlayer.release();
+                                                Commen.IS_PLAYING =false;
+                                            }
+                                            if (Commen.song.getId() == song.getId()) {
+                                                onSearchAdpSong.onSongRemoved(song.getId(),true ,songList);
+                                            } else {
+                                                onSearchAdpSong.onSongRemoved(song.getId(),false , songList);
+                                            }
+                                            isRemoved = false;
+
+                                        }
                                     }
-                                }).show();
+
+                                    @Override
+                                    public void onNegetive() {
+
+                                    }
+                                    });
+
+                                WindowManager.LayoutParams lp = customeAlertDialog.getWindow().getAttributes();
+                                lp.dimAmount = 0.7f;
+                                lp.gravity = Gravity.BOTTOM;
+                                customeAlertDialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+                                customeAlertDialog.show();
+                                customeAlertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+                                customeAlertDialog.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+                                customeAlertDialog.setCanceledOnTouchOutside(false);
                             }
 
                             break;

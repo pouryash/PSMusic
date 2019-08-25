@@ -27,7 +27,6 @@
             android:layout_height="match_parent"
             android:scaleType="center"
             tools:src="@drawable/ic_no_album" />
-        <!--TODO fix border around image-->
 
     </androidx.cardview.widget.CardView>
 

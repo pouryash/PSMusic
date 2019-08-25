@@ -97,9 +97,13 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+        if (SongListActivity.shouldStartNewInstance) {
+            super.onCreate(null);
+            SongListActivity.shouldStartNewInstance = false;
+        } else {
+            super.onCreate(savedInstanceState);
+        }
         setContentView(R.layout.activity_play_song);
-
 
         initViews();
         getExtrnalSong();
@@ -117,7 +121,6 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
 
             }
         }
-
 
     }
 
@@ -165,6 +168,7 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
             song.setSongImageUri(albumUri.toString());
             song.setTrackFile(path);
             song.setId(0);
+            Commen.song = song;
 
 
             backButton.setEnabled(false);
@@ -200,19 +204,23 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
             public void run() {
                 if (isInLongTouch) {
                     if (longTouchPosition + Commen.mediaPlayer.getCurrentPosition() >= Commen.mediaPlayer.getDuration()) {
-                        if (!isExternalSource) {
-                            if (Commen.song.getId() == SongListActivity.songList.size() - 1) {
-                                mPresenter.getSong(0);
-                            } else {
-                                mPresenter.getSong(Commen.song.getId() + 1);
-                            }
+                        if (Commen.mediaPlayer.isLooping()) {
+                            Commen.mediaPlayer.seekTo(0);
                         } else {
-                            setupMediaPLayer();
-                        }
-                        if (onPlaySongActivityStateChanged != null) {
+                            if (!isExternalSource) {
+                                if (Commen.song.getId() == SongListActivity.songList.size() - 1) {
+                                    mPresenter.getSong(0);
+                                } else {
+                                    mPresenter.getSong(Commen.song.getId() + 1);
+                                }
+                            } else {
+                                setupMediaPLayer();
+                            }
+                            if (onPlaySongActivityStateChanged != null) {
 
-                            onPlaySongActivityStateChanged.onPlaySongNextClicked();
+                                onPlaySongActivityStateChanged.onPlaySongNextClicked();
 
+                            }
                         }
                     } else {
                         Commen.mediaPlayer.seekTo(Commen.mediaPlayer.getCurrentPosition() + longTouchPosition);
@@ -239,19 +247,23 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
             public void run() {
                 if (isInLongTouch) {
                     if (Commen.mediaPlayer.getCurrentPosition() - longTouchPosition <= 0) {
-                        if (!isExternalSource) {
-                            if (Commen.song.getId() == 0) {
-                                mPresenter.getSong(SongListActivity.songList.size() - 1);
-                            } else {
-                                mPresenter.getSong(Commen.song.getId() - 1);
-                            }
+                        if (Commen.mediaPlayer.isLooping()) {
+                            Commen.mediaPlayer.seekTo(0);
                         } else {
-                            setupMediaPLayer();
-                        }
-                        if (onPlaySongActivityStateChanged != null) {
+                            if (!isExternalSource) {
+                                if (Commen.song.getId() == 0) {
+                                    mPresenter.getSong(SongListActivity.songList.size() - 1);
+                                } else {
+                                    mPresenter.getSong(Commen.song.getId() - 1);
+                                }
+                            } else {
+                                setupMediaPLayer();
+                            }
+                            if (onPlaySongActivityStateChanged != null) {
 
-                            onPlaySongActivityStateChanged.onPlaySongPreviousClicked();
+                                onPlaySongActivityStateChanged.onPlaySongPreviousClicked();
 
+                            }
                         }
                     } else {
                         Commen.mediaPlayer.seekTo(Commen.mediaPlayer.getCurrentPosition() - longTouchPosition);
@@ -338,6 +350,7 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
                         playPauseButton.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_play, null));
                         onPlaySongActivityStateChanged.onPlaySongMediaComplete();
                     } else {
+                        canClicked = true;
                         nextButton.performClick();
                     }
                 } else if (drawableCurent.getConstantState() == drawableShuffle.getConstantState()) {
@@ -574,14 +587,14 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
             }
         });
 
-            Commen.mediaPlayer.start();
-            Commen.IS_PLAYING = true;
-            seekBarProgressUpdater();
-            if (!isExternalSource && onPlaySongActivityStateChanged != null) {
+        Commen.mediaPlayer.start();
+        Commen.IS_PLAYING = true;
+        seekBarProgressUpdater();
+        if (!isExternalSource && onPlaySongActivityStateChanged != null) {
 
-                onPlaySongActivityStateChanged.onPlaySongPlaypauseClicked(true);
-            }
-            playPauseButton.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_pause, null));
+            onPlaySongActivityStateChanged.onPlaySongPlaypauseClicked(true);
+        }
+        playPauseButton.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_pause, null));
 
     }
 
@@ -696,7 +709,7 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
         if (getIntent().getData() != null) {
             newIntentUri = getIntent().getData().toString();
         }
-        if (!newIntentUri.equals("")) {
+        if (!newIntentUri.equals("") && !newIntentUri.equals(singleSongPathUri.toString())) {
             getExtrnalSong();
             setupMediaPLayer();
             if (onPlaySongActivityStateChanged != null) {
@@ -719,7 +732,7 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
             if (!isExternalSource && Commen.song != null) {
                 if (Commen.mediaPlayer != null && (Commen.song.getId() == pos)) {
                     try {
-                        if (!Commen.song.getSongName().equals(songName.getText().toString())){
+                        if (!Commen.song.getSongName().equals(songName.getText().toString())) {
                             setupViews();
                         }
                         if (Commen.IS_PLAYING) {
@@ -729,7 +742,7 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
                         }
                     } catch (Exception e) {
                         //this try catch is for when delete curent playing file and then play first song
-                        if (Commen.mediaPlayer == null){
+                        if (Commen.mediaPlayer == null) {
                             setupMediaPLayer();
                         }
                     }
@@ -779,13 +792,14 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
                 onPlaySongActivityStateChanged.onPlaySongNextClicked();
             }
         }
+
     }
 
     private void setupMediaPLayer() {
 
         if (Commen.song != null) {
 
-            if (song == null){
+            if (song == null) {
                 song = Commen.song;
             }
 
@@ -803,6 +817,9 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
 
     @Override
     protected void onDestroy() {
+        if (Commen.IS_PLAYING) {
+            Commen.IS_PLAYING = false;
+        }
         stopService(new Intent(PlaySongActivity.this, SongService.class));
         Commen.mediaPlayer.release();
         song = null;
@@ -847,6 +864,7 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
                 playPauseButton.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_play, null));
                 onPlaySongActivityStateChanged.onPlaySongMediaComplete();
             } else {
+                canClicked = true;
                 nextButton.performClick();
             }
         } else if (drawableCurent.getConstantState() == drawableShuffle.getConstantState()) {
@@ -922,4 +940,5 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
 
         void onPlaySongMediaComplete();
     }
+
 }

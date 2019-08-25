@@ -2,6 +2,7 @@ package com.example.ps.musicps.MVP;
 
 import com.example.ps.musicps.Commen.SongTask;
 import com.example.ps.musicps.Model.Song;
+import com.example.ps.musicps.SongListActivity;
 
 import java.util.ArrayList;
 
@@ -21,6 +22,9 @@ public class PlaySongModel implements PlaySongMVP.ProvidedPlaySongModelOps, Song
 
     @Override
     public void getSong(int pos) {
+        if (songsList!=null && songsList.size() > SongListActivity.songList.size()){
+            songsList = SongListActivity.songList;
+        }
         position = pos;
         if (songsList == null) {
             SongTask songTask = new SongTask(mPresenter.getActivityContext(), this);

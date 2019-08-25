@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.LocationManager;
 import android.media.MediaPlayer;
@@ -14,6 +15,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.provider.Settings;
+import android.view.Gravity;
+import android.view.WindowManager;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
@@ -163,6 +166,7 @@ public class Commen {
     }
 
     public void writeSettingAlertMessage(final Activity context) {
+
         final AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setMessage("We need write Setting permision, do you want to enable it?")
                 .setCancelable(false)

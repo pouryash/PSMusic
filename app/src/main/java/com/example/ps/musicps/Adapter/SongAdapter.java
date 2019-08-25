@@ -151,10 +151,14 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongVH> {
                                             Toast.makeText(context, "Unable to delete this Song", Toast.LENGTH_LONG).show();
                                         }
                                         if (isRemoved) {
-                                            if (Commen.song.getId() == position) {
-                                                onSongAdapter.onSongRemoved(position, true , songList);
+                                            if (Commen.song.getId() == song.getId()) {
+                                                if (Commen.IS_PLAYING){
+                                                    Commen.mediaPlayer.release();
+                                                    Commen.IS_PLAYING =false;
+                                                }
+                                                onSongAdapter.onSongRemoved(song.getId(), true , songList);
                                             } else {
-                                                onSongAdapter.onSongRemoved(position, false,songList);
+                                                onSongAdapter.onSongRemoved(song.getId(), false,songList);
                                             }
                                             isRemoved = false;
 
@@ -266,7 +270,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongVH> {
             });
 
 
-            //TODO set placeholder by requestoption
+
             Glide.with(context).asBitmap().load(Uri.parse(song.getSongImageUri()))
                     .apply(new RequestOptions().placeholder(R.drawable.ic_no_album))
                     .listener(new RequestListener<Bitmap>() {

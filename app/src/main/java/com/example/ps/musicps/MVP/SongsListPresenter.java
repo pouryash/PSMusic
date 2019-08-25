@@ -57,7 +57,6 @@ public class SongsListPresenter implements SongsListMVP.ProvidedPresenterOps,
         }else {
             mView.get().showToast(Toast.makeText(getAppContext(),"opss no song found!",Toast.LENGTH_LONG));
         }
-        //TODO set image for no songs
     }
 
     @Override

@@ -21,7 +21,6 @@ import javax.sql.StatementEvent;
 
 public class SongTask extends AsyncTask<Void, Void, Void> {
 
-//TODO add progressbar
 
     private Context context;
     private onSongListFinished onSongListFinished;

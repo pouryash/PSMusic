@@ -92,6 +92,7 @@
             android:layout_marginEnd="@dimen/standardMargin_X2"
             android:layout_marginTop="@dimen/standardMargin_X2"
             tools:text="pourya sharifi"
+            android:ellipsize="marquee"
             android:layout_below="@id/cardV_songImage"
             android:layout_centerInParent="true"
             android:singleLine="true"
@@ -203,7 +204,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true">
-<!--TODO fix select background-->
+
         <ImageView
             android:id="@+id/iv_playPayse_playSong"
             android:layout_width="wrap_content"

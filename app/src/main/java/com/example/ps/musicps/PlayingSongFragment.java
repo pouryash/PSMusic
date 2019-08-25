@@ -22,6 +22,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
@@ -53,9 +54,6 @@ public class PlayingSongFragment extends Fragment implements Commen.onMediaPlaye
     private RelativeLayout playingSongRoot;
     private boolean shouldMediaPlayerStart;
 
-    public static PlayingSongFragment newInstance() {
-        return new PlayingSongFragment();
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -91,10 +89,15 @@ public class PlayingSongFragment extends Fragment implements Commen.onMediaPlaye
 
                 if (SongListActivity.isPlaySongActivityEnabled) {
                     Intent intent = new Intent(getContext(), PlaySongActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                    intent.putExtra("position",Commen.song.getId());
+                    if (SongListActivity.shouldStartNewInstance){
+                    }else {
+                        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+
+                    }
+                    intent.putExtra("position", Commen.song.getId());
                     startActivity(intent);
                 } else {
+
                     onGetSong.onPlayingSongClicked(Commen.song.getId());
                 }
 
@@ -143,7 +146,7 @@ public class PlayingSongFragment extends Fragment implements Commen.onMediaPlaye
                 u[0] = p;
             }
         });
-        
+
         return u[0];
     }
 
@@ -175,7 +178,7 @@ public class PlayingSongFragment extends Fragment implements Commen.onMediaPlaye
                 } else {
                     playPauseButtonPlayingSong.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_play_24px, null));
                 }
-            }catch (IllegalStateException e){
+            } catch (IllegalStateException e) {
                 playPauseButtonPlayingSong.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_play_24px, null));
             }
         } else {
@@ -195,18 +198,13 @@ public class PlayingSongFragment extends Fragment implements Commen.onMediaPlaye
 
         if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE)
                 == PackageManager.PERMISSION_GRANTED && playingSongName != null) {
-            if (PlaySongActivity.song != null || Commen.song != null) {
+            if (Commen.song != null) {
 
-                if (PlaySongActivity.song != null) {
-                    setupPlayingSong(PlaySongActivity.song, Commen.mediaPlayer);
-                } else {
-                    SongListActivity.onDataRecived = this;
-                    setupPlayingSong(Commen.song, Commen.mediaPlayer);
-                }
+                setupPlayingSong(Commen.song, Commen.mediaPlayer);
 
             } else if (playingSongName.getText().equals("") || Commen.song == null) {
                 File file = new File(songSharedPrefrenceManager.getSong().getTrackFile());
-                if (file.exists()){
+                if (file.exists()) {
 
                     Commen.song = songSharedPrefrenceManager.getSong();
                     Commen.getInstance().setupMediaPLayer(getContext(), Commen.song, this);
@@ -215,6 +213,12 @@ public class PlayingSongFragment extends Fragment implements Commen.onMediaPlaye
                 SongListActivity.isPlaySongActivityEnabled = false;
             }
         }
+        if (Commen.IS_PLAYING) {
+            playPauseButtonPlayingSong.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_pause_24px, null));
+        } else {
+            playPauseButtonPlayingSong.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_play_24px, null));
+
+        }
         SongService.onNotificationServiceStateChangedList = this;
         super.onResume();
     }
@@ -222,9 +226,7 @@ public class PlayingSongFragment extends Fragment implements Commen.onMediaPlaye
 
     @Override
     public void onAttach(Context context) {
-
         super.onAttach(context);
-
     }
 
     @Override
@@ -235,10 +237,10 @@ public class PlayingSongFragment extends Fragment implements Commen.onMediaPlaye
 
     @Override
     public void onDestroy() {
-        if (!PlaySongActivity.isExternalSource){
+        if (!PlaySongActivity.isExternalSource) {
             Commen.mediaPlayer.release();
         }
-        if (songSharedPrefrenceManager != null){
+        if (songSharedPrefrenceManager != null) {
             songSharedPrefrenceManager = null;
         }
         super.onDestroy();
@@ -276,13 +278,13 @@ public class PlayingSongFragment extends Fragment implements Commen.onMediaPlaye
 
     @Override
     public void onNextButtonClickedList() {
-        if (SongListActivity.songList.size() -1 == Commen.song.getId()){
+        if (SongListActivity.songList.size() - 1 == Commen.song.getId()) {
             if (PlaySongActivity.song == null) {
                 onGetSong.getSong(0);
             } else {
                 setupPlayingSong(Commen.song, Commen.mediaPlayer);
             }
-        }else {
+        } else {
             if (PlaySongActivity.song == null) {
                 onGetSong.getSong(Commen.song.getId() + 1);
             } else {
@@ -295,31 +297,33 @@ public class PlayingSongFragment extends Fragment implements Commen.onMediaPlaye
 
     @Override
     public void onPrevioudButtonClickedList() {
-      if (Commen.song.getId() == 0){
-          if (PlaySongActivity.song == null) {
-              onGetSong.getSong(SongListActivity.songList.size()-1);
-          } else {
-              setupPlayingSong(PlaySongActivity.song, Commen.mediaPlayer);
-          }
-      }else {
-          if (PlaySongActivity.song == null) {
-              onGetSong.getSong(Commen.song.getId() - 1);
-          } else {
-              setupPlayingSong(PlaySongActivity.song, Commen.mediaPlayer);
-          }
-      }
+        if (Commen.song.getId() == 0) {
+            if (PlaySongActivity.song == null) {
+                onGetSong.getSong(SongListActivity.songList.size() - 1);
+            } else {
+                setupPlayingSong(PlaySongActivity.song, Commen.mediaPlayer);
+            }
+        } else {
+            if (PlaySongActivity.song == null) {
+                onGetSong.getSong(Commen.song.getId() - 1);
+            } else {
+                setupPlayingSong(PlaySongActivity.song, Commen.mediaPlayer);
+            }
+        }
         playPauseButtonPlayingSong.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_pause_24px, null));
     }
 
     @Override
-    public void onSongRecived(Song song , boolean shouldPlay) {
-       //TODO fix true false
-        if (!shouldPlay){
+    public void onSongRecived(Song song, boolean shouldPlay) {
+
+        if (shouldPlay) {
             shouldMediaPlayerStart = true;
         }
         Commen.song = song;
-        if(Commen.mediaPlayer != null){
-            Commen.mediaPlayer.release();
+        if (Commen.mediaPlayer != null) {
+            if (onSongListActivityStateChanged != null) {
+                onSongListActivityStateChanged.onSongListRemovedSong();
+            }
         }
         Commen.getInstance().setupMediaPLayer(getContext(), Commen.song, this);
 
@@ -328,7 +332,7 @@ public class PlayingSongFragment extends Fragment implements Commen.onMediaPlaye
     @Override
     public void onListReciveed(ArrayList<Song> songs) {
         File file = new File(songSharedPrefrenceManager.getSong().getTrackFile());
-        if (!file.exists()){
+        if (!file.exists()) {
             Commen.song = songs.get(0);
             Commen.getInstance().setupMediaPLayer(getContext(), Commen.song, this);
         }
@@ -347,6 +351,8 @@ public class PlayingSongFragment extends Fragment implements Commen.onMediaPlaye
 
     public interface onSongListActivityStateChanged {
         void onSongListPlaypauseClicked(boolean isPlaying);
+
+        void onSongListRemovedSong();
 
         void onSongListPlaypauseMediaComplete();
 

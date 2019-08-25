@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.example.ps.musicps.Adapter.SongSearchAdapter;
 import com.example.ps.musicps.Commen.Commen;
@@ -29,11 +30,13 @@ import java.util.List;
 public class SearchActivity extends AppCompatActivity {
 
     public static onSearchedItemRemoved onSearchedItemRemoved;
+    public static boolean isIntentFromSearch;
     RecyclerView recyclerView;
     EditText editText;
     SongSearchAdapter adapter;
     ImageView back;
     InputMethodManager imgr;
+    View fView;
     List<Song> songList = new ArrayList<>();
 
     @Override
@@ -55,6 +58,7 @@ public class SearchActivity extends AppCompatActivity {
         Intent intent = new Intent(SearchActivity.this, SongListActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
         startActivity(intent);
+        isIntentFromSearch = true;
     }
 
     private void setupViews() {
@@ -70,13 +74,18 @@ public class SearchActivity extends AppCompatActivity {
                 Intent intent = new Intent(SearchActivity.this, PlaySongActivity.class);
                 intent.putExtra("position", pos);
                 SearchActivity.this.startActivity(intent);
+                isIntentFromSearch = true;
             }
 
             @Override
             public void onSongRemoved(int pos,boolean isCurentSong ,List<Song> list) {
                 songList = list;
                 songList = Commen.notifyListchanged(pos,songList);
-                onSearchedItemRemoved.onRemoved(pos,isCurentSong);
+                onSearchedItemRemoved.onRemoved(pos,isCurentSong , list);
+                if (list.size() == 0){
+                    fView.setVisibility(View.GONE);
+                    Toast.makeText(getApplicationContext(),"All song deleted!",Toast.LENGTH_LONG).show();
+                }
 
             }
         });
@@ -106,12 +115,14 @@ public class SearchActivity extends AppCompatActivity {
                 Intent intent = new Intent(SearchActivity.this, SongListActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(intent);
+                isIntentFromSearch = true;
             }
         });
     }
 
     private void initViews() {
 
+        fView = findViewById(R.id.fr_PlayingSong);
         recyclerView = findViewById(R.id.rl_Search);
         editText = findViewById(R.id.et_Search);
         back = findViewById(R.id.iv_back_Search);
@@ -126,7 +137,7 @@ public class SearchActivity extends AppCompatActivity {
 
 
     public interface onSearchedItemRemoved{
-        void onRemoved(int position , boolean isCurentSong);
+        void onRemoved(int position , boolean isCurentSong , List<Song> list);
     }
 
 }
