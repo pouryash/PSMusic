@@ -6,7 +6,6 @@ import android.widget.Toast;
 import com.example.ps.musicps.Model.Song;
 
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 
 public class PlaySongPresenter implements PlaySongMVP.ProvidedPlaySongPresenterOps,
         PlaySongMVP.RequiredPlaySongPresenterOps {

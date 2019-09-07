@@ -1,11 +1,10 @@
 package com.example.ps.musicps.Adapter;
 
 import android.app.Activity;
-import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -22,8 +21,6 @@ import android.provider.MediaStore;
 import android.provider.Settings;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
-import android.util.Base64;
-import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -47,7 +44,6 @@ import com.bumptech.glide.request.target.Target;
 import com.example.ps.musicps.Commen.Commen;
 import com.example.ps.musicps.Commen.CustomeAlertDialogClass;
 import com.example.ps.musicps.Model.Song;
-import com.example.ps.musicps.PlaySongActivity;
 import com.example.ps.musicps.R;
 
 import java.io.File;
@@ -134,6 +130,14 @@ public class SongSearchAdapter extends RecyclerView.Adapter<SongSearchAdapter.So
         TextView artistName;
         TextView duration;
         PopupMenu popup;
+        View infoDialogLayout;
+        TextView infoTitle;
+        TextView infoAlbum;
+        TextView infoDuration;
+        TextView infoSize;
+        TextView infoPath;
+        TextView infoCancel;
+        Dialog infoDialog;
 
 
         public SongVH(@NonNull View itemView, final onSearchAdpSong onSearchAdpSong) {
@@ -147,6 +151,24 @@ public class SongSearchAdapter extends RecyclerView.Adapter<SongSearchAdapter.So
             Context wrapper = new ContextThemeWrapper(context, R.style.popupMenuStyle);
             popup = new PopupMenu(wrapper, ivMore);
             popup.inflate(R.menu.adp_items_menu);
+            //setup item for menu info item
+            LayoutInflater aInflater = ((Activity) context).getLayoutInflater();
+            infoDialogLayout = aInflater.inflate(R.layout.dialog_song_info, null);
+            infoTitle = infoDialogLayout.findViewById(R.id.tv_title_value_SongInfoDialog);
+            infoAlbum = infoDialogLayout.findViewById(R.id.tv_album_value_SongInfoDialog);
+            infoDuration = infoDialogLayout.findViewById(R.id.tv_duration_value_SongInfoDialog);
+            infoSize = infoDialogLayout.findViewById(R.id.tv_size_value_SongInfoDialog);
+            infoPath = infoDialogLayout.findViewById(R.id.tv_path_value_SongInfoDialog);
+            infoCancel = infoDialogLayout.findViewById(R.id.tv_cancel_SongInfoDialog);
+            infoDialog = new Dialog(context,R.style.DialogTheme);
+            infoDialog.setTitle("Login");
+            infoDialog.setCancelable(true);
+            infoDialog.setContentView(infoDialogLayout);
+            infoDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+            infoDialog.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+            WindowManager.LayoutParams lp = infoDialog.getWindow().getAttributes();
+            lp.dimAmount = 0.7f;
+            lp.gravity = Gravity.BOTTOM;
         }
 
         void bindSong(final Song song, final int position) {
@@ -304,6 +326,38 @@ public class SongSearchAdapter extends RecyclerView.Adapter<SongSearchAdapter.So
 //
 //                                mediaCursor.close();
 //                            }
+
+                            break;
+                        case R.id.menu_Info:
+
+
+                            infoDialog.show();
+                            infoTitle.setText(song.getSongName());
+                            infoAlbum.setText(song.getAlbumName());
+                            infoDuration.setText(song.getDuration());
+                            songFile = new File(song.getTrackFile());
+                            int megaB = 0;
+                            int kiloB = 0;
+                            if (songFile.length() > (10^4)){
+                                megaB = (int)(songFile.length()/1024)/1024;
+                                kiloB =(int)((songFile.length()/1024)%1024);
+
+                            }
+                            if (kiloB > 0 && megaB > 0){
+                                infoSize.setText(String.valueOf(megaB).concat("."+Integer.toString(kiloB).substring(0, 2))+" MB");
+                            }else if (megaB > 0){
+                                infoSize.setText(Integer.toString(megaB).substring(0, 2).concat(" MB"));
+                            }else if (kiloB > 0){
+                                infoSize.setText(Integer.toString(kiloB).substring(0, 2).concat(" KB"));
+                            }
+                            infoPath.setText(song.getTrackFile());
+                            infoCancel.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    infoDialog.dismiss();
+                                }
+                            });
+
 
                             break;
                     }

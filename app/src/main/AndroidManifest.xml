@@ -5,11 +5,11 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.WRITE_SETTINGS"/>
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
 
 
     <application
-        android:name=".Commen.MyApplication"
+        android:name="com.example.ps.musicps.Commen.MyApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -17,11 +17,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".SearchActivity"
+            android:name="com.example.ps.musicps.SearchActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan" />
         <activity
-            android:name=".PlaySongActivity"
+            android:name="com.example.ps.musicps.PlaySongActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -34,7 +34,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".SongListActivity"
+            android:name="com.example.ps.musicps.SongListActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -43,15 +43,14 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".Service.SongService" />
+        <service android:name="com.example.ps.musicps.Service.SongService" />
 
-        <service android:name=".Commen.FireBaseCloudMessagingService">
+        <service android:name="com.example.ps.musicps.Commen.FireBaseCloudMessagingService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-        <receiver android:name=".Service.NotificationDismissedReceiver"
-            android:exported="false"/>
+
     </application>
 
 </manifest>

@@ -1,8 +1,11 @@
 <resources>
     <string name="app_name">PSMusic</string>
     <string name="searchEditText">Search for songs, or artists</string>
-
-
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="songInfoTitle">Title:</string>
+    <string name="songInfoAlbumName">Album:</string>
+    <string name="songInfoPath">Path:</string>
+    <string name="songInfoSize">Size:</string>
+    <string name="songInfoDuration">Duration:</string>
 
 </resources>

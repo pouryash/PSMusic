@@ -45,6 +45,7 @@ import com.example.ps.musicps.MVP.PlaySongMVP;
 import com.example.ps.musicps.MVP.PlaySongPresenter;
 import com.example.ps.musicps.Model.Song;
 import com.example.ps.musicps.Service.SongService;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -91,7 +92,9 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
     Bitmap songBitmapAlbum;
     boolean isInLongTouch;
     boolean canClicked = true;
+    boolean isExternalSongFirstPlayed;
     int longTouchPosition;
+    FirebaseAnalytics firebaseAnalytics;
     PlaySongMVP.ProvidedPlaySongPresenterOps mPresenter = new PlaySongPresenter();
 
 
@@ -128,6 +131,9 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
         if (Intent.ACTION_VIEW.equals(getIntent().getAction())) {
             isExternalSource = true;
 
+            if (singleSongPathUri.toString().equals("")) {
+                isExternalSongFirstPlayed = true;
+            }
             singleSongPathUri = getIntent().getData();
 
             MediaMetadataRetriever metaRetriver;
@@ -210,8 +216,10 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
                             if (!isExternalSource) {
                                 if (Commen.song.getId() == SongListActivity.songList.size() - 1) {
                                     mPresenter.getSong(0);
+                                    Commen.IS_PLAYING = false;
                                 } else {
                                     mPresenter.getSong(Commen.song.getId() + 1);
+                                    Commen.IS_PLAYING = false;
                                 }
                             } else {
                                 setupMediaPLayer();
@@ -286,6 +294,7 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
 
     private void setupViews() {
 
+        firebaseAnalytics = FirebaseAnalytics.getInstance(this);
         AudioFocusControler.getInstance().onAudioFocusChangePlay = new AudioFocusControler.onAudioFocusChangePlay() {
             @Override
             public void onPlaySongFocusChange() {
@@ -376,6 +385,9 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Bundle bundle = new Bundle();
+                bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "Back Button PlaySong");
+                firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
                 Intent intent = new Intent(PlaySongActivity.this, SongListActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(intent);
@@ -387,6 +399,9 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
 
                 audioManager.setStreamVolume(AudioManager.STREAM_MUSIC,
                         i, 0);
+                Bundle bundle = new Bundle();
+                bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "seekbar volume");
+                firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
             }
 
             @Override
@@ -404,6 +419,9 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
             public void onProgressChanged(SeekBar seekBar, int i, boolean fromUser) {
                 if (fromUser) {
                     Commen.mediaPlayer.seekTo(i);
+                    Bundle bundle = new Bundle();
+                    bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "seekbar main");
+                    firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
 
                 }
             }
@@ -422,6 +440,9 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
         playPauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Bundle bundle = new Bundle();
+                bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "PlayPause Button PlaySong");
+                firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
                 if (Commen.IS_PLAYING) {
 
                     Commen.getInstance().FadeOut(2);
@@ -452,14 +473,20 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
         nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Bundle bundle = new Bundle();
+                bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "Next Button playSong");
+                firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
                 if (canClicked) {
                     if (!isExternalSource) {
                         if (Commen.song.getId() == SongListActivity.songList.size() - 1) {
                             mPresenter.getSong(0);
+                            Commen.IS_PLAYING = false;
                         } else {
                             mPresenter.getSong(Commen.song.getId() + 1);
+                            Commen.IS_PLAYING = false;
                         }
                     } else {
+                        Commen.IS_PLAYING = false;
                         setupMediaPLayer();
                     }
                     if (onPlaySongActivityStateChanged != null) {
@@ -518,14 +545,20 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
         previousButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Bundle bundle = new Bundle();
+                bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "Previous Button");
+                firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
                 if (canClicked) {
                     if (!isExternalSource) {
                         if (Commen.song.getId() == 0) {
                             mPresenter.getSong(SongListActivity.songList.size() - 1);
+                            Commen.IS_PLAYING = false;
                         } else {
                             mPresenter.getSong(Commen.song.getId() - 1);
+                            Commen.IS_PLAYING = false;
                         }
                     } else {
+                        Commen.IS_PLAYING = false;
                         setupMediaPLayer();
                     }
                     if (onPlaySongActivityStateChanged != null) {
@@ -541,6 +574,9 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
         forwardButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Bundle bundle = new Bundle();
+                bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "Forward Button 30s");
+                firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
                 Commen.mediaPlayer.seekTo(Commen.mediaPlayer.getCurrentPosition() + 30000);
 
                 seekBar.setProgress(Commen.mediaPlayer.getCurrentPosition());
@@ -552,12 +588,15 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
         repeatButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                Bundle bundle = new Bundle();
+                bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "Repeat Button ");
+                firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
                 if (drawableCurent.getConstantState() == drawableRepeatOne.getConstantState()) {
                     repeatButton.setImageBitmap(Commen.getBitmapFromVectorDrawable(PlaySongActivity.this,
                             getResources().getDrawable(R.drawable.ic_repeat_24px)));
                     Commen.mediaPlayer.setLooping(false);
                     drawableCurent = drawableRepeatAll;
+                    Toast.makeText(getApplicationContext(), "Repeat list", Toast.LENGTH_SHORT).show();
                 } else if (drawableCurent.getConstantState() == drawableRepeatAll.getConstantState()) {
                     repeatButton.setImageBitmap(Commen.getBitmapFromVectorDrawable(PlaySongActivity.this,
                             getResources().getDrawable(R.drawable.ic_shuffle_24px)));
@@ -567,11 +606,13 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
                     Collections.shuffle(shuffleList);
                     Commen.mediaPlayer.setLooping(false);
                     drawableCurent = drawableShuffle;
+                    Toast.makeText(getApplicationContext(), "Shuffle", Toast.LENGTH_SHORT).show();
                 } else if (drawableCurent.getConstantState() == drawableShuffle.getConstantState()) {
                     repeatButton.setImageBitmap(Commen.getBitmapFromVectorDrawable(PlaySongActivity.this,
                             getResources().getDrawable(R.drawable.ic_repeat_one_24px)));
                     Commen.mediaPlayer.setLooping(true);
                     drawableCurent = drawableRepeatOne;
+                    Toast.makeText(getApplicationContext(), "Repeat one", Toast.LENGTH_SHORT).show();
                 }
 
 
@@ -587,7 +628,10 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
             }
         });
 
-        Commen.mediaPlayer.start();
+        if (!Commen.IS_PLAYING) {
+
+            Commen.getInstance().FadeIn(2);
+        }
         Commen.IS_PLAYING = true;
         seekBarProgressUpdater();
         if (!isExternalSource && onPlaySongActivityStateChanged != null) {
@@ -710,11 +754,21 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
             newIntentUri = getIntent().getData().toString();
         }
         if (!newIntentUri.equals("") && !newIntentUri.equals(singleSongPathUri.toString())) {
+            Commen.IS_PLAYING = false;
             getExtrnalSong();
             setupMediaPLayer();
             if (onPlaySongActivityStateChanged != null) {
                 onPlaySongActivityStateChanged.onPlaySongNextClicked();
             }
+        } else if (!newIntentUri.equals("") && isExternalSongFirstPlayed) {
+            //this section is for when
+            Commen.IS_PLAYING = false;
+            getExtrnalSong();
+            setupMediaPLayer();
+            if (onPlaySongActivityStateChanged != null) {
+                onPlaySongActivityStateChanged.onPlaySongNextClicked();
+            }
+            isExternalSongFirstPlayed = false;
         }
 
         if (Commen.song == null && !PlaySongActivity.isExternalSource) {
@@ -758,6 +812,9 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
 
             SongService.onNotificationServiceStateChangedPlay = this;
         }
+        if (isExternalSource && !Commen.song.getSongName().equals(songName.getText().toString())) {
+            setupViews();
+        }
         super.onResume();
     }
 
@@ -778,10 +835,19 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
 
     @Override
     public void onSongRecived(Song song) {
+
         PlaySongActivity.song = song;
-        if (song.getId() == Commen.song.getId()) {
-            setupViews();
+        if (Commen.song != null && song.getId() == Commen.song.getId()) {
+            try {
+                setupViews();
+            } catch (Exception e) {
+                Commen.getInstance().setupMediaPLayer(PlaySongActivity.this,
+                        song, PlaySongActivity.this);
+            }
         } else {
+            if (Commen.song == null) {
+                Commen.song = song;
+            }
             setupMediaPLayer();
             if (drawableCurent.getConstantState() == drawableRepeatAll.getConstantState()) {
                 Commen.mediaPlayer.setLooping(false);
@@ -821,11 +887,18 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
             Commen.IS_PLAYING = false;
         }
         stopService(new Intent(PlaySongActivity.this, SongService.class));
-        Commen.mediaPlayer.release();
+        if (Commen.mediaPlayer != null){
+            Commen.mediaPlayer.release();
+        }
         song = null;
-        timer.purge();
-        timer.cancel();
-        PlaySongActivity.this.getContentResolver().unregisterContentObserver(mVolumeContentObserver);
+        if (timer != null){
+            timer.purge();
+            timer.cancel();
+        }
+        if (mVolumeContentObserver != null) {
+            PlaySongActivity.this.getContentResolver().unregisterContentObserver(mVolumeContentObserver);
+        }
+
         this.finish();
         super.onDestroy();
     }
@@ -845,7 +918,9 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
         } else {
             intent = new Intent(PlaySongActivity.this, SongListActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+
             startActivity(intent);
+
         }
 
     }
@@ -860,13 +935,10 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
     public void onMediaPlayerCompletion() {
 
         if (drawableCurent.getConstantState() == drawableRepeatAll.getConstantState()) {
-            if ((SongListActivity.songList.size() - 1) == Commen.song.getId()) {
-                playPauseButton.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_play, null));
-                onPlaySongActivityStateChanged.onPlaySongMediaComplete();
-            } else {
-                canClicked = true;
-                nextButton.performClick();
-            }
+
+            canClicked = true;
+            nextButton.performClick();
+
         } else if (drawableCurent.getConstantState() == drawableShuffle.getConstantState()) {
             PlaySongActivity.song = shuffleList.get(curentShuffleSong);
             if (curentShuffleSong != shuffleList.size() - 1) {
@@ -875,6 +947,7 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
                 Collections.shuffle(shuffleList);
                 curentShuffleSong = 0;
             }
+            Commen.IS_PLAYING = false;
             setupMediaPLayer();
             if (drawableCurent.getConstantState() == drawableRepeatAll.getConstantState()) {
                 Commen.mediaPlayer.setLooping(false);
@@ -906,11 +979,15 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
         if (!isExternalSource) {
             if (Commen.song.getId() == SongListActivity.songList.size() - 1) {
                 mPresenter.getSong(0);
+                Commen.IS_PLAYING = false;
             } else {
                 mPresenter.getSong(Commen.song.getId() + 1);
+                Commen.IS_PLAYING = false;
             }
         } else {
+            Commen.IS_PLAYING = false;
             setupMediaPLayer();
+
         }
     }
 
@@ -919,10 +996,13 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
         if (!isExternalSource) {
             if (Commen.song.getId() == 0) {
                 mPresenter.getSong(SongListActivity.songList.size() - 1);
+                Commen.IS_PLAYING = false;
             } else {
                 mPresenter.getSong(Commen.song.getId() - 1);
+                Commen.IS_PLAYING = false;
             }
         } else {
+            Commen.IS_PLAYING = false;
             setupMediaPLayer();
         }
     }

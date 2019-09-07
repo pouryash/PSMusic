@@ -1,6 +1,5 @@
 package com.example.ps.musicps.Commen;
 
-import android.content.Context;
 import android.media.AudioAttributes;
 import android.media.AudioFocusRequest;
 import android.media.AudioManager;
@@ -57,7 +56,8 @@ public class AudioFocusControler implements AudioManager.OnAudioFocusChangeListe
 
     @Override
     public void onAudioFocusChange(int i) {
-        Commen.mediaPlayer.pause();
+        //TODO
+        Commen.getInstance().FadeOut(2);
         if (onAudioFocusChangeService != null){
             onAudioFocusChangeService.onServiceFocusChange();
         }

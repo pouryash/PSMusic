@@ -7,22 +7,15 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import android.location.LocationManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.provider.Settings;
-import android.view.Gravity;
-import android.view.WindowManager;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.core.content.ContextCompat;
-import androidx.core.content.res.ResourcesCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.ps.musicps.Model.Song;
 
@@ -126,20 +119,21 @@ public class Commen {
     }
 
     public void FadeIn(final float deltaTime) {
-        IS_PLAYING = true;
-        mediaPlayer.start();
-        mediaPlayer.setVolume(volumeIn, volumeIn);
-        volumeIn += speed * deltaTime;
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (volumeIn != 1 && !(volumeIn > 1)) {
-                    FadeIn(deltaTime);
-                } else if (volumeIn == 1 || volumeIn > 1) {
-                    volumeIn = 0;
+            IS_PLAYING = true;
+            mediaPlayer.start();
+            mediaPlayer.setVolume(volumeIn, volumeIn);
+            volumeIn += speed * deltaTime;
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if (volumeIn != 1 && !(volumeIn > 1)) {
+                        FadeIn(deltaTime);
+                    } else if (volumeIn == 1 || volumeIn > 1) {
+                        volumeIn = 0;
+                    }
                 }
-            }
-        }, 20);
+            }, 20);
+
     }
 
     public static List<Song> notifyListchanged(int pos, List<Song> songs) {

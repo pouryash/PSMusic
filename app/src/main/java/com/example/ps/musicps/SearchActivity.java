@@ -23,6 +23,7 @@ import android.widget.Toast;
 import com.example.ps.musicps.Adapter.SongSearchAdapter;
 import com.example.ps.musicps.Commen.Commen;
 import com.example.ps.musicps.Model.Song;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +38,10 @@ public class SearchActivity extends AppCompatActivity {
     ImageView back;
     InputMethodManager imgr;
     View fView;
+    String searchTerm;
     List<Song> songList = new ArrayList<>();
+    FirebaseAnalytics firebaseAnalytics;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +66,8 @@ public class SearchActivity extends AppCompatActivity {
     }
 
     private void setupViews() {
+
+        firebaseAnalytics = FirebaseAnalytics.getInstance(this);
         songList = SongListActivity.songList;
         imgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imgr.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
@@ -70,11 +76,20 @@ public class SearchActivity extends AppCompatActivity {
         adapter = new SongSearchAdapter(songList, this, new SongSearchAdapter.onSearchAdpSong() {
             @Override
             public void onSongClicked(int pos) {
+                if (pos != Commen.song.getId()){
+                    Commen.IS_PLAYING = false;
+                }
                 imgr.hideSoftInputFromWindow(SearchActivity.this.getCurrentFocus().getWindowToken(), 0);
                 Intent intent = new Intent(SearchActivity.this, PlaySongActivity.class);
                 intent.putExtra("position", pos);
                 SearchActivity.this.startActivity(intent);
                 isIntentFromSearch = true;
+                Bundle bundle = new Bundle();
+                bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, songList.get(pos).getSongName());
+                bundle.putString(FirebaseAnalytics.Param.SEARCH_TERM,searchTerm);
+                bundle.putString("ITEM_DESCRIPTION", songList.get(pos).getArtistName());
+                bundle.putString("ITEM_LOCATION", songList.get(pos).getArtistName());
+                firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SEARCH, bundle);
             }
 
             @Override
@@ -102,6 +117,7 @@ public class SearchActivity extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 adapter.getFilter().filter(charSequence);
+                searchTerm = charSequence.toString();
             }
 
             @Override
@@ -112,10 +128,14 @@ public class SearchActivity extends AppCompatActivity {
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Bundle bundle = new Bundle();
+                bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "Back Button Search");
+                firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
                 Intent intent = new Intent(SearchActivity.this, SongListActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(intent);
                 isIntentFromSearch = true;
+                imgr.hideSoftInputFromWindow(SearchActivity.this.getCurrentFocus().getWindowToken(), 0);
             }
         });
     }
@@ -131,7 +151,9 @@ public class SearchActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        Commen.mediaPlayer.release();
+        if(Commen.mediaPlayer !=null){
+            Commen.mediaPlayer.release();
+        }
         super.onDestroy();
     }
 

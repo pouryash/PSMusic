@@ -1,11 +1,10 @@
 package com.example.ps.musicps.Adapter;
 
 import android.app.Activity;
-import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -18,6 +17,7 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Build;
+import android.os.Bundle;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.view.ContextThemeWrapper;
@@ -38,12 +38,15 @@ import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
+import com.crashlytics.android.Crashlytics;
 import com.example.ps.musicps.Commen.Commen;
 import com.example.ps.musicps.Commen.CustomeAlertDialogClass;
 import com.example.ps.musicps.Model.Song;
 import com.example.ps.musicps.R;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.io.File;
+import java.text.DecimalFormat;
 import java.util.List;
 
 public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongVH> {
@@ -89,6 +92,15 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongVH> {
         TextView artistName;
         TextView duration;
         PopupMenu popup;
+        FirebaseAnalytics firebaseAnalytics;
+        View infoDialogLayout;
+        TextView infoTitle;
+        TextView infoAlbum;
+        TextView infoDuration;
+        TextView infoSize;
+        TextView infoPath;
+        TextView infoCancel;
+        Dialog infoDialog;
 
 
         public SongVH(@NonNull View itemView, final onSongAdapter onSongAdapter) {
@@ -102,6 +114,24 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongVH> {
             Context wrapper = new ContextThemeWrapper(context, R.style.popupMenuStyle);
             popup = new PopupMenu(wrapper, ivMore);
             popup.inflate(R.menu.adp_items_menu);
+            firebaseAnalytics = FirebaseAnalytics.getInstance(context);
+            LayoutInflater aInflater = ((Activity) context).getLayoutInflater();
+            infoDialogLayout = aInflater.inflate(R.layout.dialog_song_info, null);
+            infoTitle = infoDialogLayout.findViewById(R.id.tv_title_value_SongInfoDialog);
+            infoAlbum = infoDialogLayout.findViewById(R.id.tv_album_value_SongInfoDialog);
+            infoDuration = infoDialogLayout.findViewById(R.id.tv_duration_value_SongInfoDialog);
+            infoSize = infoDialogLayout.findViewById(R.id.tv_size_value_SongInfoDialog);
+            infoPath = infoDialogLayout.findViewById(R.id.tv_path_value_SongInfoDialog);
+            infoCancel = infoDialogLayout.findViewById(R.id.tv_cancel_SongInfoDialog);
+            infoDialog = new Dialog(context,R.style.DialogTheme);
+            infoDialog.setTitle("Login");
+            infoDialog.setCancelable(true);
+            infoDialog.setContentView(SongVH.this.infoDialogLayout);
+            infoDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+            infoDialog.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+            WindowManager.LayoutParams lp = infoDialog.getWindow().getAttributes();
+            lp.dimAmount = 0.7f;
+            lp.gravity = Gravity.BOTTOM;
 
 
         }
@@ -113,16 +143,23 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongVH> {
                 @Override
                 public void onClick(View view) {
 
-                    popup.show();
+                    try {
+                        popup.show();
+                    } catch (Exception e) {
+                        Crashlytics.log("show popup menu(SongAdp)");
+                    }
                 }
             });
             // song item option menu click listener
             popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                 @Override
                 public boolean onMenuItemClick(MenuItem menuItem) {
+                    Bundle bundle = new Bundle();
                     switch (menuItem.getItemId()) {
 
                         case R.id.menu_Delete:
+                            bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "menu item delete list");
+                            firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
                             final File fdelete = new File(song.getTrackFile());
 
                             if (fdelete.exists()) {
@@ -131,45 +168,45 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongVH> {
                                         CustomeAlertDialogClass((Activity) context,
                                         "Do you want to delete this Song?",
                                         new CustomeAlertDialogClass.onAlertDialogCliscked() {
-                                    @Override
-                                    public void onPosetive() {
-                                        if (fdelete.delete()) {
+                                            @Override
+                                            public void onPosetive() {
+                                                if (fdelete.delete()) {
 
-                                            Toast.makeText(context, "song is sucsessfuly deleted", Toast.LENGTH_LONG).show();
-                                            MediaScannerConnection.scanFile(
-                                                    context,
-                                                    new String[]{fdelete.getAbsolutePath(), null},
-                                                    null, null);
-                                            songList.remove(position);
-                                            notifyItemRemoved(position);
-                                            notifyItemRangeRemoved(position, songList.size());
-                                            notifyDataSetChanged();
-                                            isRemoved = true;
+                                                    Toast.makeText(context, "song is sucsessfuly deleted", Toast.LENGTH_LONG).show();
+                                                    MediaScannerConnection.scanFile(
+                                                            context,
+                                                            new String[]{fdelete.getAbsolutePath(), null},
+                                                            null, null);
+                                                    songList.remove(position);
+                                                    notifyItemRemoved(position);
+                                                    notifyItemRangeRemoved(position, songList.size());
+                                                    notifyDataSetChanged();
+                                                    isRemoved = true;
 
-                                        } else {
-                                            context.deleteFile(fdelete.getName());
-                                            Toast.makeText(context, "Unable to delete this Song", Toast.LENGTH_LONG).show();
-                                        }
-                                        if (isRemoved) {
-                                            if (Commen.song.getId() == song.getId()) {
-                                                if (Commen.IS_PLAYING){
-                                                    Commen.mediaPlayer.release();
-                                                    Commen.IS_PLAYING =false;
+                                                } else {
+                                                    context.deleteFile(fdelete.getName());
+                                                    Toast.makeText(context, "Unable to delete this Song", Toast.LENGTH_LONG).show();
                                                 }
-                                                onSongAdapter.onSongRemoved(song.getId(), true , songList);
-                                            } else {
-                                                onSongAdapter.onSongRemoved(song.getId(), false,songList);
+                                                if (isRemoved) {
+                                                    if (Commen.song.getId() == song.getId()) {
+                                                        if (Commen.IS_PLAYING) {
+                                                            Commen.mediaPlayer.release();
+                                                            Commen.IS_PLAYING = false;
+                                                        }
+                                                        onSongAdapter.onSongRemoved(song.getId(), true, songList);
+                                                    } else {
+                                                        onSongAdapter.onSongRemoved(song.getId(), false, songList);
+                                                    }
+                                                    isRemoved = false;
+
+                                                }
                                             }
-                                            isRemoved = false;
 
-                                        }
-                                    }
+                                            @Override
+                                            public void onNegetive() {
 
-                                    @Override
-                                    public void onNegetive() {
-
-                                    }
-                                });
+                                            }
+                                        });
                                 WindowManager.LayoutParams lp = customeAlertDialog.getWindow().getAttributes();
                                 lp.dimAmount = 0.7f;
                                 lp.gravity = Gravity.BOTTOM;
@@ -184,6 +221,9 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongVH> {
 
                             break;
                         case R.id.menu_Rington:
+                            bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "menu item rington list");
+                            firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
+
                             File songFile = new File(song.getTrackFile());
                             //this is for add song to contentresolver
                             ContentValues values = new ContentValues();
@@ -200,13 +240,13 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongVH> {
                             Uri uri = MediaStore.Audio.Media.getContentUriForPath(songFile.getAbsolutePath());
 
                             Uri ringtoneUri;
-                            if (uri.toString().contains("internal")){
+                            if (uri.toString().contains("internal")) {
                                 context.getContentResolver().delete(
                                         uri,
                                         MediaStore.MediaColumns.DATA + "=\""
                                                 + songFile.getAbsolutePath() + "\"", null);
-                                ringtoneUri = context.getContentResolver().insert(uri,values);
-                            }else {
+                                ringtoneUri = context.getContentResolver().insert(uri, values);
+                            } else {
                                 ringtoneUri = ContentUris.withAppendedId(uri, song.getContentID());
                             }
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -263,12 +303,55 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongVH> {
 //                            }
 
                             break;
+                        case R.id.menu_Info:
+
+
+                            infoDialog.show();
+                            infoTitle.setText(song.getSongName());
+                            infoAlbum.setText(song.getAlbumName());
+                            infoDuration.setText(song.getDuration());
+                            songFile = new File(song.getTrackFile());
+                            int megaB = 0;
+                            int kiloB = 0;
+                            if (songFile.length() > (10^4)){
+                                megaB = (int)(songFile.length()/1024)/1024;
+                                kiloB =(int)((songFile.length()/1024)%1024);
+
+                            }
+                            if (kiloB > 0 && megaB > 0){
+                                if (kiloB > 9){
+                                    infoSize.setText(String.valueOf(megaB).concat("."+Integer.toString(kiloB).substring(0, 2))+" MB");
+                                }else {
+                                    infoSize.setText(String.valueOf(megaB).concat("."+Integer.toString(kiloB).substring(0, 1))+" MB");
+                                }
+                            }else if (megaB > 0){
+                                if (megaB > 9){
+                                    infoSize.setText(Integer.toString(megaB).substring(0, 2).concat(" MB"));
+                                }else {
+                                    infoSize.setText(Integer.toString(megaB).substring(0, 1).concat(" MB"));
+                                }
+                            }else if (kiloB > 0){
+                                if (kiloB > 9){
+                                    infoSize.setText(Integer.toString(kiloB).substring(0, 2).concat(" KB"));
+                                }else {
+                                    infoSize.setText(Integer.toString(kiloB).substring(0, 1).concat(" KB"));
+                                }
+                            }
+                            infoPath.setText(song.getTrackFile());
+                            infoCancel.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    infoDialog.dismiss();
+                                }
+                            });
+
+
+                            break;
                     }
 
                     return false;
                 }
             });
-
 
 
             Glide.with(context).asBitmap().load(Uri.parse(song.getSongImageUri()))
@@ -302,6 +385,6 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongVH> {
     public interface onSongAdapter {
         void onSongClicked(int pos);
 
-        void onSongRemoved(int pos, boolean isCurent , List<Song> list);
+        void onSongRemoved(int pos, boolean isCurent, List<Song> list);
     }
 }

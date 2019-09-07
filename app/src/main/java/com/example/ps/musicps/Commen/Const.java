@@ -1,24 +1,5 @@
 package com.example.ps.musicps.Commen;
 
-import android.content.Context;
-import android.content.Intent;
-import android.media.MediaPlayer;
-import android.net.Uri;
-import android.view.View;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-import android.widget.Toast;
-
-import androidx.core.content.res.ResourcesCompat;
-
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
-import com.example.ps.musicps.Model.Song;
-import com.example.ps.musicps.PlayingSongFragment;
-import com.example.ps.musicps.R;
-import com.example.ps.musicps.Service.SongService;
-
 public class Const {
 
 //    public ImageView playingSongImage;

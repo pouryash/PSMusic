@@ -22,4 +22,14 @@
         app:showAsAction="never"
         />
 </group>
+
+
+    <group android:id="@+id/grp_Info">
+        <item
+            android:icon="@null"
+            android:id="@+id/menu_Info"
+            android:title="Info"
+            app:showAsAction="never"
+            />
+    </group>
 </menu>

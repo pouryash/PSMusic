@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "978134860884",
+    "firebase_url": "https://psmusic-pouryash.firebaseio.com",
+    "project_id": "psmusic-pouryash",
+    "storage_bucket": "psmusic-pouryash.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:978134860884:android:a5d8804c6d869cfd",
+        "android_client_info": {
+          "package_name": "com.example.ps.musicps"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "978134860884-e4kkeb9nikoc9bbu0ceahh75g2lmdt4r.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.ps.musicps",
+            "certificate_hash": "3e9e9ace708ed20927b750cd4e9adbbcfe1c1746"
+          }
+        },
+        {
+          "client_id": "978134860884-idrn0m7cvtrbbpca1cm67pq5ssdomagr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCfJPD4WKoJorrplAyO-_o-n1v460AWiYk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "978134860884-idrn0m7cvtrbbpca1cm67pq5ssdomagr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

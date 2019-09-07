@@ -5,22 +5,17 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.media.AudioFocusRequest;
 import android.os.IBinder;
-
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
-
+import android.support.v4.media.session.MediaSessionCompat;
 import android.widget.RemoteViews;
 import android.widget.Toast;
-
 import com.example.ps.musicps.Commen.AudioFocusControler;
 import com.example.ps.musicps.Commen.Commen;
-import com.example.ps.musicps.Commen.MyApplication;
 import com.example.ps.musicps.Commen.SongSharedPrefrenceManager;
 import com.example.ps.musicps.PlaySongActivity;
 import com.example.ps.musicps.PlayingSongFragment;
@@ -43,7 +38,13 @@ public class SongService extends Service implements Commen.onMediaPlayerStateCha
     NotificationCompat.Builder notification;
     NotificationManager notificationManager;
     private SongSharedPrefrenceManager songSharedPrefrenceManager;
+    private MediaSessionCompat mediaSession;
 
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+    }
 
     @Nullable
     @Override
@@ -59,6 +60,7 @@ public class SongService extends Service implements Commen.onMediaPlayerStateCha
         AudioFocusControler.getInstance().onAudioFocusChangeService = new AudioFocusControler.onAudioFocusChangeService() {
             @Override
             public void onServiceFocusChange() {
+                Commen.IS_PLAYING = false;
                 view.setImageViewResource(R.id.iv_playPayse_notification, R.drawable.ic_play_24px);
                 bigView.setImageViewResource(R.id.iv_playPayse_notification, R.drawable.ic_play_24px);
                 notificationManager.notify(NOTIFICATION_ID, notification.build());
@@ -131,19 +133,21 @@ public class SongService extends Service implements Commen.onMediaPlayerStateCha
 
             @Override
             public void onSongListRemovedSong() {
-                view.setTextViewText(R.id.tv_SongName_notification, Commen.song.getSongName());
-                bigView.setTextViewText(R.id.tv_SongName_notification, Commen.song.getSongName());
-                bigView.setTextViewText(R.id.tv_ArtistName_notification, Commen.song.getArtistName());
-                view.setImageViewResource(R.id.iv_playPayse_notification, R.drawable.ic_play_24px);
-                bigView.setImageViewResource(R.id.iv_playPayse_notification, R.drawable.ic_play_24px);
-                notificationManager.notify(NOTIFICATION_ID, notification.build());
+                if (!Commen.IS_PLAYING) {
+                    view.setTextViewText(R.id.tv_SongName_notification, Commen.song.getSongName());
+                    bigView.setTextViewText(R.id.tv_SongName_notification, Commen.song.getSongName());
+                    bigView.setTextViewText(R.id.tv_ArtistName_notification, Commen.song.getArtistName());
+                    view.setImageViewResource(R.id.iv_playPayse_notification, R.drawable.ic_play_24px);
+                    bigView.setImageViewResource(R.id.iv_playPayse_notification, R.drawable.ic_play_24px);
+                    notificationManager.notify(NOTIFICATION_ID, notification.build());
+                }
             }
 
             @Override
             public void onSongListPlaypauseMediaComplete() {
-                view.setImageViewResource(R.id.iv_playPayse_notification, R.drawable.ic_play_24px);
-                bigView.setImageViewResource(R.id.iv_playPayse_notification, R.drawable.ic_play_24px);
-                notificationManager.notify(NOTIFICATION_ID, notification.build());
+                if (!Commen.IS_PLAYING) {
+
+                }
             }
         };
         if (intent.getAction() == null) {
@@ -257,13 +261,15 @@ public class SongService extends Service implements Commen.onMediaPlayerStateCha
 
 
                     notification = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL);
-                    notification.setContent(view).
-                            setCustomBigContentView(bigView)
+                    notification.setContent(view)
+                            .setCustomBigContentView(bigView)
                             .setSmallIcon(R.drawable.icon1)
                             .setContentText(Commen.song.getSongName())
                             .setColor(getResources().getColor(R.color.colorPrimary))
                             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                             .setContentIntent(PendingIntent.getActivity(this, 0, showMusicPlayerActivityIntent, 0));
+
                     notificationManager.notify(NOTIFICATION_ID, notification.build());
                     startForeground(NOTIFICATION_ID, notification.build());
 
@@ -288,7 +294,9 @@ public class SongService extends Service implements Commen.onMediaPlayerStateCha
             }
             PlaySongActivity.isExternalSource = false;
         }
-        Commen.mediaPlayer.release();
+        if (Commen.mediaPlayer != null) {
+            Commen.mediaPlayer.release();
+        }
         Commen.song = null;
         onNotificationServiceStateChangedList = null;
         onNotificationServiceStateChangedPlay = null;
@@ -332,6 +340,40 @@ public class SongService extends Service implements Commen.onMediaPlayerStateCha
 //
 //
 //    }
+
+
+
+
+   //////////////////Lock screen///////////////////
+
+//    private void setupMediaSession() {
+//        ComponentName receiver = new ComponentName(getPackageName(), SongService.class.getName());
+//        mediaSession = new MediaSessionCompat(this, "StreamService", receiver, null);
+//        mediaSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
+//                MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
+//        mediaSession.setPlaybackState(new PlaybackStateCompat.Builder()
+//                .setState(PlaybackStateCompat.STATE_PAUSED, 0, 0)
+//                .setActions(PlaybackStateCompat.ACTION_PLAY_PAUSE | PlaybackStateCompat.ACTION_PLAY | PlaybackStateCompat.ACTION_PAUSE)
+//                .build());
+//        mediaSession.setMetadata(new MediaMetadataCompat.Builder()
+//                .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, "Test Artist")
+//                .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, "Test Album")
+//                .putString(MediaMetadataCompat.METADATA_KEY_TITLE, "Test Track Name")
+//                .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, 10000)
+//                .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART,
+//                        BitmapFactory.decodeResource(getResources(), R.drawable.ic_repeat_one_24px))
+//                //.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, "Test Artist")
+//                .build());
+//
+//
+//        mediaSession.setActive(true);
+//
+//        IntentFilter filter = new IntentFilter();
+//        filter.addAction(ACTION_NEXT);
+//        filter.addAction(ACTION_PLAY);
+//       this.registerReceiver( new RemoteReceiver(), filter);
+//    }
+
 
     // i use isPlaying param becausse fadin and fadeout , stop and atart mediaplayer in period of time
     public interface onNotificationServiceStateChangedPlay {

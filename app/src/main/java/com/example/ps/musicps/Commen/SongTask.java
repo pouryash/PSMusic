@@ -10,14 +10,13 @@ import android.os.AsyncTask;
 import android.provider.MediaStore;
 import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
 import com.example.ps.musicps.Model.Song;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-
-import javax.sql.StatementEvent;
 
 public class SongTask extends AsyncTask<Void, Void, Void> {
 
@@ -54,17 +53,27 @@ public class SongTask extends AsyncTask<Void, Void, Void> {
                     Song song = new Song();
                     song.setTrackFile(cur.getString(cur.getColumnIndex(MediaStore.Audio.Media.DATA)));
                     song.setSongName(cur.getString(cur.getColumnIndex(MediaStore.Audio.Media.TITLE)));
-                    int m = Integer.parseInt(cur.getString(cur.getColumnIndex(MediaStore.Audio.Media.DURATION)));
-                    song.setContentID(Integer.parseInt(cur.getString(cur.getColumnIndex(MediaStore.Audio.Media._ID))));
+                    try{
+                        int m = Integer.parseInt(cur.getString(cur.getColumnIndex(MediaStore.Audio.Media.DURATION)));
+                        int seconds = (int) m / 1000;
+                        int minutes = (int) seconds / 60;
+                        seconds %= 60;
+                        String s = String.format(Locale.ENGLISH, "%02d", minutes) +
+                                ":" + String.format(Locale.ENGLISH, "%02d", seconds);
+                        song.setDuration(s);
+                    }catch (Exception e){
+                        Crashlytics.log(e.getMessage() + "  song task 59");
+                        song.setDuration("0");
+                    }
+                    try {
+                        song.setContentID(Integer.parseInt(cur.getString(cur.getColumnIndex(MediaStore.Audio.Media._ID))));
+                    }catch (Exception e){
+                        Crashlytics.log(e.getMessage() + "  song task 64");
+                    }
 //                        int hours = (int) ((m / (1000 * 60 * 60)) % 24);
 //                        int minutes = (int) (m % (1000 * 60 * 60) / (1000 * 60));
 //                        int seconds = (int) ((m % (1000 * 60 * 60)) % (1000 * 60) / 1000);
-                    int seconds = (int) m / 1000;
-                    int minutes = (int) seconds / 60;
-                    seconds %= 60;
-                    String s = String.format(Locale.ENGLISH, "%02d", minutes) +
-                            ":" + String.format(Locale.ENGLISH, "%02d", seconds);
-                    song.setDuration(s);
+
                     song.setArtistName(cur.getString(cur.getColumnIndex(MediaStore.Audio.Media.ARTIST)));
                     song.setAlbumName(cur.getString(cur.getColumnIndex(MediaStore.Audio.Media.ALBUM)));
                     int albumId = cur.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID);

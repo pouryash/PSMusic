@@ -2,14 +2,14 @@ package com.example.ps.musicps;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.ColorDrawable;
-import android.media.MediaScannerConnection;
 import android.os.Bundle;
 
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.FragmentManager;
@@ -21,13 +21,13 @@ import androidx.appcompat.widget.Toolbar;
 
 import android.os.Handler;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,12 +35,11 @@ import com.example.ps.musicps.Adapter.SongAdapter;
 import com.example.ps.musicps.Commen.Commen;
 import com.example.ps.musicps.Commen.CustomeDialogClass;
 import com.example.ps.musicps.Commen.RuntimePermissionsActivity;
-import com.example.ps.musicps.Commen.SongSharedPrefrenceManager;
 import com.example.ps.musicps.MVP.SongsListMVP;
 import com.example.ps.musicps.MVP.SongsListPresenter;
 import com.example.ps.musicps.Model.Song;
 import com.example.ps.musicps.Service.SongService;
-import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -64,6 +63,7 @@ public class SongListActivity extends RuntimePermissionsActivity implements Song
     FragmentManager fragmentManager;
     FragmentTransaction fragmentTransaction;
     CustomeDialogClass customeDialog;
+    FirebaseAnalytics firebaseAnalytics;
 
 
     @Override
@@ -82,7 +82,6 @@ public class SongListActivity extends RuntimePermissionsActivity implements Song
                             Manifest.permission.WRITE_EXTERNAL_STORAGE}
                     , READ_EXTERNAL_STORAGE);
         }
-
 
         playingSongFragment = new PlayingSongFragment();
         fragmentManager = getSupportFragmentManager();
@@ -120,7 +119,7 @@ public class SongListActivity extends RuntimePermissionsActivity implements Song
 
     private void setupView() {
         //when song removed from search activity
-
+        firebaseAnalytics = FirebaseAnalytics.getInstance(this);
         SearchActivity.onSearchedItemRemoved = new SearchActivity.onSearchedItemRemoved() {
             @Override
             public void onRemoved(int position, boolean isCurentSong, List<Song> list) {
@@ -183,8 +182,11 @@ public class SongListActivity extends RuntimePermissionsActivity implements Song
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Bundle bundle = new Bundle();
         switch (item.getItemId()) {
             case R.id.menu_search:
+                bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "menu item search");
+                firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
                 if (fView.getVisibility() != View.VISIBLE) {
                     Toast.makeText(this, "There is no song on your phone. Try again later!",
                             Toast.LENGTH_LONG).show();
@@ -194,7 +196,9 @@ public class SongListActivity extends RuntimePermissionsActivity implements Song
                 }
                 break;
             case R.id.menu_scan:
-                if (songList.size() == 0 && Commen.mediaPlayer != null){
+                bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "menu item scan");
+                firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
+                if (songList.size() == 0 && Commen.mediaPlayer != null) {
                     shouldStartNewInstance = true;
                     Commen.mediaPlayer.release();
                     Commen.mediaPlayer = null;
@@ -219,6 +223,7 @@ public class SongListActivity extends RuntimePermissionsActivity implements Song
 
 
                 break;
+
         }
         return true;
     }
@@ -297,14 +302,29 @@ public class SongListActivity extends RuntimePermissionsActivity implements Song
                 if (PlaySongActivity.timer != null) {
                     PlaySongActivity.timer.purge();
                     PlaySongActivity.timer.cancel();
-                    Commen.mediaPlayer.release();
                 }
+                Commen.mediaPlayer.release();
+                Commen.IS_PLAYING = false;
             }
+        }else {
+           if (!PlayingSongFragment.isFragmentRootClicked){
+               Commen.mediaPlayer.release();
+               Commen.IS_PLAYING = false;
+               // this is for when start song from fragment and clicked root(problem is restart mediaplayer)
+               PlayingSongFragment.isFragmentRootClicked = false;
+           }
         }
         intent.putExtra("position", pos);
         File file = new File(songList.get(pos).getTrackFile());
         if (file.exists()) {
             startActivity(intent);
+
+            //analetics
+            Bundle bundle = new Bundle();
+            bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, songList.get(pos).getSongName());
+            bundle.putString("ITEM_DESCRIPTION", songList.get(pos).getArtistName());
+            bundle.putString("ITEM_LOCATION", songList.get(pos).getArtistName());
+            firebaseAnalytics.logEvent(FirebaseAnalytics.Event.VIEW_ITEM, bundle);
         } else {
             Toast.makeText(getActivityContext(), "this file not exists!", Toast.LENGTH_LONG).show();
 
@@ -368,7 +388,9 @@ public class SongListActivity extends RuntimePermissionsActivity implements Song
         }
         if (!PlaySongActivity.isExternalSource) {
             stopService(new Intent(SongListActivity.this, SongService.class));
-            Commen.mediaPlayer.release();
+            if (Commen.mediaPlayer != null){
+                Commen.mediaPlayer.release();
+            }
         }
         songList = null;
         super.onDestroy();

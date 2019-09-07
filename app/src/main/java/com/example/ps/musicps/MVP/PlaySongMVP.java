@@ -6,8 +6,6 @@ import android.widget.Toast;
 
 import com.example.ps.musicps.Model.Song;
 
-import java.util.ArrayList;
-
 
 public interface PlaySongMVP {
 
