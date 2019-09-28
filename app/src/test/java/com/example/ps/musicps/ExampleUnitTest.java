@@ -2,6 +2,10 @@ package com.example.ps.musicps;
 
 import org.junit.Test;
 
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
 import static org.junit.Assert.*;
 
 /**
@@ -12,6 +16,10 @@ import static org.junit.Assert.*;
 public class ExampleUnitTest {
     @Test
     public void addition_isCorrect() {
+        assertEquals(4, 2 + 2);
+    }
+    @Test
+    public void addition_isCorrect2() {
         assertEquals(4, 2 + 2);
     }
 }

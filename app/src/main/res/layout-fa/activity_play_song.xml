@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/colorPrimary"
     android:theme="@style/ThemeOverlay.MaterialComponents.Dark"
-    tools:context=".PlaySongActivity">
+    tools:context="com.example.ps.musicps.View.PlaySongActivity">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar_platSong"

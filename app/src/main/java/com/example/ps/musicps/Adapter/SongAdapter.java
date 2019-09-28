@@ -11,11 +11,6 @@ import android.graphics.drawable.ColorDrawable;
 import android.media.MediaScannerConnection;
 import android.media.RingtoneManager;
 import android.net.Uri;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -31,7 +26,9 @@ import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
@@ -44,10 +41,10 @@ import com.example.ps.musicps.Commen.CustomeAlertDialogClass;
 import com.example.ps.musicps.Model.Song;
 import com.example.ps.musicps.R;
 import com.google.firebase.analytics.FirebaseAnalytics;
-
 import java.io.File;
-import java.text.DecimalFormat;
 import java.util.List;
+
+
 
 public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongVH> {
 
@@ -68,7 +65,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongVH> {
     @NonNull
     @Override
     public SongVH onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-        View view = LayoutInflater.from(context).inflate(R.layout.adp_songlist, viewGroup, false);
+       View view = LayoutInflater.from(context).inflate(R.layout.adp_songlist, viewGroup, false);
         return new SongVH(view, onSongAdapter);
     }
 

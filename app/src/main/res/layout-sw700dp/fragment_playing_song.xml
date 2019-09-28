@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".PlayingSongFragment">
+    tools:context="com.example.ps.musicps.View.PlayingSongFragment">
 
     <RelativeLayout android:id="@+id/rl_playingSong_fragment"
         android:layout_width="match_parent"

@@ -3,15 +3,21 @@ package com.example.ps.musicps.MVP;
 import android.content.Context;
 import android.widget.Toast;
 
+import com.example.ps.musicps.Di.SongListModel.DaggerSongListModelApplicationComponent;
+import com.example.ps.musicps.Di.SongListModel.RequiredSongListPresenterOpsModule;
+import com.example.ps.musicps.Di.SongListModel.SongListModelModule;
 import com.example.ps.musicps.Model.Song;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
+import javax.inject.Inject;
+
 public class SongsListPresenter implements SongsListMVP.ProvidedPresenterOps,
         SongsListMVP.RequiredPresenterOps {
 
     WeakReference<SongsListMVP.RequiredSongsListViewOps> mView;
+    @Inject
     SongsListMVP.ProvidedModelOps mModel ;
     Context con;
 
@@ -19,7 +25,12 @@ public class SongsListPresenter implements SongsListMVP.ProvidedPresenterOps,
 
     public SongsListPresenter() {
 
-        mModel = new SongsListModel(this);
+//        mModel = new SongsListModel(this);
+
+        DaggerSongListModelApplicationComponent.builder()
+                .requiredSongListPresenterOpsModule(new RequiredSongListPresenterOpsModule(this))
+                .songListModelModule(new SongListModelModule())
+                .build().inject(this);
     }
 
 

@@ -13,12 +13,9 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.provider.Settings;
-
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.graphics.drawable.DrawableCompat;
-
 import com.example.ps.musicps.Model.Song;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -116,6 +113,7 @@ public class Commen {
                 }
             }
         }, 20);
+
     }
 
     public void FadeIn(final float deltaTime) {

@@ -1,4 +1,4 @@
-package com.example.ps.musicps;
+package com.example.ps.musicps.View;
 
 import android.app.Activity;
 import android.content.Context;
@@ -44,6 +44,7 @@ import com.example.ps.musicps.Commen.VolumeContentObserver;
 import com.example.ps.musicps.MVP.PlaySongMVP;
 import com.example.ps.musicps.MVP.PlaySongPresenter;
 import com.example.ps.musicps.Model.Song;
+import com.example.ps.musicps.R;
 import com.example.ps.musicps.Service.SongService;
 import com.google.firebase.analytics.FirebaseAnalytics;
 

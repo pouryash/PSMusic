@@ -17,10 +17,10 @@ import android.widget.Toast;
 import com.example.ps.musicps.Commen.AudioFocusControler;
 import com.example.ps.musicps.Commen.Commen;
 import com.example.ps.musicps.Commen.SongSharedPrefrenceManager;
-import com.example.ps.musicps.PlaySongActivity;
-import com.example.ps.musicps.PlayingSongFragment;
+import com.example.ps.musicps.View.PlaySongActivity;
+import com.example.ps.musicps.View.PlayingSongFragment;
 import com.example.ps.musicps.R;
-import com.example.ps.musicps.SongListActivity;
+import com.example.ps.musicps.View.SongListActivity;
 
 public class SongService extends Service implements Commen.onMediaPlayerStateChanged {
 
@@ -97,18 +97,22 @@ public class SongService extends Service implements Commen.onMediaPlayerStateCha
 
             @Override
             public void onPlaySongNextClicked() {
-                view.setTextViewText(R.id.tv_SongName_notification, Commen.song.getSongName());
-                bigView.setTextViewText(R.id.tv_SongName_notification, Commen.song.getSongName());
-                bigView.setTextViewText(R.id.tv_ArtistName_notification, Commen.song.getArtistName());
-                notificationManager.notify(NOTIFICATION_ID, notification.build());
+                if(Commen.song != null){
+                    view.setTextViewText(R.id.tv_SongName_notification, Commen.song.getSongName());
+                    bigView.setTextViewText(R.id.tv_SongName_notification, Commen.song.getSongName());
+                    bigView.setTextViewText(R.id.tv_ArtistName_notification, Commen.song.getArtistName());
+                    notificationManager.notify(NOTIFICATION_ID, notification.build());
+                }
             }
 
             @Override
             public void onPlaySongPreviousClicked() {
-                view.setTextViewText(R.id.tv_SongName_notification, Commen.song.getSongName());
-                bigView.setTextViewText(R.id.tv_SongName_notification, Commen.song.getSongName());
-                bigView.setTextViewText(R.id.tv_ArtistName_notification, Commen.song.getArtistName());
-                notificationManager.notify(NOTIFICATION_ID, notification.build());
+                if (Commen.song != null){
+                    view.setTextViewText(R.id.tv_SongName_notification, Commen.song.getSongName());
+                    bigView.setTextViewText(R.id.tv_SongName_notification, Commen.song.getSongName());
+                    bigView.setTextViewText(R.id.tv_ArtistName_notification, Commen.song.getArtistName());
+                    notificationManager.notify(NOTIFICATION_ID, notification.build());
+                }
             }
 
             @Override
@@ -118,22 +122,25 @@ public class SongService extends Service implements Commen.onMediaPlayerStateCha
                 notificationManager.notify(NOTIFICATION_ID, notification.build());
             }
         };
+
         PlayingSongFragment.onSongListActivityStateChanged = new PlayingSongFragment.onSongListActivityStateChanged() {
             @Override
             public void onSongListPlaypauseClicked(boolean isPlaying) {
-                if (isPlaying) {
-                    view.setImageViewResource(R.id.iv_playPayse_notification, R.drawable.ic_pause_24px);
-                    bigView.setImageViewResource(R.id.iv_playPayse_notification, R.drawable.ic_pause_24px);
-                } else {
-                    view.setImageViewResource(R.id.iv_playPayse_notification, R.drawable.ic_play_24px);
-                    bigView.setImageViewResource(R.id.iv_playPayse_notification, R.drawable.ic_play_24px);
+                if (view != null && bigView != null){
+                    if (isPlaying) {
+                        view.setImageViewResource(R.id.iv_playPayse_notification, R.drawable.ic_pause_24px);
+                        bigView.setImageViewResource(R.id.iv_playPayse_notification, R.drawable.ic_pause_24px);
+                    } else {
+                        view.setImageViewResource(R.id.iv_playPayse_notification, R.drawable.ic_play_24px);
+                        bigView.setImageViewResource(R.id.iv_playPayse_notification, R.drawable.ic_play_24px);
+                    }
+                    notificationManager.notify(NOTIFICATION_ID, notification.build());
                 }
-                notificationManager.notify(NOTIFICATION_ID, notification.build());
             }
 
             @Override
             public void onSongListRemovedSong() {
-                if (!Commen.IS_PLAYING) {
+                if (!Commen.IS_PLAYING && (view != null && bigView != null)) {
                     view.setTextViewText(R.id.tv_SongName_notification, Commen.song.getSongName());
                     bigView.setTextViewText(R.id.tv_SongName_notification, Commen.song.getSongName());
                     bigView.setTextViewText(R.id.tv_ArtistName_notification, Commen.song.getArtistName());
@@ -154,7 +161,7 @@ public class SongService extends Service implements Commen.onMediaPlayerStateCha
             intent.setAction("");
         }
 
-        if (PlaySongActivity.isExternalSource || SongListActivity.songList.size() > 0) {
+        if (intent.getAction() != null && (PlaySongActivity.isExternalSource || SongListActivity.songList.size() > 0)) {
 
             switch (intent.getAction()) {
                 case ACTION_PLAY:

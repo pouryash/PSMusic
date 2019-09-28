@@ -1,15 +1,12 @@
-package com.example.ps.musicps;
+package com.example.ps.musicps.View;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.FragmentManager;
@@ -18,10 +15,8 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.Toolbar;
-
 import android.os.Handler;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,7 +25,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.example.ps.musicps.Adapter.SongAdapter;
 import com.example.ps.musicps.Commen.Commen;
 import com.example.ps.musicps.Commen.CustomeDialogClass;
@@ -38,12 +32,16 @@ import com.example.ps.musicps.Commen.RuntimePermissionsActivity;
 import com.example.ps.musicps.MVP.SongsListMVP;
 import com.example.ps.musicps.MVP.SongsListPresenter;
 import com.example.ps.musicps.Model.Song;
+import com.example.ps.musicps.R;
 import com.example.ps.musicps.Service.SongService;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
+
+
 
 public class SongListActivity extends RuntimePermissionsActivity implements SongAdapter.onSongAdapter,
         SongsListMVP.RequiredSongsListViewOps {
@@ -307,12 +305,12 @@ public class SongListActivity extends RuntimePermissionsActivity implements Song
                 Commen.IS_PLAYING = false;
             }
         }else {
-           if (!PlayingSongFragment.isFragmentRootClicked){
-               Commen.mediaPlayer.release();
-               Commen.IS_PLAYING = false;
-               // this is for when start song from fragment and clicked root(problem is restart mediaplayer)
-               PlayingSongFragment.isFragmentRootClicked = false;
-           }
+//           if (!PlayingSongFragment.isFragmentRootClicked){
+//               Commen.mediaPlayer.release();
+//               Commen.IS_PLAYING = false;
+//               // this is for when start song from fragment and clicked root(problem is restart mediaplayer)
+//               PlayingSongFragment.isFragmentRootClicked = false;
+//           }
         }
         intent.putExtra("position", pos);
         File file = new File(songList.get(pos).getTrackFile());
@@ -400,6 +398,9 @@ public class SongListActivity extends RuntimePermissionsActivity implements Song
     protected void onStop() {
         super.onStop();
     }
+
+
+
 
 
     public interface onDataRecived {

@@ -1,4 +1,4 @@
-package com.example.ps.musicps;
+package com.example.ps.musicps.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -23,6 +23,7 @@ import android.widget.Toast;
 import com.example.ps.musicps.Adapter.SongSearchAdapter;
 import com.example.ps.musicps.Commen.Commen;
 import com.example.ps.musicps.Model.Song;
+import com.example.ps.musicps.R;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.ArrayList;

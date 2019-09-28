@@ -6,6 +6,9 @@ import android.widget.Toast;
 
 import com.example.ps.musicps.Model.Song;
 
+import dagger.Module;
+import dagger.Provides;
+
 
 public interface PlaySongMVP {
 

@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/colorPrimary"
     android:theme="@style/ThemeOverlay.MaterialComponents.Dark"
-    tools:context=".SongListActivity">
+    tools:context="com.example.ps.musicps.View.SongListActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
@@ -53,7 +53,7 @@
        android:id="@+id/fr_PlayingSong"
        android:layout_gravity="bottom"
        tools:layout="@layout/fragment_playing_song"
-       android:name="com.example.ps.musicps.PlayingSongFragment"
+       android:name="com.example.ps.musicps.View.PlayingSongFragment"
        android:layout_width="match_parent"
        android:layout_height="wrap_content"/>
 

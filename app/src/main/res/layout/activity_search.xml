@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorPrimary"
-    tools:context=".SearchActivity">
+    tools:context="com.example.ps.musicps.View.SearchActivity">
 
 
     <androidx.appcompat.widget.Toolbar
@@ -64,7 +64,7 @@
 
     <fragment
         android:id="@+id/fr_PlayingSong"
-        android:name="com.example.ps.musicps.PlayingSongFragment"
+        android:name="com.example.ps.musicps.View.PlayingSongFragment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"

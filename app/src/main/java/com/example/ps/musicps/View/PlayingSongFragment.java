@@ -1,4 +1,4 @@
-package com.example.ps.musicps;
+package com.example.ps.musicps.View;
 
 import android.Manifest;
 import android.content.Context;
@@ -33,6 +33,7 @@ import com.bumptech.glide.request.target.Target;
 import com.example.ps.musicps.Commen.Commen;
 import com.example.ps.musicps.Commen.SongSharedPrefrenceManager;
 import com.example.ps.musicps.Model.Song;
+import com.example.ps.musicps.R;
 import com.example.ps.musicps.Service.SongService;
 import com.google.firebase.analytics.FirebaseAnalytics;
 

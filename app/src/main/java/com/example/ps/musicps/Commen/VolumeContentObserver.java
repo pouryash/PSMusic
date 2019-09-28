@@ -4,7 +4,7 @@ import android.database.ContentObserver;
 import android.media.AudioManager;
 import android.os.Handler;
 
-import com.example.ps.musicps.PlaySongActivity;
+import com.example.ps.musicps.View.PlaySongActivity;
 
 public class VolumeContentObserver extends ContentObserver {
 
