@@ -5,7 +5,6 @@ import android.widget.Toast;
 
 import com.example.ps.musicps.Di.SongListModel.DaggerSongListModelApplicationComponent;
 import com.example.ps.musicps.Di.SongListModel.RequiredSongListPresenterOpsModule;
-import com.example.ps.musicps.Di.SongListModel.SongListModelModule;
 import com.example.ps.musicps.Model.Song;
 
 import java.lang.ref.WeakReference;
@@ -18,9 +17,8 @@ public class SongsListPresenter implements SongsListMVP.ProvidedPresenterOps,
 
     WeakReference<SongsListMVP.RequiredSongsListViewOps> mView;
     @Inject
-    SongsListMVP.ProvidedModelOps mModel ;
+    SongsListMVP.ProvidedModelOps mModel;
     Context con;
-
 
 
     public SongsListPresenter() {
@@ -29,16 +27,14 @@ public class SongsListPresenter implements SongsListMVP.ProvidedPresenterOps,
 
         DaggerSongListModelApplicationComponent.builder()
                 .requiredSongListPresenterOpsModule(new RequiredSongListPresenterOpsModule(this))
-                .songListModelModule(new SongListModelModule())
-                .build().inject(this);
+                .build()
+                .inject(this);
     }
-
-
 
 
     @Override
     public void setView(SongsListMVP.RequiredSongsListViewOps view) {
-        mView =new WeakReference<>(view);
+        mView = new WeakReference<>(view);
     }
 
     @Override
@@ -63,10 +59,10 @@ public class SongsListPresenter implements SongsListMVP.ProvidedPresenterOps,
 
     @Override
     public void onSongsRecived(ArrayList<Song> songs) {
-        if (songs!= null && songs.size() > 0){
+        if (songs != null && songs.size() > 0) {
             mView.get().onSongListFinished(songs);
-        }else {
-            mView.get().showToast(Toast.makeText(getAppContext(),"opss no song found!",Toast.LENGTH_LONG));
+        } else {
+            mView.get().showToast(Toast.makeText(getAppContext(), "opss no song found!", Toast.LENGTH_LONG));
         }
     }
 
@@ -78,6 +74,6 @@ public class SongsListPresenter implements SongsListMVP.ProvidedPresenterOps,
 
     @Override
     public void onError(String message) {
-        mView.get().showToast(Toast.makeText(getAppContext(),message,Toast.LENGTH_LONG));
+        mView.get().showToast(Toast.makeText(getAppContext(), message, Toast.LENGTH_LONG));
     }
 }

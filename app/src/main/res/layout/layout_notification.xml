@@ -6,6 +6,15 @@
     android:background="@color/colorPrimary"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <ImageView
+        android:id="@+id/iv_close"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:padding="@dimen/smallMargin"
+        android:src="@drawable/ic_close_black_24dp"
+        />
+
 
   <RelativeLayout
       android:layout_marginTop="@dimen/smallMargin"
@@ -69,7 +78,10 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_alignParentEnd="true"
-        android:layout_margin="@dimen/standardMargin">
+        android:layout_below="@id/iv_close"
+        android:layout_marginEnd="@dimen/standardMargin"
+        android:layout_marginStart="@dimen/standardMargin"
+        >
 
 
 

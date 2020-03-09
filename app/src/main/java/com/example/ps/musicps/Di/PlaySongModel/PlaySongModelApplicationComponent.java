@@ -6,7 +6,7 @@ import com.example.ps.musicps.MVP.PlaySongPresenter;
 import javax.inject.Singleton;
 import dagger.Component;
 
-@Component(modules = {PLaySongModelModule.class , RequiredPlySongPresenterOpsModule.class})
+@Component(modules = {RequiredPlySongPresenterOpsModule.class})
 @Singleton
 public interface PlaySongModelApplicationComponent {
 

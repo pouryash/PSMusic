@@ -2,8 +2,11 @@ package com.example.ps.musicps.View;
 
 import android.Manifest;
 import android.app.Activity;
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -28,6 +31,8 @@ import android.widget.Toast;
 import com.example.ps.musicps.Adapter.SongAdapter;
 import com.example.ps.musicps.Commen.Commen;
 import com.example.ps.musicps.Commen.CustomeDialogClass;
+import com.example.ps.musicps.Commen.MyApplication;
+import com.example.ps.musicps.Commen.OnAppCleared;
 import com.example.ps.musicps.Commen.RuntimePermissionsActivity;
 import com.example.ps.musicps.MVP.SongsListMVP;
 import com.example.ps.musicps.MVP.SongsListPresenter;
@@ -35,7 +40,6 @@ import com.example.ps.musicps.Model.Song;
 import com.example.ps.musicps.R;
 import com.example.ps.musicps.Service.SongService;
 import com.google.firebase.analytics.FirebaseAnalytics;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,6 +53,7 @@ public class SongListActivity extends RuntimePermissionsActivity implements Song
     private static final int READ_EXTERNAL_STORAGE = 1;
     public static boolean shouldStartNewInstance = false;
     public static SongsListMVP.ProvidedPresenterOps mPresenter = new SongsListPresenter();
+    public static onSongClickedWidget onSongClickedWidget;
     public static boolean isPlaySongActivityEnabled;
     public static ArrayList<Song> songList = new ArrayList<>();
     public static onDataRecived onDataRecived;
@@ -69,6 +74,8 @@ public class SongListActivity extends RuntimePermissionsActivity implements Song
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_song_list);
 
+
+        startService(new Intent(getBaseContext(),OnAppCleared.class));
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
                 == PackageManager.PERMISSION_GRANTED) {
@@ -110,14 +117,15 @@ public class SongListActivity extends RuntimePermissionsActivity implements Song
             intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
             startActivity(intent);
             this.finish();
+            return;
 
         }
         super.onResume();
     }
 
     private void setupView() {
-        //when song removed from search activity
         firebaseAnalytics = FirebaseAnalytics.getInstance(this);
+        //when song removed from search activity
         SearchActivity.onSearchedItemRemoved = new SearchActivity.onSearchedItemRemoved() {
             @Override
             public void onRemoved(int position, boolean isCurentSong, List<Song> list) {
@@ -292,6 +300,10 @@ public class SongListActivity extends RuntimePermissionsActivity implements Song
     @Override
     public void onSongClicked(int pos) {
 
+        if (onSongClickedWidget != null){
+            onSongClickedWidget.onSongClicked(songList.get(pos));
+        }
+
         Intent intent = new Intent(SongListActivity.this, PlaySongActivity.class);
         if (PlaySongActivity.song != null) {
             if (PlaySongActivity.song.getId() == pos && Commen.mediaPlayer != null) {
@@ -391,7 +403,10 @@ public class SongListActivity extends RuntimePermissionsActivity implements Song
             }
         }
         songList = null;
+
+
         super.onDestroy();
+
     }
 
     @Override
@@ -399,14 +414,14 @@ public class SongListActivity extends RuntimePermissionsActivity implements Song
         super.onStop();
     }
 
-
-
-
-
     public interface onDataRecived {
         void onSongRecived(Song song, boolean shouldPlay);
 
         void onListReciveed(ArrayList<Song> songs);
+    }
+
+    public interface onSongClickedWidget{
+        void onSongClicked(Song song);
     }
 }
 

@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 
 import com.example.ps.musicps.MVP.PlaySongMVP;
+import com.example.ps.musicps.MVP.PlaySongModel;
 
 import dagger.Module;
 import dagger.Provides;
@@ -20,6 +21,13 @@ public class RequiredPlySongPresenterOpsModule {
     @Provides
     public PlaySongMVP.RequiredPlaySongPresenterOps provideRequiredPlaySongPresenter() {
         return requiredPlaySongPresenterOps;
+    }
+
+    @Provides
+    PlaySongMVP.ProvidedPlaySongModelOps providePlaySongModel
+            (PlaySongMVP.RequiredPlaySongPresenterOps playSongPresenterOps) {
+
+        return new PlaySongModel(playSongPresenterOps);
     }
 
 }

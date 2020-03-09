@@ -5,7 +5,6 @@ import android.widget.Toast;
 import com.example.ps.musicps.Di.PlaySongModel.DaggerPlaySongModelApplicationComponent;
 import com.example.ps.musicps.Di.PlaySongModel.PLaySongModelModule;
 import com.example.ps.musicps.Di.PlaySongModel.RequiredPlySongPresenterOpsModule;
-import com.example.ps.musicps.Di.SongListModel.DaggerSongListModelApplicationComponent;
 import com.example.ps.musicps.Model.Song;
 import java.lang.ref.WeakReference;
 import javax.inject.Inject;
@@ -22,9 +21,11 @@ public class PlaySongPresenter implements PlaySongMVP.ProvidedPlaySongPresenterO
 
 //        mModel = new PlaySongModel(this);
         DaggerPlaySongModelApplicationComponent.builder()
-                .pLaySongModelModule(new PLaySongModelModule())
                 .requiredPlySongPresenterOpsModule(
-                         new RequiredPlySongPresenterOpsModule(PlaySongPresenter.this)).build().inject(this);
+                         new RequiredPlySongPresenterOpsModule(PlaySongPresenter.this))
+                .build()
+                .inject(this);
+        int a = 0;
     }
 
 

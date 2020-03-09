@@ -61,6 +61,7 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
     public static Timer timer;
     private final Handler handler = new Handler();
     public static Song song;
+    public static onSongPlaySongStateChangedWidget onSongPlaySongStateChangedWidget;
     public static onPlaySongActivityCompletion onPlaySongActivityCompletion;
     public static onPlaySongActivityStateChanged onPlaySongActivityStateChanged;
     public static ArrayList<Song> shuffleList = new ArrayList<>();
@@ -294,7 +295,20 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
     }
 
     private void setupViews() {
+        if (PSMusicWidget.onWidgetStatusChangedPlaySong == null) {
+            PSMusicWidget.onWidgetStatusChangedPlaySong = new PSMusicWidget.onWidgetStatusChanged() {
+                @Override
+                public void onPlayPauseClicked() {
+                    onPlayButtonClickedPlaySong(Commen.IS_PLAYING);
+                }
 
+                @Override
+                public void onSongChanged() {
+                    song = Commen.song;
+                    setupViews();
+                }
+            };
+        }
         firebaseAnalytics = FirebaseAnalytics.getInstance(this);
         AudioFocusControler.getInstance().onAudioFocusChangePlay = new AudioFocusControler.onAudioFocusChangePlay() {
             @Override
@@ -456,7 +470,7 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
 
                     playPauseButton.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_play, null));
                 } else {
-//                    Commen.mediaPlayer.setVolume(1,1);
+
                     Commen.getInstance().FadeIn(2);
                     AudioFocusControler.getInstance().initAudio();
                     seekBarProgressUpdater();
@@ -466,6 +480,10 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
                         onPlaySongActivityStateChanged.onPlaySongPlaypauseClicked(true);
 
                     }
+                }
+
+                if (onSongPlaySongStateChangedWidget != null) {
+                    onSongPlaySongStateChangedWidget.onPlaypauseClicked();
                 }
 
             }
@@ -493,10 +511,12 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
                     if (onPlaySongActivityStateChanged != null) {
 
                         onPlaySongActivityStateChanged.onPlaySongNextClicked();
-
                     }
                 }
                 canClicked = true;
+                if (onSongPlaySongStateChangedWidget != null) {
+                    onSongPlaySongStateChangedWidget.onSongChanged();
+                }
             }
         });
         nextButton.setOnLongClickListener(new View.OnLongClickListener() {
@@ -569,6 +589,9 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
                     }
                 }
                 canClicked = true;
+                if (onSongPlaySongStateChangedWidget != null) {
+                    onSongPlaySongStateChangedWidget.onSongChanged();
+                }
             }
         });
 
@@ -632,6 +655,9 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
         if (!Commen.IS_PLAYING) {
 
             Commen.getInstance().FadeIn(2);
+            if (onSongPlaySongStateChangedWidget != null) {
+                onSongPlaySongStateChangedWidget.onPlaypauseClicked();
+            }
         }
         Commen.IS_PLAYING = true;
         seekBarProgressUpdater();
@@ -664,7 +690,6 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
                                 seekBar.setProgress(Commen.mediaPlayer.getCurrentPosition());
                                 timePassed.setText(changeDurationFormat(Commen.mediaPlayer.getCurrentPosition()));
                             } catch (Exception e) {
-                                Log.e("seekbar timer", "error: " + e);
 //                                new Handler().postDelayed(new Runnable() {
 //                                    @Override
 //                                    public void run() {
@@ -882,17 +907,19 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
         }
     }
 
+
+
     @Override
     protected void onDestroy() {
         if (Commen.IS_PLAYING) {
             Commen.IS_PLAYING = false;
         }
         stopService(new Intent(PlaySongActivity.this, SongService.class));
-        if (Commen.mediaPlayer != null){
+        if (Commen.mediaPlayer != null) {
             Commen.mediaPlayer.release();
         }
         song = null;
-        if (timer != null){
+        if (timer != null) {
             timer.purge();
             timer.cancel();
         }
@@ -1008,6 +1035,12 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
         }
     }
 
+    @Override
+    public void onCloseButtonClickedPlaySong() {
+        playPauseButton.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_play, null));
+        Commen.getInstance().FadeOut(2);
+    }
+
     public interface onPlaySongActivityCompletion {
         void onCompletion();
     }
@@ -1020,6 +1053,12 @@ public class PlaySongActivity extends AppCompatActivity implements PlaySongMVP.R
         void onPlaySongPreviousClicked();
 
         void onPlaySongMediaComplete();
+    }
+
+    public interface onSongPlaySongStateChangedWidget {
+        void onPlaypauseClicked();
+
+        void onSongChanged();
     }
 
 }

@@ -2,10 +2,12 @@ package com.example.ps.musicps.Commen;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.media.AudioManager;
 
 public class MyApplication extends Application {
 
+    public static SongSharedPrefrenceManager songSharedPrefrence;
     private static AudioManager am;
     static Context context;
 
@@ -13,6 +15,7 @@ public class MyApplication extends Application {
         super.onCreate();
         MyApplication.am = (AudioManager) getApplicationContext().getSystemService(AUDIO_SERVICE);
         context = getApplicationContext();
+        songSharedPrefrence = new SongSharedPrefrenceManager(context);
     }
 
     public static AudioManager getAudioManager() {

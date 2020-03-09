@@ -1,6 +1,8 @@
 package com.example.ps.musicps.Di.SongListModel;
 
 import com.example.ps.musicps.MVP.SongsListMVP;
+import com.example.ps.musicps.MVP.SongsListModel;
+
 import dagger.Module;
 import dagger.Provides;
 
@@ -17,5 +19,13 @@ public class RequiredSongListPresenterOpsModule {
     public SongsListMVP.RequiredPresenterOps provideRequiredPresenter() {
         return requiredPresenterOps;
     }
+
+    @Provides
+    SongsListMVP.ProvidedModelOps providedSongListModelOps
+            (SongsListMVP.RequiredPresenterOps requiredPresenterOps) {
+
+        return new SongsListModel(requiredPresenterOps);
+    }
+
 
 }

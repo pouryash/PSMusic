@@ -7,5 +7,7 @@
     <string name="songInfoPath">Path:</string>
     <string name="songInfoSize">Size:</string>
     <string name="songInfoDuration">Duration:</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
 
 </resources>
