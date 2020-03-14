@@ -62,12 +62,4 @@
         android:layout_below="@+id/toolbar_Search" />
 
 
-    <fragment
-        android:id="@+id/fr_PlayingSong"
-        android:name="com.example.ps.musicps.View.PlayingSongFragment"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        tools:layout="@layout/fragment_playing_song" />
-
 </RelativeLayout>

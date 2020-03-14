@@ -4,20 +4,32 @@ package com.example.ps.musicps.Model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
 /**
  * Created by poorya on 8/8/2018.
  */
 
+@Entity(tableName = "tbl_song")
 public class Song implements Parcelable {
 
-
-    private Integer id;
+    @PrimaryKey(autoGenerate = true)
+    private int id;
+    @ColumnInfo(name = "songName")
     private String songName;
+    @ColumnInfo(name = "artistName")
     private String artistName;
+    @ColumnInfo(name = "trackFile")
     private String trackFile;
+    @ColumnInfo(name = "albumName")
     private String albumName;
+    @ColumnInfo(name = "duration")
     private String duration;
+    @ColumnInfo(name = "songImageUri")
     private String songImageUri;
+    @ColumnInfo(name = "ContentId")
     private int ContentID;
 
     public int getContentID() {

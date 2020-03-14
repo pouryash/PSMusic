@@ -2,9 +2,7 @@ package com.example.ps.musicps.MVP;
 
 import android.content.Context;
 import android.widget.Toast;
-import com.example.ps.musicps.Di.PlaySongModel.DaggerPlaySongModelApplicationComponent;
-import com.example.ps.musicps.Di.PlaySongModel.PLaySongModelModule;
-import com.example.ps.musicps.Di.PlaySongModel.RequiredPlySongPresenterOpsModule;
+
 import com.example.ps.musicps.Model.Song;
 import java.lang.ref.WeakReference;
 import javax.inject.Inject;
@@ -20,12 +18,7 @@ public class PlaySongPresenter implements PlaySongMVP.ProvidedPlaySongPresenterO
     public PlaySongPresenter() {
 
 //        mModel = new PlaySongModel(this);
-        DaggerPlaySongModelApplicationComponent.builder()
-                .requiredPlySongPresenterOpsModule(
-                         new RequiredPlySongPresenterOpsModule(PlaySongPresenter.this))
-                .build()
-                .inject(this);
-        int a = 0;
+
     }
 
 

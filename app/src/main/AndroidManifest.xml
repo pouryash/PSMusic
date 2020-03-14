@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.example.ps.musicps">
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -9,12 +10,31 @@
 
     <application
         android:name=".Commen.MyApplication"
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+        android:requestLegacyExternalStorage="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".View.ListActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <meta-data
+            android:name="firebase_analytics_collection_enabled"
+            android:value="false" />
+        <meta-data
+            android:name="firebase_analytics_collection_deactivated"
+            android:value="true" />
+
         <receiver android:name=".View.PSMusicWidget">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -24,34 +44,24 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/psmusic_widget_info" />
         </receiver>
+
         <activity
             android:name=".View.SearchActivity"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustPan" />
-        <activity
-            android:name=".View.PlaySongActivity"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <data android:scheme="content" />
-                <data android:scheme="file" />
-                <data android:mimeType="audio/*" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".View.SongListActivity"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:windowSoftInputMode="adjustPan"
+            tools:ignore="LockedOrientationActivity" /> <!-- <activity -->
+        <!-- android:name=".View.PlaySongActivity" -->
+        <!-- android:launchMode="singleTop" -->
+        <!-- android:screenOrientation="portrait" -->
+        <!-- tools:ignore="LockedOrientationActivity"> -->
+        <!-- <intent-filter> -->
+        <!-- <action android:name="android.intent.action.VIEW" /> -->
+        <!-- <category android:name="android.intent.category.DEFAULT" /> -->
+        <!-- <data android:scheme="content" /> -->
+        <!-- <data android:scheme="file" /> -->
+        <!-- <data android:mimeType="audio/*" /> -->
+        <!-- </intent-filter> -->
+        <!-- </activity> -->
 
         <service android:name=".Service.SongService" />
         <service android:name=".Commen.FireBaseCloudMessagingService">
@@ -59,7 +69,7 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-        <service android:name=".Commen.OnAppCleared"/>
+        <service android:name=".Commen.OnAppCleared" />
     </application>
 
 </manifest>

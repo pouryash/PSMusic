@@ -3,10 +3,7 @@ package com.example.ps.musicps.MVP;
 import android.content.Context;
 import android.widget.Toast;
 
-import com.example.ps.musicps.Di.SongListModel.DaggerSongListModelApplicationComponent;
-import com.example.ps.musicps.Di.SongListModel.RequiredSongListPresenterOpsModule;
 import com.example.ps.musicps.Model.Song;
-
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
@@ -25,10 +22,7 @@ public class SongsListPresenter implements SongsListMVP.ProvidedPresenterOps,
 
 //        mModel = new SongsListModel(this);
 
-        DaggerSongListModelApplicationComponent.builder()
-                .requiredSongListPresenterOpsModule(new RequiredSongListPresenterOpsModule(this))
-                .build()
-                .inject(this);
+
     }
 
 

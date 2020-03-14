@@ -4,7 +4,6 @@ import android.content.Context;
 
 import com.example.ps.musicps.Commen.SongTask;
 import com.example.ps.musicps.Model.Song;
-import com.example.ps.musicps.View.SongListActivity;
 
 import java.util.ArrayList;
 

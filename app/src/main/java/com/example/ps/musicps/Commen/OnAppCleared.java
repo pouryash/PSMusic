@@ -8,7 +8,6 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
-import com.example.ps.musicps.Service.SongService;
 
 public class OnAppCleared extends Service {
     @Nullable
@@ -27,7 +26,7 @@ public class OnAppCleared extends Service {
     public void onDestroy() {
         super.onDestroy();
         Log.d("ClearFromRecentService", "Service Destroyed");
-        stopService(new Intent(MyApplication.context, SongService.class));
+//        stopService(new Intent(MyApplication.context, SongService.class));
     }
 
     @Override

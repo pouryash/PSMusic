@@ -19,6 +19,11 @@
         android:layout_marginStart="@dimen/standardMargin_X2"
         app:cardCornerRadius="10dp"
         app:cardElevation="2dp"
+        app:contentPaddingTop="0dp"
+        app:contentPaddingRight="0dp"
+        app:contentPaddingLeft="0dp"
+        app:contentPaddingBottom="0dp"
+        app:cardPreventCornerOverlap="false"
         android:layout_width="50dp"
         android:layout_height="50dp">
 
@@ -27,7 +32,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="fitXY"
-            tools:src="@drawable/ic_launcher_background" />
+            tools:src="@drawable/ic_icon" />
 
     </androidx.cardview.widget.CardView>
 

@@ -19,22 +19,15 @@ import com.example.ps.musicps.Model.Song;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 
 public class Commen {
 
-    public static boolean IS_PLAYING;
     private static final int WRITE_SETTINGS_REQUEST = 10;
     private static Commen instance;
-    public static MediaPlayer mediaPlayer;
-    public static Song song;
-    float volumeOut = 1;
-    float volumeIn = 0;
-    float speed = 0.02f;
-
 
     private Commen() {
-
     }
 
     static {
@@ -43,34 +36,6 @@ public class Commen {
 
     public static Commen getInstance() {
         return instance;
-    }
-
-
-    public void setupMediaPLayer(Context context, Song song, final onMediaPlayerStateChanged onMediaPlayerStateChanged) {
-        Commen.song = song;
-        mediaPlayer = new MediaPlayer();
-        try {
-            mediaPlayer.setDataSource(context, Uri.parse(song.getTrackFile()));
-            mediaPlayer.prepareAsync();
-            mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                @Override
-                public void onPrepared(MediaPlayer mediaPlayer) {
-                    onMediaPlayerStateChanged.onMediaPlayerPrepared();
-                }
-            });
-
-            mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                @Override
-                public void onCompletion(MediaPlayer mediaPlayer) {
-
-                    onMediaPlayerStateChanged.onMediaPlayerCompletion();
-                }
-            });
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        mediaPlayer.setLooping(true);
     }
 
     public static Bitmap getBitmapFromVectorDrawable(Context context, Drawable drawableId) {
@@ -98,40 +63,11 @@ public class Commen {
         return false;
     }
 
-    public void FadeOut(final float deltaTime) {
-        IS_PLAYING = false;
-        mediaPlayer.setVolume(volumeOut, volumeOut);
-        volumeOut -= speed * deltaTime;
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (volumeOut != 1 && !(volumeOut < 0)) {
-                    FadeOut(deltaTime);
-                } else if (volumeOut == 0 || volumeOut < 0) {
-                    mediaPlayer.pause();
-                    volumeOut = 1;
-                }
-            }
-        }, 20);
-
-    }
-
-    public void FadeIn(final float deltaTime) {
-            IS_PLAYING = true;
-            mediaPlayer.start();
-            mediaPlayer.setVolume(volumeIn, volumeIn);
-            volumeIn += speed * deltaTime;
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    if (volumeIn != 1 && !(volumeIn > 1)) {
-                        FadeIn(deltaTime);
-                    } else if (volumeIn == 1 || volumeIn > 1) {
-                        volumeIn = 0;
-                    }
-                }
-            }, 20);
-
+    public static String changeDurationFormat(long duration) {
+        int seconds = (int) (duration / 1000);
+        int minutes = seconds / 60;
+        seconds %= 60;
+        return String.format(Locale.ENGLISH, "%02d", minutes) + ":" + String.format(Locale.ENGLISH, "%02d", seconds);
     }
 
     public static List<Song> notifyListchanged(int pos, List<Song> songs) {
@@ -177,9 +113,4 @@ public class Commen {
         alert.show();
     }
 
-    public interface onMediaPlayerStateChanged {
-        void onMediaPlayerPrepared();
-
-        void onMediaPlayerCompletion();
-    }
 }

@@ -5,13 +5,14 @@ import android.content.SharedPreferences;
 
 import com.example.ps.musicps.Model.Song;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 public class SongSharedPrefrenceManager {
 
     private static final String SONG_SHARED_PREF_NAME = "song_shared_pref";
     private static final String FIRST_IN_SHARED_PREF_NAME = "first_in_shared_pref";
-
     private static final String KEY_FIRST_IN = "first_in";
-
     private static final String KEY_SONG_NAME = "song_name";
     private static final String KEY_SONG_ARTIST_NAME = "song_artist_name";
     private static final String KEY_ALBUM_NAME = "album_name";
@@ -19,14 +20,13 @@ public class SongSharedPrefrenceManager {
     private static final String KEY_SONG_DURATION = "song_duration";
     private static final String KEY_SONG_IMAGE_URI = "song_image_uri";
     private static final String KEY_SONG_ID = "song_id";
-
     private SharedPreferences songSharedPreferences;
     private SharedPreferences firstInSharedPreferences;
 
 
 
-
-    public SongSharedPrefrenceManager(Context context) {
+    @Inject
+    public SongSharedPrefrenceManager(@Named("context") Context context) {
 
         songSharedPreferences = context.getSharedPreferences(SONG_SHARED_PREF_NAME, context.MODE_PRIVATE);
         firstInSharedPreferences = context.getSharedPreferences(FIRST_IN_SHARED_PREF_NAME, context.MODE_PRIVATE);

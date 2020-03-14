@@ -60,7 +60,7 @@ public class SearchActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        Intent intent = new Intent(SearchActivity.this, SongListActivity.class);
+        Intent intent = new Intent(SearchActivity.this, ListActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
         startActivity(intent);
         isIntentFromSearch = true;
@@ -69,7 +69,6 @@ public class SearchActivity extends AppCompatActivity {
     private void setupViews() {
 
         firebaseAnalytics = FirebaseAnalytics.getInstance(this);
-        songList = SongListActivity.songList;
         imgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imgr.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
         recyclerView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
@@ -77,13 +76,12 @@ public class SearchActivity extends AppCompatActivity {
         adapter = new SongSearchAdapter(songList, this, new SongSearchAdapter.onSearchAdpSong() {
             @Override
             public void onSongClicked(int pos) {
-                if (pos != Commen.song.getId()){
-                    Commen.IS_PLAYING = false;
-                }
-                imgr.hideSoftInputFromWindow(SearchActivity.this.getCurrentFocus().getWindowToken(), 0);
-                Intent intent = new Intent(SearchActivity.this, PlaySongActivity.class);
-                intent.putExtra("position", pos);
-                SearchActivity.this.startActivity(intent);
+//                if (pos != Commen.song.getId()){
+//                }
+//                imgr.hideSoftInputFromWindow(SearchActivity.this.getCurrentFocus().getWindowToken(), 0);
+//                Intent intent = new Intent(SearchActivity.this, PlaySongActivity.class);
+//                intent.putExtra("position", pos);
+//                SearchActivity.this.startActivity(intent);
                 isIntentFromSearch = true;
                 Bundle bundle = new Bundle();
                 bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, songList.get(pos).getSongName());
@@ -132,7 +130,7 @@ public class SearchActivity extends AppCompatActivity {
                 Bundle bundle = new Bundle();
                 bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "Back Button Search");
                 firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
-                Intent intent = new Intent(SearchActivity.this, SongListActivity.class);
+                Intent intent = new Intent(SearchActivity.this, ListActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(intent);
                 isIntentFromSearch = true;
@@ -152,9 +150,9 @@ public class SearchActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        if(Commen.mediaPlayer !=null){
-            Commen.mediaPlayer.release();
-        }
+//        if(Commen.mediaPlayer !=null){
+//            Commen.mediaPlayer.release();
+//        }
         super.onDestroy();
     }
 

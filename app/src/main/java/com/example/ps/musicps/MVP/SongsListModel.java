@@ -2,18 +2,15 @@ package com.example.ps.musicps.MVP;
 
 import com.example.ps.musicps.Commen.SongTask;
 import com.example.ps.musicps.Model.Song;
-import com.example.ps.musicps.View.SongListActivity;
 
 import java.util.ArrayList;
-
-
 
 
 public class SongsListModel implements SongsListMVP.ProvidedModelOps , SongTask.onSongListFinished {
 
 
     private SongsListMVP.RequiredPresenterOps mPresenter;
-    ArrayList<Song> songsList;
+    private ArrayList<Song> songsList;
 
 
     public SongsListModel(SongsListMVP.RequiredPresenterOps presenter) {
@@ -30,9 +27,7 @@ public class SongsListModel implements SongsListMVP.ProvidedModelOps , SongTask.
 
     @Override
     public void getSong(int pos) {
-        if (songsList!=null && songsList.size() > SongListActivity.songList.size()){
-            songsList = SongListActivity.songList;
-        }
+
         if (pos > songsList.size()-1 || pos < 0){
             int a;
             if (pos > songsList.size()-1){

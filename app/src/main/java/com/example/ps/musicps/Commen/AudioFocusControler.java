@@ -57,13 +57,13 @@ public class AudioFocusControler implements AudioManager.OnAudioFocusChangeListe
     @Override
     public void onAudioFocusChange(int i) {
         //TODO
-        Commen.getInstance().FadeOut(2);
-        if (onAudioFocusChangeService != null){
-            onAudioFocusChangeService.onServiceFocusChange();
-        }
-        if (onAudioFocusChangePlay != null){
-            onAudioFocusChangePlay.onPlaySongFocusChange();
-        }
+//        Commen.getInstance().FadeOut(2);
+//        if (onAudioFocusChangeService != null){
+//            onAudioFocusChangeService.onServiceFocusChange();
+//        }
+//        if (onAudioFocusChangePlay != null){
+//            onAudioFocusChangePlay.onPlaySongFocusChange();
+//        }
 
     }
 

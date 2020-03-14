@@ -1,7 +1,4 @@
-package com.example.ps.musicps.Di.PlaySongModel;
-
-import android.app.Application;
-import android.content.Context;
+package com.example.ps.musicps.Di.module;
 
 import com.example.ps.musicps.MVP.PlaySongMVP;
 import com.example.ps.musicps.MVP.PlaySongModel;
@@ -10,11 +7,11 @@ import dagger.Module;
 import dagger.Provides;
 
 @Module
-public class RequiredPlySongPresenterOpsModule {
+public class PlaySongModule {
 
     private PlaySongMVP.RequiredPlaySongPresenterOps requiredPlaySongPresenterOps;
 
-    public RequiredPlySongPresenterOpsModule(PlaySongMVP.RequiredPlaySongPresenterOps requiredPlaySongPresenterOps) {
+    public PlaySongModule(PlaySongMVP.RequiredPlaySongPresenterOps requiredPlaySongPresenterOps) {
         this.requiredPlaySongPresenterOps = requiredPlaySongPresenterOps;
     }
 
