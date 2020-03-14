@@ -16,8 +16,8 @@ import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.RecyclerView;
 import com.crashlytics.android.Crashlytics;
-import com.example.ps.musicps.Di.component.DaggerSongListComponent;
 import com.example.ps.musicps.Helper.SongsConfigHelper;
+import com.example.ps.musicps.Model.Song;
 import com.example.ps.musicps.Model.SongInfo;
 import com.example.ps.musicps.View.Dialog.CustomeAlertDialogClass;
 import com.example.ps.musicps.R;
@@ -27,6 +27,9 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 
 public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongVH> {
 
@@ -34,11 +37,14 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongVH> {
     private LayoutInflater layoutInflater;
     private Context context;
     private onSongAdapter onSongAdapter;
+    private SongsConfigHelper songsConfigHelper;
 
-    public SongAdapter(List<SongViewModel> songViewModels, Context context, onSongAdapter onSongAdapter) {
+    @Inject
+    public SongAdapter(List<SongViewModel> songViewModels, Context context, onSongAdapter onSongAdapter, SongsConfigHelper songsConfigHelper) {
         this.viewModelList = songViewModels;
         this.context = context;
         this.onSongAdapter = onSongAdapter;
+        this.songsConfigHelper = songsConfigHelper;
     }
 
     public SongAdapter() {
@@ -66,7 +72,6 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongVH> {
 
     class SongVH extends RecyclerView.ViewHolder {
 
-        SongsConfigHelper songsConfigHelper;
         SongRowBinding binding;
         PopupMenu popup;
         FirebaseAnalytics firebaseAnalytics;
@@ -76,7 +81,6 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongVH> {
             super(itemView.getRoot());
             this.binding = itemView;
 
-            songsConfigHelper = DaggerSongListComponent.builder().build().getSongConfigHelper();
             Context wrapper = new ContextThemeWrapper(context, R.style.popupMenuStyle);
             popup = new PopupMenu(wrapper, binding.ivMoreSongListAdp);
             popup.inflate(R.menu.adp_items_menu);
@@ -172,7 +176,16 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongVH> {
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    onSongAdapter.onSongClicked(0);
+                    Song song = new Song();
+                    song.setContentID(viewModelList.get(position).getContentID());
+                    song.setId(viewModelList.get(position).getId());
+                    song.setSongImageUri(viewModelList.get(position).getSongImageUri());
+                    song.setDuration(viewModelList.get(position).getDuration());
+                    song.setTrackFile(viewModelList.get(position).getTrackFile());
+                    song.setArtistName(viewModelList.get(position).getArtistName());
+                    song.setAlbumName(viewModelList.get(position).getAlbumName());
+                    song.setSongName(viewModelList.get(position).getSongName());
+                    onSongAdapter.onSongClicked(song);
                 }
             });
         }
@@ -180,7 +193,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongVH> {
     }
 
     public interface onSongAdapter {
-        void onSongClicked(int pos);
+        void onSongClicked(Song song);
 
         void onSongRemoved(int id, int size);
 

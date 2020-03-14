@@ -1,8 +1,10 @@
 package com.example.ps.musicps.viewmodels;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.widget.ImageView;
 
@@ -22,9 +24,11 @@ import com.example.ps.musicps.Model.Song;
 import com.example.ps.musicps.Model.SongInfo;
 import com.example.ps.musicps.R;
 
+import javax.inject.Inject;
+
 public class SongPanelViewModel extends BaseObservable {
 
-    private int id;
+    private int id = -1;
     private String songName;
     private String albumName;
     private String duration;
@@ -34,6 +38,9 @@ public class SongPanelViewModel extends BaseObservable {
     private Context context;
     private int maxDuration;
     private int progressDuration;
+    private int audioManagerMax;
+    private int audioManagerProgress;
+    private boolean isSoundOn = true;
 
     public SongPanelViewModel(Song song) {
         this.songName = song.getSongName();
@@ -46,8 +53,14 @@ public class SongPanelViewModel extends BaseObservable {
 
     @BindingAdapter({"imgaeUri", "context"})
     public static void loadImage(ImageView iv, String uri, Context context) {
+//        int res;
+//        if (iv.getId() == R.id.iv_songImage_expand){
+//            res = R.drawable.ic_no_album_128;
+//        }else {
+//            res = R.drawable.ic_no_album;
+//        }
         Glide.with(iv.getContext()).asBitmap().load(Uri.parse(uri))
-                .apply(new RequestOptions().placeholder(R.drawable.ic_no_album))
+                .apply(new RequestOptions().placeholder(res))
                 .listener(new RequestListener<Bitmap>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
@@ -63,6 +76,32 @@ public class SongPanelViewModel extends BaseObservable {
                 .into(iv);
     }
 
+    @BindingAdapter({"imgaeRes"})
+    public static void loadImage(ImageView iv, boolean isSoundOn) {
+        int res;
+        if (isSoundOn){
+            res = R.drawable.ic_sound_on;
+        }else {
+            res = R.drawable.ic_sound_off;
+        }
+        Glide.with(iv.getContext()).asBitmap().load(res)
+                .apply(new RequestOptions().placeholder(R.drawable.ic_sound_on))
+                .listener(new RequestListener<Bitmap>() {
+                    @Override
+                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
+                        iv.setBackgroundColor(Color.parseColor("#d1d9ff"));
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target, DataSource dataSource, boolean isFirstResource) {
+                        return false;
+                    }
+                })
+                .into(iv);
+    }
+
+    @Inject
     public SongPanelViewModel(Context context) {
         this.context = context;
     }
@@ -163,5 +202,35 @@ public class SongPanelViewModel extends BaseObservable {
     public void setPath(String path) {
         this.path = path;
         notifyPropertyChanged(BR.path);
+    }
+
+    @Bindable
+    public int getAudioManagerMax() {
+        return audioManagerMax;
+    }
+
+    public void setAudioManagerMax(int audioManagerMax) {
+        this.audioManagerMax = audioManagerMax;
+        notifyPropertyChanged(BR.audioManagerMax);
+    }
+
+    @Bindable
+    public int getAudioManagerProgress() {
+        return audioManagerProgress;
+    }
+
+    public void setAudioManagerProgress(int audioManagerProgress) {
+        this.audioManagerProgress = audioManagerProgress;
+        notifyPropertyChanged(BR.audioManagerProgress);
+    }
+
+    @Bindable
+    public boolean isSoundOn() {
+        return isSoundOn;
+    }
+
+    public void setSoundOn(boolean soundOn) {
+        isSoundOn = soundOn;
+        notifyPropertyChanged(BR.soundOn);
     }
 }

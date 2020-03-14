@@ -3,7 +3,6 @@ package com.example.ps.musicps.Di.component;
 
 import com.example.ps.musicps.Di.module.PlaySongModule;
 import com.example.ps.musicps.Di.Scop.ActivityScop;
-import com.example.ps.musicps.MVP.PlaySongPresenter;
 
 import dagger.Component;
 
@@ -11,6 +10,5 @@ import dagger.Component;
 @ActivityScop
 public interface PlaySongComponent {
 
-    void inject(PlaySongPresenter playSongPresenter);
 
 }

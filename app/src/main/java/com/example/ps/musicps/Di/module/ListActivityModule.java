@@ -2,20 +2,25 @@ package com.example.ps.musicps.Di.module;
 
 import android.content.Context;
 
+import com.example.ps.musicps.viewmodels.SongViewModel;
+
 import dagger.Module;
 import dagger.Provides;
 
 @Module
-public class ContextModule {
+public class ListActivityModule {
 
-   private Context context;
+    private Context context;
 
-    public ContextModule(Context context) {
+    public ListActivityModule(Context context) {
         this.context = context;
     }
 
     @Provides
-    Context provideContext(Context context){
+    Context getContext(){
         return context;
     }
+
+
+
 }

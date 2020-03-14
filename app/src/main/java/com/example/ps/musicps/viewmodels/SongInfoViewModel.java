@@ -7,6 +7,8 @@ import androidx.databinding.Bindable;
 import com.example.ps.musicps.BR;
 import com.example.ps.musicps.Model.SongInfo;
 
+import javax.inject.Inject;
+
 public class SongInfoViewModel extends BaseObservable {
 
     private String title;
@@ -32,6 +34,7 @@ public class SongInfoViewModel extends BaseObservable {
         setPath(songInfo.getPath());
     }
 
+    @Inject
     public SongInfoViewModel(Context context) {
         this.context = context;
     }

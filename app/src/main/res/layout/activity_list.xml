@@ -71,6 +71,7 @@
                         android:layout_height="match_parent"
                         android:paddingBottom="70dp"
                         tools:listitem="@layout/song_row"
+                        bind:viewModelList="@{song.userViewModelList1}"
                         bind:songAdapter="@{song.songAdapter}"
                         bind:context="@{song.context}"
                         bind:recyclerBinder="@{song.mutableSongViewModelList}"/>

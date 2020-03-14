@@ -7,8 +7,10 @@ import androidx.fragment.app.FragmentTransaction;
 
 import android.Manifest;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
+import android.media.AudioManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -27,10 +29,16 @@ import com.example.ps.musicps.Commen.MyApplication;
 import com.example.ps.musicps.Commen.OnAppCleared;
 import com.example.ps.musicps.Commen.RuntimePermissionsActivity;
 import com.example.ps.musicps.Commen.SongSharedPrefrenceManager;
+import com.example.ps.musicps.Commen.VolumeContentObserver;
+import com.example.ps.musicps.Di.component.DaggerSongListComponent;
+import com.example.ps.musicps.Di.component.SongListComponent;
+import com.example.ps.musicps.Di.module.ListActivityModule;
+import com.example.ps.musicps.Di.module.SongAdapterModule;
 import com.example.ps.musicps.Helper.MusiPlayerHelper;
 import com.example.ps.musicps.Model.Song;
 import com.example.ps.musicps.Model.SongInfo;
 import com.example.ps.musicps.R;
+import com.example.ps.musicps.Repository.SongRepository;
 import com.example.ps.musicps.View.Dialog.CustomeDialogClass;
 import com.example.ps.musicps.databinding.ActivityListBinding;
 import com.example.ps.musicps.databinding.PlayingSongPanelBinding;
@@ -46,25 +54,33 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import javax.inject.Inject;
+
 public class ListActivity extends RuntimePermissionsActivity implements SongAdapter.onSongAdapter,
         MusiPlayerHelper.onMediaPlayerStateChanged {
 
     private static final int READ_EXTERNAL_STORAGE = 1;
     ActivityListBinding binding;
     MusiPlayerHelper musiPlayerHelper;
-    SongAdapter songAdapter;
     SongSharedPrefrenceManager sharedPrefrenceManager;
     FragmentManager fragmentManager;
     FragmentTransaction fragmentTransaction;
     CustomeDialogClass customeDialog;
     FirebaseAnalytics firebaseAnalytics;
+    @Inject
     SongViewModel songViewModel;
+    @Inject
     SongInfoViewModel songInfoViewModel;
     SongInfoDialogBinding songInfoBinding;
+    @Inject
     SongPanelViewModel songPanelViewModel;
+    @Inject
+    VolumeContentObserver volumeContentObserver;
     Dialog infoDialog;
     List<SongViewModel> songViewModelList = new ArrayList<>();
+    SongListComponent component;
     boolean isSetupedPanel = false;
+    boolean isSeekbarTouched = false;
 
 
     @Override
@@ -72,11 +88,14 @@ public class ListActivity extends RuntimePermissionsActivity implements SongAdap
         super.onCreate(savedInstanceState);
         binding = ActivityListBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        songViewModel = new SongViewModel(this);
+
+        component = DaggerSongListComponent.builder()
+                .listActivityModule(new ListActivityModule(this))
+                .build();
+        component.inject(this);
+
         binding.setSong(songViewModel);
-        songInfoViewModel = new SongInfoViewModel(this);
         songInfoBinding = SongInfoDialogBinding.inflate(getLayoutInflater());
-        songPanelViewModel = new SongPanelViewModel(this);
         startService(new Intent(getBaseContext(), OnAppCleared.class));
 
         ListActivity.super.requestAppPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -151,18 +170,18 @@ public class ListActivity extends RuntimePermissionsActivity implements SongAdap
         SearchActivity.onSearchedItemRemoved = new SearchActivity.onSearchedItemRemoved() {
             @Override
             public void onRemoved(int position, boolean isCurentSong, List<Song> list) {
-                songAdapter.notifyItemRemoved(position);
-                songAdapter.notifyItemRangeRemoved(position, songViewModelList.size() - 1);
-                songAdapter.notifyDataSetChanged();
-                if (isCurentSong) {
-                    if (songViewModelList.size() > 0) {
-//                        onDataRecived.onSongRecived(songList.get(0), false);
-                        //when curent song deleted and then open first song by PlayingSongFragment
-//                        PlaySongActivity.song = songList.get(0);
-                    } else {
-                        binding.ivNoItems.setVisibility(View.VISIBLE);
-                    }
-                }
+//                songAdapter.notifyItemRemoved(position);
+//                songAdapter.notifyItemRangeRemoved(position, songViewModelList.size() - 1);
+//                songAdapter.notifyDataSetChanged();
+//                if (isCurentSong) {
+//                    if (songViewModelList.size() > 0) {
+////                        onDataRecived.onSongRecived(songList.get(0), false);
+//                        //when curent song deleted and then open first song by PlayingSongFragment
+////                        PlaySongActivity.song = songList.get(0);
+//                    } else {
+//                        binding.ivNoItems.setVisibility(View.VISIBLE);
+//                    }
+//                }
             }
         };
 
@@ -234,6 +253,27 @@ public class ListActivity extends RuntimePermissionsActivity implements SongAdap
             }
         });
 
+        binding.panel.sbSoundPlaySong.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                volumeContentObserver.setVolume(i);
+                Bundle bundle = new Bundle();
+                bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "seekbar volume");
+                firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                if (!songPanelViewModel.isSoundOn())
+                    songPanelViewModel.setSoundOn(true);
+            }
+        });
+
         binding.panel.ivPlayPauseCollpase.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -289,20 +329,37 @@ public class ListActivity extends RuntimePermissionsActivity implements SongAdap
         binding.panel.seekbarExpand.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean fromUser) {
-                if (fromUser)
-                    musiPlayerHelper.mediaPlayer.seekTo(i);
+//                if (fromUser)
+//                    musiPlayerHelper.mediaPlayer.seekTo(i);
 
             }
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-
+                isSeekbarTouched = true;
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
+                isSeekbarTouched = false;
+                musiPlayerHelper.mediaPlayer.seekTo(seekBar.getProgress());
                 songPanelViewModel.setProgressDuration(musiPlayerHelper.mediaPlayer.getCurrentPosition());
                 songPanelViewModel.setCurrentDuration(Commen.changeDurationFormat(musiPlayerHelper.mediaPlayer.getCurrentPosition()));
+
+            }
+        });
+
+        binding.panel.ivSoundSeekbarPlaySong.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (songPanelViewModel.isSoundOn()) {
+                    volumeContentObserver.setLastVolum(volumeContentObserver.getAudioManager().getStreamVolume(AudioManager.STREAM_MUSIC));
+                    songPanelViewModel.setSoundOn(false);
+                    volumeContentObserver.setVolume(0);
+                } else {
+                    songPanelViewModel.setSoundOn(true);
+                    volumeContentObserver.setVolume(volumeContentObserver.getLastVolum());
+                }
             }
         });
 
@@ -320,8 +377,10 @@ public class ListActivity extends RuntimePermissionsActivity implements SongAdap
                         @Override
                         public void run() {
                             try {
-                                songPanelViewModel.setProgressDuration(musiPlayerHelper.mediaPlayer.getCurrentPosition());
-                                songPanelViewModel.setCurrentDuration(Commen.changeDurationFormat(musiPlayerHelper.mediaPlayer.getCurrentPosition()));
+                                if (!isSeekbarTouched) {
+                                    songPanelViewModel.setProgressDuration(musiPlayerHelper.mediaPlayer.getCurrentPosition());
+                                    songPanelViewModel.setCurrentDuration(Commen.changeDurationFormat(musiPlayerHelper.mediaPlayer.getCurrentPosition()));
+                                }
                             } catch (Exception e) {
 
                             }
@@ -352,6 +411,7 @@ public class ListActivity extends RuntimePermissionsActivity implements SongAdap
 
         firebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
+        volumeContentObserver.setSongPanelViewModel(songPanelViewModel);
         binding.panel.setSong(songPanelViewModel);
         songInfoBinding.setSongInfo(songInfoViewModel);
         infoDialog = new Dialog(this, R.style.DialogTheme);
@@ -424,35 +484,36 @@ public class ListActivity extends RuntimePermissionsActivity implements SongAdap
 
 
     @Override
-    public void onSongClicked(int pos) {
+    public void onSongClicked(Song song) {
 
-//        if (onSongClickedWidget != null) {
-//            onSongClickedWidget.onSongClicked(songList.get(pos));
-//        }
 
-//        Intent intent = new Intent(SongListActivity.this, PlaySongActivity.class);
-//        if (PlaySongActivity.song != null) {
-//            if (PlaySongActivity.song.getId() == pos && musiPlayerHelper.mediaPlayer != null) {
-//                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-//            } else {
-//                if (PlaySongActivity.timer != null) {
-//                    PlaySongActivity.timer.purge();
-//                    PlaySongActivity.timer.cancel();
-//                }
-//                musiPlayerHelper.mediaPlayer.release();
-//            }
-//        }else {
-////           if (!PlayingSongFragment.isFragmentRootClicked){
-////               Commen.mediaPlayer.release();
-////               Commen.IS_PLAYING = false;
-////               // this is for when start song from fragment and clicked root(problem is restart mediaplayer)
-////               PlayingSongFragment.isFragmentRootClicked = false;
-////           }
-//        }
-//        intent.putExtra("position", pos);
-//        File file = new File(songList.get(pos).getTrackFile());
-//        if (file.exists()) {
-//            startActivity(intent);
+        if (song.getId() == sharedPrefrenceManager.getSong().getId() && musiPlayerHelper.mediaPlayer != null) {
+
+            binding.slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
+            if (!musiPlayerHelper.mediaPlayer.isPlaying()) {
+                musiPlayerHelper.FadeIn(2);
+                binding.panel.ivPlayPauseCollpase.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_pause_24px, null));
+                binding.panel.ivPlayPayseExpand.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_pause, null));
+            }
+
+        } else {
+            if (musiPlayerHelper.mediaPlayer != null){
+                musiPlayerHelper.mediaPlayer.release();
+            }
+            musiPlayerHelper.setupMediaPLayer(ListActivity.this, song, ListActivity.this);
+            if (musiPlayerHelper.mediaPlayer == null) {
+                    musiPlayerHelper.FadeIn(2);
+            }else if (song.getId() != sharedPrefrenceManager.getSong().getId()){
+                sharedPrefrenceManager.saveSong(song);
+                setupPanel(song);
+                binding.slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
+                musiPlayerHelper.FadeIn(2);
+                binding.panel.ivPlayPauseCollpase.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_pause_24px, null));
+                binding.panel.ivPlayPayseExpand.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_pause, null));
+            }
+        }
+
+
 //TODO
         //analetics
 //            Bundle bundle = new Bundle();
@@ -529,6 +590,10 @@ public class ListActivity extends RuntimePermissionsActivity implements SongAdap
             musiPlayerHelper.mediaPlayer.release();
         }
 
+        if (volumeContentObserver != null) {
+            this.getContentResolver().unregisterContentObserver(volumeContentObserver);
+        }
+
         super.onDestroy();
 
     }
@@ -548,5 +613,9 @@ public class ListActivity extends RuntimePermissionsActivity implements SongAdap
     @Override
     public void onMediaPlayerCompletion() {
 
+    }
+
+    public SongListComponent getComponent() {
+        return component;
     }
 }

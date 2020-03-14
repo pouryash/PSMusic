@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.widget.ImageView;
 import androidx.annotation.Nullable;
 import androidx.databinding.BaseObservable;
+import androidx.databinding.Bindable;
 import androidx.databinding.BindingAdapter;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.MutableLiveData;
@@ -20,13 +21,19 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
 import com.example.ps.musicps.Adapter.SongAdapter;
-import com.example.ps.musicps.Di.component.DaggerSongListComponent;
+import com.example.ps.musicps.BR;
+import com.example.ps.musicps.Di.component.DaggerSongViewModelComponent;
+import com.example.ps.musicps.Di.component.SongViewModelComponent;
+import com.example.ps.musicps.Di.module.SongAdapterModule;
 import com.example.ps.musicps.Model.Song;
 import com.example.ps.musicps.R;
 import com.example.ps.musicps.Repository.SongRepository;
+import com.example.ps.musicps.View.ListActivity;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.inject.Inject;
 
 public class SongViewModel extends BaseObservable {
 
@@ -42,10 +49,17 @@ public class SongViewModel extends BaseObservable {
     private int ContentID;
     private Context context;
     private SongAdapter songAdapter;
+    private List<SongViewModel> userViewModelList1 = new ArrayList<>();
+    private SongViewModelComponent component;
 
+    @Inject
     public SongViewModel(Context context) {
-        this.context = context;
-        songRepository = DaggerSongListComponent.builder().build().getSongRepository();
+        setContext(context);
+        component = DaggerSongViewModelComponent.builder()
+                .songAdapterModule(new SongAdapterModule((SongAdapter.onSongAdapter) context, userViewModelList1, context))
+                .build();
+        songRepository = component.getSongRepository();
+        songAdapter = component.getSongAdapter();
     }
 
     public SongViewModel(Song song) {
@@ -59,21 +73,19 @@ public class SongViewModel extends BaseObservable {
         ContentID = song.getContentID();
     }
 
-    @BindingAdapter({"bind:recyclerBinder", "bind:context", "bind:songAdapter"})
+    @BindingAdapter({"bind:recyclerBinder", "bind:context", "bind:songAdapter", "bind:viewModelList"})
     public static void getRecyclerBinder(RecyclerView recyclerView, MutableLiveData<List<SongViewModel>> mutableSongViewModelList,
-                                         Context context, SongAdapter songAdapter) {
+                                         Context context, SongAdapter songAdapter, List<SongViewModel> songViewModels) {
 
-        List<SongViewModel> userViewModelList1 = new ArrayList<>();
 
-        songAdapter = new SongAdapter(userViewModelList1, context, (SongAdapter.onSongAdapter) context);
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext(), LinearLayoutManager.VERTICAL, false));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(songAdapter);
 
         SongAdapter finalSongAdapter = songAdapter;
         mutableSongViewModelList.observe((LifecycleOwner) context, songViewModellist -> {
-            userViewModelList1.clear();
-            userViewModelList1.addAll(songViewModellist);
+            songViewModels.clear();
+            songViewModels.addAll(songViewModellist);
             finalSongAdapter.notifyDataSetChanged();
         });
 
@@ -125,7 +137,15 @@ public class SongViewModel extends BaseObservable {
         songRepository.deleteSong(id);
     }
 
+    @Bindable
+    public List<SongViewModel> getUserViewModelList1() {
+        return userViewModelList1;
+    }
 
+    public void setUserViewModelList1(List<SongViewModel> userViewModelList1) {
+        this.userViewModelList1 = userViewModelList1;
+        notifyPropertyChanged(BR.userViewModelList1);
+    }
 
     public int getId() {
         return id;
@@ -163,8 +183,14 @@ public class SongViewModel extends BaseObservable {
         return ContentID;
     }
 
+    @Bindable
     public Context getContext() {
         return context;
+    }
+
+    public void setContext(Context context) {
+        this.context = context;
+        notifyPropertyChanged(BR.context);
     }
 
     public MutableLiveData<List<SongViewModel>> getMutableSongViewModelList() {

@@ -56,7 +56,7 @@
                         android:scaleType="fitXY"
                         app:imgaeUri="@{song.imageUri}"
                         app:context="@{song.context}"
-                        tools:src="@drawable/ic_icon" />
+                        tools:src="@drawable/ic_no_album" />
 
                 </androidx.cardview.widget.CardView>
 
@@ -127,6 +127,8 @@
                 android:layout_marginEnd="@dimen/standardMargin_X2"
                 android:layout_toEndOf="@+id/iv_SoundSeekbar_PlaySong"
                 android:background="@null"
+                android:max="@{song.audioManagerMax}"
+                android:progress="@{song.audioManagerProgress}"
                 android:progressTint="#ccc"
                 android:thumb="@null" />
 
@@ -136,6 +138,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_marginStart="@dimen/standardMargin"
+                app:imgaeRes="@{song.soundOn}"
                 app:srcCompat="@drawable/ic_sound_on" />
 
         </RelativeLayout>
