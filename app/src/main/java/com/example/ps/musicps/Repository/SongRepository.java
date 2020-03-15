@@ -139,4 +139,17 @@ public class SongRepository {
     public void deleteSong(int id){
         dbRepository.deleteById(id);
     }
+
+    public Song getSong(String id){
+       return dbRepository.getSong(id);
+    }
+
+    public Song getMinSong(String id){
+        return dbRepository.getMinSong(id);
+    }
+
+    public Song getMaxSong(String id){
+        return dbRepository.getMaxSong(id);
+    }
+
 }

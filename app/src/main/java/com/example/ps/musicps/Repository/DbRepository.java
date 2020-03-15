@@ -43,6 +43,18 @@ public class DbRepository {
         }
     }
 
+    public Song getSong(String id){
+        return songDao.getSongById(Integer.parseInt(id));
+    }
+
+    public Song getMinSong(String id){
+        return songDao.getSongByIdMin(Integer.parseInt(id));
+    }
+
+    public Song getMaxSong(String id){
+        return songDao.getSongByIdMax(Integer.parseInt(id));
+    }
+
     public void deleteById(final int id) {
         AsyncTask.execute(new Runnable() {
             @Override
@@ -52,7 +64,7 @@ public class DbRepository {
         });
     }
 
-    public void deleteUser(final Song song) {
+    public void deleteSong(final Song song) {
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {

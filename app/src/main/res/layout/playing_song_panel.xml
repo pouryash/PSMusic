@@ -5,7 +5,11 @@
     <data>
 
         <variable
-            name="song"
+            name="listViewModel"
+            type="com.example.ps.musicps.viewmodels.SongViewModel" />
+
+        <variable
+            name="songPanel"
             type="com.example.ps.musicps.viewmodels.SongPanelViewModel" />
 
     </data>
@@ -55,7 +59,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:scaleType="center"
-                        bind:imgaeUriPanel="@{song.imageUri}"
+                        bind:imgaeUriPanel="@{songPanel.imageUri}"
                         app:srcCompat="@drawable/ic_no_album" />
 
                 </androidx.cardview.widget.CardView>
@@ -72,7 +76,7 @@
                     android:maxWidth="260dp"
                     android:paddingTop="@dimen/smallMargin"
                     android:singleLine="true"
-                    android:text="@{song.songName}"
+                    android:text="@{songPanel.songName}"
                     android:textColor="@color/colorWhite"
                     android:textSize="@dimen/standardTextSize_12"
                     tools:text="pourya sharifi" />
@@ -89,7 +93,7 @@
                     android:fontFamily="@font/sans"
                     android:maxWidth="260dp"
                     android:singleLine="true"
-                    android:text="@{song.albumName}"
+                    android:text="@{songPanel.albumName}"
                     android:textColor="@color/colorGray"
                     android:textSize="@dimen/standardTextSize_12"
                     tools:text="pourya sharifi" />
@@ -127,8 +131,8 @@
                 android:layout_marginEnd="@dimen/standardMargin_X2"
                 android:layout_toEndOf="@+id/iv_SoundSeekbar_PlaySong"
                 android:background="@null"
-                android:max="@{song.audioManagerMax}"
-                android:progress="@{song.audioManagerProgress}"
+                android:max="@{songPanel.audioManagerMax}"
+                android:progress="@{songPanel.audioManagerProgress}"
                 android:progressTint="#ccc"
                 android:thumb="@null" />
 
@@ -138,7 +142,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_marginStart="@dimen/standardMargin"
-                app:imgaeRes="@{song.soundOn}"
+                app:imgaeRes="@{songPanel.soundOn}"
                 app:srcCompat="@drawable/ic_sound_on" />
 
         </RelativeLayout>
@@ -162,7 +166,8 @@
                     android:id="@+id/iv_songImage_expand"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    bind:imgaeUriPanel="@{song.imageUri}"
+                    android:scaleType="fitXY"
+                    bind:imgaeUriPanel="@{songPanel.imageUri}"
                     tools:src="@drawable/ic_no_album_128" />
 
             </androidx.cardview.widget.CardView>
@@ -179,7 +184,7 @@
                 android:ellipsize="marquee"
                 android:fontFamily="@font/sans_bold"
                 android:singleLine="true"
-                android:text="@{song.songName}"
+                android:text="@{songPanel.songName}"
                 android:textColor="@color/colorWhite"
                 android:textSize="@dimen/standardTextSize_15"
                 tools:text="pourya sharifi" />
@@ -194,7 +199,7 @@
                 android:layout_marginEnd="@dimen/standardMargin_X2"
                 android:fontFamily="@font/sans_bold"
                 android:singleLine="true"
-                android:text="@{song.albumName}"
+                android:text="@{songPanel.albumName}"
                 android:textColor="@color/colorGray"
                 android:textSize="@dimen/standardTextSize_13"
                 tools:text="pourya sharifi" />
@@ -215,7 +220,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
-                android:text="@{song.duration}"
+                android:text="@{songPanel.duration}"
                 android:layout_marginStart="@dimen/standardMargin"
                 android:textColor="@color/colorWhite"
                 android:textSize="@dimen/standardTextSize_10"
@@ -228,8 +233,8 @@
                 android:layout_centerInParent="true"
                 android:layout_centerVertical="true"
                 android:layout_marginBottom="@dimen/standardMargin"
-                android:max="@{song.maxDuration}"
-                android:progress="@{song.progressDuration}"
+                android:max="@{songPanel.maxDuration}"
+                android:progress="@{songPanel.progressDuration}"
                 android:layout_toStartOf="@id/tv_duration_expand"
                 android:layout_toEndOf="@id/tv_timePassed_expand" />
 
@@ -239,7 +244,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
-                android:text="@{song.currentDuration}"
+                android:text="@{songPanel.currentDuration}"
                 android:layout_marginEnd="@dimen/standardMargin"
                 android:textColor="@color/colorWhite"
                 android:textSize="@dimen/standardTextSize_10"
@@ -277,6 +282,7 @@
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:clickable="true"
                 android:focusable="true"
+                android:onClick="@{() -> listViewModel.getPrevSongById()}"
                 android:padding="@dimen/smallMargin"
                 app:srcCompat="@drawable/ic_previous_track" />
 
@@ -289,6 +295,7 @@
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:clickable="true"
                 android:focusable="true"
+                android:onClick="@{() -> listViewModel.getNextSongById()}"
                 android:padding="@dimen/smallMargin"
                 app:srcCompat="@drawable/ic_next_track" />
 

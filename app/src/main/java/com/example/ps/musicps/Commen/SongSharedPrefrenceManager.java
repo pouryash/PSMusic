@@ -20,6 +20,7 @@ public class SongSharedPrefrenceManager {
     private static final String KEY_SONG_DURATION = "song_duration";
     private static final String KEY_SONG_IMAGE_URI = "song_image_uri";
     private static final String KEY_SONG_ID = "song_id";
+    private static final String KEY_CURENT_PLAYING_STATE = "curentPlayingState";
     private SharedPreferences songSharedPreferences;
     private SharedPreferences firstInSharedPreferences;
 
@@ -30,6 +31,10 @@ public class SongSharedPrefrenceManager {
 
         songSharedPreferences = context.getSharedPreferences(SONG_SHARED_PREF_NAME, context.MODE_PRIVATE);
         firstInSharedPreferences = context.getSharedPreferences(FIRST_IN_SHARED_PREF_NAME, context.MODE_PRIVATE);
+
+        if (getPlayingState().equals("")){
+            setPlayingState("repeatOne");
+        }
     }
 
 
@@ -47,6 +52,15 @@ public class SongSharedPrefrenceManager {
         }
     }
 
+    public void setPlayingState(String state){
+        SharedPreferences.Editor editor = songSharedPreferences.edit();
+        editor.putString(KEY_CURENT_PLAYING_STATE, state);
+        editor.apply();
+    }
+
+    public String getPlayingState(){
+        return songSharedPreferences.getString(KEY_CURENT_PLAYING_STATE, "");
+    }
 
     public Song getSong() {
         Song song = new Song();

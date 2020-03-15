@@ -19,6 +19,15 @@ public interface SongDao {
     @Query("SELECT * FROM tbl_song WHERE trackFile LIKE :path")
     Song getSong(String path);
 
+    @Query("SELECT * FROM tbl_song WHERE id = (select max(id) from tbl_song where id < :id)")
+    Song getSongByIdMin(int id);
+
+    @Query("SELECT * FROM tbl_song WHERE id = (select min(id) from tbl_song where id > :id)")
+    Song getSongByIdMax(int id);
+
+    @Query("SELECT * FROM tbl_song WHERE id = :id")
+    Song getSongById(int id);
+
     @Insert
     void insertSong(Song song);
 

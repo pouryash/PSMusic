@@ -1,6 +1,7 @@
 package com.example.ps.musicps.View;
 
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -10,13 +11,16 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -50,6 +54,7 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -67,6 +72,7 @@ public class ListActivity extends RuntimePermissionsActivity implements SongAdap
     FragmentTransaction fragmentTransaction;
     CustomeDialogClass customeDialog;
     FirebaseAnalytics firebaseAnalytics;
+    List<SongViewModel> shuffleList = new ArrayList<>();
     @Inject
     SongViewModel songViewModel;
     @Inject
@@ -81,6 +87,13 @@ public class ListActivity extends RuntimePermissionsActivity implements SongAdap
     SongListComponent component;
     boolean isSetupedPanel = false;
     boolean isSeekbarTouched = false;
+    boolean isInLongTouch;
+    boolean isSongComplete = false;
+    int longTouchPosition;
+    int curentShuffleSong;
+    Drawable drawableRepeatOne;
+    Drawable drawableRepeatAll;
+    Drawable drawableShuffle;
 
 
     @Override
@@ -148,8 +161,6 @@ public class ListActivity extends RuntimePermissionsActivity implements SongAdap
 
 
         isSetupedPanel = true;
-
-        binding.slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
 
 
         if (musiPlayerHelper.mediaPlayer != null && !musiPlayerHelper.mediaPlayer.isPlaying()) {
@@ -331,7 +342,9 @@ public class ListActivity extends RuntimePermissionsActivity implements SongAdap
             public void onProgressChanged(SeekBar seekBar, int i, boolean fromUser) {
 //                if (fromUser)
 //                    musiPlayerHelper.mediaPlayer.seekTo(i);
-
+                if (i > seekBar.getMax() / 2) {
+                    isSongComplete = false;
+                }
             }
 
             @Override
@@ -363,11 +376,181 @@ public class ListActivity extends RuntimePermissionsActivity implements SongAdap
             }
         });
 
+        songViewModel.getSongMutableLiveData().observe(this, this::onSongClicked);
+
+        binding.panel.ivNextExpand.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                isInLongTouch = true;
+                longTouchPosition = 2000;
+                longTouchForward();
+                return false;
+            }
+        });
+
+        binding.panel.ivNextExpand.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                    if (isInLongTouch) {
+                        isInLongTouch = false;
+                        songViewModel.setCanClick(false);
+                    }
+                }
+                return false;
+            }
+        });
+
+        binding.panel.ivPreviousExpand.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                isInLongTouch = true;
+                longTouchPosition = 2000;
+                longTouchBackward();
+                return false;
+            }
+        });
+
+        binding.panel.ivPreviousExpand.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                    if (isInLongTouch) {
+                        songViewModel.setCanClick(false);
+                        isInLongTouch = false;
+                    }
+                }
+                return false;
+            }
+        });
+
+        binding.panel.ivRepeatExpand.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Bundle bundle = new Bundle();
+                bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "Repeat Button ");
+                firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
+                switch (sharedPrefrenceManager.getPlayingState()) {
+                    case "repeatOne":
+                        binding.panel.ivRepeatExpand.setImageBitmap(Commen.getBitmapFromVectorDrawable(ListActivity.this,
+                                getResources().getDrawable(R.drawable.ic_repeat_24px)));
+                        musiPlayerHelper.mediaPlayer.setLooping(false);
+                        sharedPrefrenceManager.setPlayingState("repeatList");
+                        Toast.makeText(getApplicationContext(), "Repeat list", Toast.LENGTH_SHORT).show();
+                        break;
+                    case "repeatList":
+                        binding.panel.ivRepeatExpand.setImageBitmap(Commen.getBitmapFromVectorDrawable(ListActivity.this,
+                                getResources().getDrawable(R.drawable.ic_shuffle_24px)));
+                        if (shuffleList.size() == 0) {
+                            shuffleList = songViewModelList;
+                        }
+                        Collections.shuffle(shuffleList);
+                        musiPlayerHelper.mediaPlayer.setLooping(false);
+                        sharedPrefrenceManager.setPlayingState("shuffle");
+                        Toast.makeText(getApplicationContext(), "Shuffle", Toast.LENGTH_SHORT).show();
+                        break;
+                    case "shuffle":
+                        binding.panel.ivRepeatExpand.setImageBitmap(Commen.getBitmapFromVectorDrawable(ListActivity.this,
+                                getResources().getDrawable(R.drawable.ic_repeat_one_24px)));
+                        musiPlayerHelper.mediaPlayer.setLooping(true);
+                        sharedPrefrenceManager.setPlayingState("repeatOne");
+                        Toast.makeText(getApplicationContext(), "Repeat one", Toast.LENGTH_SHORT).show();
+                        break;
+                }
+
+
+//                if (!bmpCurrent.equals(bmpReplayList)) {
+//                    repeatButton.setImageDrawable(drawable);
+//                    Toast.makeText(getApplicationContext(), "Play All Song In List", Toast.LENGTH_SHORT).show();
+//                    Commen.mediaPlayer.setLooping(false);
+//                } else {
+//                    Commen.mediaPlayer.setLooping(true);
+//                    repeatButton.setImageResource(R.drawable.ic_repeat_one_24px);
+//                    Toast.makeText(getApplicationContext(), "Replay Current Song", Toast.LENGTH_SHORT).show();
+//                }
+            }
+        });
+
     }
+
+    public void longTouchBackward() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (isInLongTouch) {
+                    if (musiPlayerHelper.mediaPlayer.getCurrentPosition() - longTouchPosition <= 0) {
+                        if (musiPlayerHelper.mediaPlayer.isLooping()) {
+                            musiPlayerHelper.mediaPlayer.seekTo(0);
+                        } else {
+//                            if (!isExternalSource) {
+                            binding.panel.ivPlayPayseExpand.performClick();
+//                            } else {
+//                                setupMediaPLayer();
+//                            }
+
+                        }
+                    } else {
+                        musiPlayerHelper.mediaPlayer.seekTo(musiPlayerHelper.mediaPlayer.getCurrentPosition() - longTouchPosition);
+                        songPanelViewModel.setProgressDuration(musiPlayerHelper.mediaPlayer.getCurrentPosition());
+                        songPanelViewModel.setCurrentDuration(Commen.changeDurationFormat(musiPlayerHelper.mediaPlayer.getCurrentPosition()));
+                    }
+
+                    if (longTouchPosition >= 20000) {
+                        longTouchPosition = 20000;
+                    } else {
+                        longTouchPosition = longTouchPosition + 2000;
+                    }
+                    if (isInLongTouch) {
+                        longTouchBackward();
+                    }
+                }
+            }
+        }, 500);
+    }
+
+    public void longTouchForward() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (isInLongTouch) {
+                    if (longTouchPosition + musiPlayerHelper.mediaPlayer.getCurrentPosition() >= musiPlayerHelper.mediaPlayer.getDuration()) {
+                        if (musiPlayerHelper.mediaPlayer.isLooping()) {
+                            musiPlayerHelper.mediaPlayer.seekTo(0);
+                        } else {
+                            //TODO
+//                            if (!isExternalSource) {
+//                                    mPresenter.getSong(Commen.song.getId() + 1);
+                            binding.panel.ivNextExpand.performClick();
+//                            } else {
+//                                setupMediaPLayer();
+//                            }
+
+                        }
+                    } else {
+                        musiPlayerHelper.mediaPlayer.seekTo(musiPlayerHelper.mediaPlayer.getCurrentPosition() + longTouchPosition);
+                        songPanelViewModel.setProgressDuration(musiPlayerHelper.mediaPlayer.getCurrentPosition());
+                        songPanelViewModel.setCurrentDuration(Commen.changeDurationFormat(musiPlayerHelper.mediaPlayer.getCurrentPosition()));
+                    }
+
+                    if (longTouchPosition >= 20000) {
+                        longTouchPosition = 20000;
+                    } else {
+                        longTouchPosition = longTouchPosition + 2000;
+                    }
+                    if (isInLongTouch) {
+                        longTouchForward();
+                    }
+                }
+            }
+        }, 500);
+
+
+    }
+
 
     private void seekBarProgressUpdater() {
 
-        if (musiPlayerHelper.mediaPlayer != null && musiPlayerHelper.mediaPlayer.isPlaying()) {
+        if (musiPlayerHelper.mediaPlayer != null) {
 
             musiPlayerHelper.setTimer(new Timer());
             musiPlayerHelper.getTimer().schedule(new TimerTask() {
@@ -389,6 +572,7 @@ public class ListActivity extends RuntimePermissionsActivity implements SongAdap
                 }
             }, 0, 1000);
         }
+
 
     }
 
@@ -412,7 +596,8 @@ public class ListActivity extends RuntimePermissionsActivity implements SongAdap
         firebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
         volumeContentObserver.setSongPanelViewModel(songPanelViewModel);
-        binding.panel.setSong(songPanelViewModel);
+        binding.panel.setSongPanel(songPanelViewModel);
+        binding.panel.setListViewModel(songViewModel);
         songInfoBinding.setSongInfo(songInfoViewModel);
         infoDialog = new Dialog(this, R.style.DialogTheme);
         infoDialog.setTitle("Login");
@@ -431,6 +616,13 @@ public class ListActivity extends RuntimePermissionsActivity implements SongAdap
         });
         sharedPrefrenceManager = ((MyApplication) getApplication()).getComponent().getSharedPrefrence();
         musiPlayerHelper = ((MyApplication) getApplication()).getComponent().getMusicPlayerHelper();
+
+        drawableRepeatOne = AppCompatResources.getDrawable(this,
+                R.drawable.ic_repeat_one_24px);
+        drawableRepeatAll = AppCompatResources.getDrawable(this,
+                R.drawable.ic_repeat_24px);
+        drawableShuffle = AppCompatResources.getDrawable(this,
+                R.drawable.ic_shuffle_24px);
 
     }
 
@@ -489,49 +681,38 @@ public class ListActivity extends RuntimePermissionsActivity implements SongAdap
 
         if (song.getId() == sharedPrefrenceManager.getSong().getId() && musiPlayerHelper.mediaPlayer != null) {
 
+
             binding.slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
+
             if (!musiPlayerHelper.mediaPlayer.isPlaying()) {
                 musiPlayerHelper.FadeIn(2);
+
                 binding.panel.ivPlayPauseCollpase.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_pause_24px, null));
                 binding.panel.ivPlayPayseExpand.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_pause, null));
+                if (musiPlayerHelper.getTimer() == null) {
+                    seekBarProgressUpdater();
+                }
             }
 
         } else {
-            if (musiPlayerHelper.mediaPlayer != null){
+            if (musiPlayerHelper.mediaPlayer != null) {
                 musiPlayerHelper.mediaPlayer.release();
             }
-            musiPlayerHelper.setupMediaPLayer(ListActivity.this, song, ListActivity.this);
-            if (musiPlayerHelper.mediaPlayer == null) {
-                    musiPlayerHelper.FadeIn(2);
-            }else if (song.getId() != sharedPrefrenceManager.getSong().getId()){
+
+            if (song.getId() != sharedPrefrenceManager.getSong().getId()) {
+                musiPlayerHelper.setupMediaPLayer(ListActivity.this, song, ListActivity.this);
                 sharedPrefrenceManager.saveSong(song);
                 setupPanel(song);
-                binding.slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
+                if (binding.slidingPanel.getPanelState() != SlidingUpPanelLayout.PanelState.EXPANDED)
+                    binding.slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
                 musiPlayerHelper.FadeIn(2);
+                if (musiPlayerHelper.getTimer() == null) {
+                    seekBarProgressUpdater();
+                }
                 binding.panel.ivPlayPauseCollpase.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_pause_24px, null));
                 binding.panel.ivPlayPayseExpand.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_pause, null));
             }
         }
-
-
-//TODO
-        //analetics
-//            Bundle bundle = new Bundle();
-//            bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, songList.get(pos).getSongName());
-//            bundle.putString("ITEM_DESCRIPTION", songList.get(pos).getArtistName());
-//            bundle.putString("ITEM_LOCATION", songList.get(pos).getArtistName());
-//            firebaseAnalytics.logEvent(FirebaseAnalytics.Event.VIEW_ITEM, bundle);
-//        } else {
-//            Toast.makeText(getActivityContext(), "this file not exists!", Toast.LENGTH_LONG).show();
-
-//            MediaScannerConnection.scanFile(
-//                    this,
-//                    new String[]{songList.get(pos).getTrackFile(), null},
-//                    null, null);
-//            songList.remove(pos);
-//            songAdapter.notifyItemRemoved(pos);
-//            songAdapter.notifyItemRangeRemoved(pos,songAdapter.getItemCount());
-//            songAdapter.notifyDataSetChanged();
     }
 
 
@@ -589,7 +770,7 @@ public class ListActivity extends RuntimePermissionsActivity implements SongAdap
         if (musiPlayerHelper.mediaPlayer != null) {
             musiPlayerHelper.mediaPlayer.release();
         }
-
+        sharedPrefrenceManager.setPlayingState("repeatOne");
         if (volumeContentObserver != null) {
             this.getContentResolver().unregisterContentObserver(volumeContentObserver);
         }
@@ -612,6 +793,42 @@ public class ListActivity extends RuntimePermissionsActivity implements SongAdap
 
     @Override
     public void onMediaPlayerCompletion() {
+
+//this is for bug(muti time called onComplete)
+        if (!isSongComplete) {
+
+            switch (sharedPrefrenceManager.getPlayingState()) {
+                case "repeatOne":
+                    break;
+                case "repeatList":
+                    if (songViewModel.isCanClick())
+                        binding.panel.ivNextExpand.performClick();
+
+                    binding.panel.ivNextExpand.performClick();
+                    break;
+                case "shuffle":
+                    sharedPrefrenceManager.saveSong(shuffleList.get(curentShuffleSong).getViewModelSong());
+                    if (curentShuffleSong != shuffleList.size() - 1) {
+                        curentShuffleSong++;
+                    } else {
+                        Collections.shuffle(shuffleList);
+                        curentShuffleSong = 0;
+                    }
+
+                    musiPlayerHelper.setupMediaPLayer(ListActivity.this, sharedPrefrenceManager.getSong(), ListActivity.this);
+
+                    musiPlayerHelper.FadeIn(2);
+                    if (musiPlayerHelper.getTimer() == null) {
+                        seekBarProgressUpdater();
+                    }
+                    setupPanel(sharedPrefrenceManager.getSong());
+                    break;
+            }
+
+            isSongComplete = true;
+        } else
+            return;
+
 
     }
 
