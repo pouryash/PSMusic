@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:app="http://schemas.android.com/apk/res-auto">
+<layout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:bind="http://schemas.android.com/apk/res-auto">
 
     <data>
 
@@ -53,10 +54,9 @@
                         android:id="@+id/iv_songImage_collapse"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:scaleType="fitXY"
-                        app:imgaeUri="@{song.imageUri}"
-                        app:context="@{song.context}"
-                        tools:src="@drawable/ic_no_album" />
+                        android:scaleType="center"
+                        bind:imgaeUriPanel="@{song.imageUri}"
+                        app:srcCompat="@drawable/ic_no_album" />
 
                 </androidx.cardview.widget.CardView>
 
@@ -162,9 +162,7 @@
                     android:id="@+id/iv_songImage_expand"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:scaleType="center"
-                    app:imgaeUri="@{song.imageUri}"
-                    app:context="@{song.context}"
+                    bind:imgaeUriPanel="@{song.imageUri}"
                     tools:src="@drawable/ic_no_album_128" />
 
             </androidx.cardview.widget.CardView>

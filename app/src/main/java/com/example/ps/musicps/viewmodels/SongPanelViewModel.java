@@ -51,37 +51,44 @@ public class SongPanelViewModel extends BaseObservable {
     }
 
 
-    @BindingAdapter({"imgaeUri", "context"})
-    public static void loadImage(ImageView iv, String uri, Context context) {
-//        int res;
-//        if (iv.getId() == R.id.iv_songImage_expand){
-//            res = R.drawable.ic_no_album_128;
-//        }else {
-//            res = R.drawable.ic_no_album;
-//        }
-        Glide.with(iv.getContext()).asBitmap().load(Uri.parse(uri))
-                .apply(new RequestOptions().placeholder(res))
-                .listener(new RequestListener<Bitmap>() {
-                    @Override
-                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
-                        iv.setBackgroundColor(Color.parseColor("#d1d9ff"));
-                        return false;
-                    }
+    @BindingAdapter({"bind:imgaeUriPanel"})
+    public static void songImageLoad(ImageView iv, String uri) {
+        int res;
+        if (iv.getId() == R.id.iv_songImage_expand)
+            res = R.drawable.ic_no_album_128;
+        else
+            res = R.drawable.ic_no_album;
 
-                    @Override
-                    public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target, DataSource dataSource, boolean isFirstResource) {
-                        return false;
-                    }
-                })
-                .into(iv);
+
+        if (uri != null) {
+            Glide.with(iv.getContext()).asBitmap().load(Uri.parse(uri))
+                    .apply(new RequestOptions().placeholder(res))
+                    .listener(new RequestListener<Bitmap>() {
+                        @Override
+                        public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
+                            if (iv.getId() == R.id.iv_songImage_expand)
+                                iv.setPadding(64, 64, 64, 64);
+                            iv.setBackgroundColor(Color.parseColor("#d1d9ff"));
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target, DataSource dataSource, boolean isFirstResource) {
+                            if (iv.getId() == R.id.iv_songImage_expand)
+                                iv.setPadding(0, 0, 0, 0);
+                            return false;
+                        }
+                    })
+                    .into(iv);
+        }
     }
 
     @BindingAdapter({"imgaeRes"})
     public static void loadImage(ImageView iv, boolean isSoundOn) {
         int res;
-        if (isSoundOn){
+        if (isSoundOn) {
             res = R.drawable.ic_sound_on;
-        }else {
+        } else {
             res = R.drawable.ic_sound_off;
         }
         Glide.with(iv.getContext()).asBitmap().load(res)
