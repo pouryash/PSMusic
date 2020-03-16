@@ -37,17 +37,14 @@ public class SearchActivity extends AppCompatActivity {
     EditText editText;
     SongSearchAdapter adapter;
     ImageView back;
-    InputMethodManager imgr;
     View fView;
-    String searchTerm;
     List<Song> songList = new ArrayList<>();
-    FirebaseAnalytics firebaseAnalytics;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_search);
+//        setContentView(R.layout.activity_search);
 
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
 
@@ -68,41 +65,40 @@ public class SearchActivity extends AppCompatActivity {
 
     private void setupViews() {
 
-        firebaseAnalytics = FirebaseAnalytics.getInstance(this);
-        imgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        imgr.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
+//        firebaseAnalytics = FirebaseAnalytics.getInstance(this);
+
         recyclerView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-        adapter = new SongSearchAdapter(songList, this, new SongSearchAdapter.onSearchAdpSong() {
-            @Override
-            public void onSongClicked(int pos) {
-//                if (pos != Commen.song.getId()){
+//        adapter = new SongSearchAdapter(songList, this, new SongSearchAdapter.onSearchAdpSong() {
+//            @Override
+//            public void onSongClicked(int pos) {
+////                if (pos != Commen.song.getId()){
+////                }
+////                imgr.hideSoftInputFromWindow(SearchActivity.this.getCurrentFocus().getWindowToken(), 0);
+////                Intent intent = new Intent(SearchActivity.this, PlaySongActivity.class);
+////                intent.putExtra("position", pos);
+////                SearchActivity.this.startActivity(intent);
+//                isIntentFromSearch = true;
+//                Bundle bundle = new Bundle();
+//                bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, songList.get(pos).getSongName());
+////                bundle.putString(FirebaseAnalytics.Param.SEARCH_TERM,searchTerm);
+//                bundle.putString("ITEM_DESCRIPTION", songList.get(pos).getArtistName());
+//                bundle.putString("ITEM_LOCATION", songList.get(pos).getArtistName());
+////                firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SEARCH, bundle);
+//            }
+//
+//            @Override
+//            public void onSongRemoved(int pos,boolean isCurentSong ,List<Song> list) {
+//                songList = list;
+//                songList = Commen.notifyListchanged(pos,songList);
+//                onSearchedItemRemoved.onRemoved(pos,isCurentSong , list);
+//                if (list.size() == 0){
+//                    fView.setVisibility(View.GONE);
+//                    Toast.makeText(getApplicationContext(),"All song deleted!",Toast.LENGTH_LONG).show();
 //                }
-//                imgr.hideSoftInputFromWindow(SearchActivity.this.getCurrentFocus().getWindowToken(), 0);
-//                Intent intent = new Intent(SearchActivity.this, PlaySongActivity.class);
-//                intent.putExtra("position", pos);
-//                SearchActivity.this.startActivity(intent);
-                isIntentFromSearch = true;
-                Bundle bundle = new Bundle();
-                bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, songList.get(pos).getSongName());
-                bundle.putString(FirebaseAnalytics.Param.SEARCH_TERM,searchTerm);
-                bundle.putString("ITEM_DESCRIPTION", songList.get(pos).getArtistName());
-                bundle.putString("ITEM_LOCATION", songList.get(pos).getArtistName());
-                firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SEARCH, bundle);
-            }
-
-            @Override
-            public void onSongRemoved(int pos,boolean isCurentSong ,List<Song> list) {
-                songList = list;
-                songList = Commen.notifyListchanged(pos,songList);
-                onSearchedItemRemoved.onRemoved(pos,isCurentSong , list);
-                if (list.size() == 0){
-                    fView.setVisibility(View.GONE);
-                    Toast.makeText(getApplicationContext(),"All song deleted!",Toast.LENGTH_LONG).show();
-                }
-
-            }
-        });
+//
+//            }
+//        });
         recyclerView.setAdapter(adapter);
         editText.requestFocus();
         editText.setCompoundDrawablesWithIntrinsicBounds(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_search_search_activity, null)
@@ -116,7 +112,7 @@ public class SearchActivity extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 adapter.getFilter().filter(charSequence);
-                searchTerm = charSequence.toString();
+//                searchTerm = charSequence.toString();
             }
 
             @Override
@@ -129,19 +125,19 @@ public class SearchActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Bundle bundle = new Bundle();
                 bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "Back Button Search");
-                firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
+//                firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
                 Intent intent = new Intent(SearchActivity.this, ListActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(intent);
                 isIntentFromSearch = true;
-                imgr.hideSoftInputFromWindow(SearchActivity.this.getCurrentFocus().getWindowToken(), 0);
+//                imgr.hideSoftInputFromWindow(SearchActivity.this.getCurrentFocus().getWindowToken(), 0);
             }
         });
     }
 
     private void initViews() {
 
-        fView = findViewById(R.id.fr_PlayingSong);
+//        fView = findViewById(R.id.fr_PlayingSong);
         recyclerView = findViewById(R.id.rl_Search);
         editText = findViewById(R.id.et_Search);
         back = findViewById(R.id.iv_back_Search);
@@ -150,9 +146,6 @@ public class SearchActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-//        if(Commen.mediaPlayer !=null){
-//            Commen.mediaPlayer.release();
-//        }
         super.onDestroy();
     }
 

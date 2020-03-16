@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:bind="http://schemas.android.com/apk/res-auto"
-
     >
 
     <data>
 
         <variable
             name="song"
-            type="com.example.ps.musicps.viewmodels.SongViewModel" />
+            type="com.example.ps.musicps.viewmodels.SearchSongViewModel" />
 
     </data>
 
@@ -41,7 +40,7 @@
                 android:layout_height="match_parent"
                 android:scaleType="center"
                 bind:context="@{song.context}"
-                bind:imgaeUri="@{song.songImageUri}"
+                bind:Uri="@{song.songImageUri}"
                 tools:src="@drawable/ic_no_album" />
 
 
@@ -59,7 +58,8 @@
             android:maxWidth="260dp"
             android:singleLine="true"
             android:textColor="@color/colorWhite"
-            android:text="@{song.songName}"
+            bind:songName="@{song.songName}"
+            bind:filterText="@{song.filterText}"
             android:textSize="@dimen/standardTextSize_14"
             tools:text="pourya sharifi" />
 
@@ -75,7 +75,8 @@
             android:maxWidth="260dp"
             android:singleLine="true"
             android:textColor="@color/colorGray"
-            android:text="@{song.artistName}"
+            bind:songName="@{song.artistName}"
+            bind:filterText="@{song.filterText}"
             android:textSize="@dimen/standardTextSize_12"
             tools:text="pourya sharifi" />
 

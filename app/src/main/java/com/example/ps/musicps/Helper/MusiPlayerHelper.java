@@ -53,7 +53,7 @@ public class MusiPlayerHelper {
         } catch (IOException e) {
             e.printStackTrace();
         }
-//        mediaPlayer.setLooping(true);
+        mediaPlayer.setLooping(true);
     }
 
     public void setTimer(Timer timer) {

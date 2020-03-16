@@ -152,7 +152,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongVH> {
                             bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "menu item rington list");
                             firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
 
-                            songsConfigHelper.setRingtone(songViewModel, (Activity) context);
+                            songsConfigHelper.setRingtone(songViewModel.getViewModelSong(), (Activity) context);
 
                             break;
                         case R.id.menu_Info:

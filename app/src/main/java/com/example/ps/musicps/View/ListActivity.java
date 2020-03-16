@@ -637,8 +637,7 @@ public class ListActivity extends RuntimePermissionsActivity implements SongAdap
         Bundle bundle = new Bundle();
         switch (item.getItemId()) {
             case R.id.menu_search:
-                bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "menu item search");
-                firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
+                startActivity(new Intent(ListActivity.this, com.example.ps.musicps.SearchActivity.class));
 
                 break;
             case R.id.menu_scan:
@@ -801,7 +800,7 @@ public class ListActivity extends RuntimePermissionsActivity implements SongAdap
                 case "repeatOne":
                     break;
                 case "repeatList":
-                    if (songViewModel.isCanClick())
+                    if (!songViewModel.isCanClick())
                         binding.panel.ivNextExpand.performClick();
 
                     binding.panel.ivNextExpand.performClick();

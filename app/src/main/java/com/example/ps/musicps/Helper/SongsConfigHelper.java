@@ -16,6 +16,7 @@ import android.widget.Toast;
 import com.example.ps.musicps.Commen.Commen;
 import com.example.ps.musicps.Commen.MyApplication;
 import com.example.ps.musicps.Di.Scop.ActivityScop;
+import com.example.ps.musicps.Model.Song;
 import com.example.ps.musicps.Model.SongInfo;
 import com.example.ps.musicps.viewmodels.SongViewModel;
 
@@ -83,17 +84,17 @@ public class SongsConfigHelper {
         return size;
     }
 
-    public void setRingtone(SongViewModel songViewModel, Activity activity){
+    public void setRingtone(Song song, Activity activity){
 
-        File songFile = new File(songViewModel.getTrackFile());
+        File songFile = new File(song.getTrackFile());
         //this is for add song to contentresolver
         ContentValues values = new ContentValues();
         values.put(MediaStore.MediaColumns.DATA, songFile.getPath());
-        values.put(MediaStore.MediaColumns.TITLE, songViewModel.getSongName());
+        values.put(MediaStore.MediaColumns.TITLE, song.getSongName());
         values.put(MediaStore.MediaColumns.SIZE, songFile.getTotalSpace());
         values.put(MediaStore.MediaColumns.MIME_TYPE, "audio/mp3");
-        values.put(MediaStore.Audio.Media.ARTIST, songViewModel.getArtistName());
-        values.put(MediaStore.Audio.Media.DURATION, songViewModel.getDuration());
+        values.put(MediaStore.Audio.Media.ARTIST, song.getArtistName());
+        values.put(MediaStore.Audio.Media.DURATION, song.getDuration());
         values.put(MediaStore.Audio.Media.IS_RINGTONE, true);
         values.put(MediaStore.Audio.Media.IS_NOTIFICATION, false);
         values.put(MediaStore.Audio.Media.IS_ALARM, false);
@@ -108,7 +109,7 @@ public class SongsConfigHelper {
                             + songFile.getAbsolutePath() + "\"", null);
             ringtoneUri = MyApplication.getAppContext().getContentResolver().insert(uri, values);
         } else {
-            ringtoneUri = ContentUris.withAppendedId(uri, songViewModel.getContentID());
+            ringtoneUri = ContentUris.withAppendedId(uri, song.getContentID());
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (Settings.System.canWrite(MyApplication.getAppContext())) {
