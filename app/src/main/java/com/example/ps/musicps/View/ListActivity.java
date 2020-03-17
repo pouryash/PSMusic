@@ -3,18 +3,13 @@ package com.example.ps.musicps.View;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.content.res.ResourcesCompat;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
 import android.Manifest;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
-import android.media.MediaPlayer;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Gravity;
@@ -22,13 +17,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.Window;
 import android.view.WindowManager;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
 import com.example.ps.musicps.Adapter.OnSongAdapter;
-import com.example.ps.musicps.Adapter.SongAdapter;
 import com.example.ps.musicps.Commen.Commen;
 import com.example.ps.musicps.Commen.MyApplication;
 import com.example.ps.musicps.Commen.OnAppCleared;
@@ -38,16 +31,12 @@ import com.example.ps.musicps.Commen.VolumeContentObserver;
 import com.example.ps.musicps.Di.component.DaggerSongListComponent;
 import com.example.ps.musicps.Di.component.SongListComponent;
 import com.example.ps.musicps.Di.module.ListActivityModule;
-import com.example.ps.musicps.Di.module.SongAdapterModule;
 import com.example.ps.musicps.Helper.MusiPlayerHelper;
 import com.example.ps.musicps.Model.Song;
 import com.example.ps.musicps.Model.SongInfo;
 import com.example.ps.musicps.R;
-import com.example.ps.musicps.Repository.SongRepository;
-import com.example.ps.musicps.SearchActivity;
 import com.example.ps.musicps.View.Dialog.CustomeDialogClass;
 import com.example.ps.musicps.databinding.ActivityListBinding;
-import com.example.ps.musicps.databinding.PlayingSongPanelBinding;
 import com.example.ps.musicps.databinding.SongInfoDialogBinding;
 import com.example.ps.musicps.viewmodels.SongInfoViewModel;
 import com.example.ps.musicps.viewmodels.SongPanelViewModel;
@@ -70,8 +59,6 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
     ActivityListBinding binding;
     MusiPlayerHelper musiPlayerHelper;
     SongSharedPrefrenceManager sharedPrefrenceManager;
-    FragmentManager fragmentManager;
-    FragmentTransaction fragmentTransaction;
     CustomeDialogClass customeDialog;
     FirebaseAnalytics firebaseAnalytics;
     List<SongViewModel> shuffleList = new ArrayList<>();
@@ -136,6 +123,18 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
     @Override
     protected void onResume() {
 
+        if (musiPlayerHelper.mediaPlayer != null) {
+            if (musiPlayerHelper.mediaPlayer.isPlaying()) {
+                binding.panel.ivPlayPauseCollpase.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_pause_24px, null));
+                binding.panel.ivPlayPayseExpand.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_pause, null));
+                seekBarProgressUpdater();
+            } else {
+                binding.panel.ivPlayPauseCollpase.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_play_24px, null));
+                binding.panel.ivPlayPayseExpand.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_play, null));
+            }
+            if (songPanelViewModel.getId() != sharedPrefrenceManager.getSong().getId())
+                setupPanel(sharedPrefrenceManager.getSong());
+        }
 
 //        if (PlaySongActivity.isExternalSource) {
 //
@@ -172,9 +171,7 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
         } else {
             binding.panel.ivPlayPauseCollpase.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_pause_24px, null));
             binding.panel.ivPlayPayseExpand.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_pause, null));
-            if (musiPlayerHelper.getTimer() == null) {
-                seekBarProgressUpdater();
-            }
+            seekBarProgressUpdater();
         }
     }
 
@@ -230,6 +227,7 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
                 Toast.makeText(this, "No songs found, try again later", Toast.LENGTH_LONG).show();
                 if (binding.ivNoItems.getVisibility() != View.VISIBLE) {
                     binding.ivNoItems.setVisibility(View.VISIBLE);
+                    binding.slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
                 }
 
             }
@@ -299,9 +297,7 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
                     musiPlayerHelper.mediaPlayer.start();
                     binding.panel.ivPlayPauseCollpase.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_pause_24px, null));
                     binding.panel.ivPlayPayseExpand.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_pause, null));
-                    if (musiPlayerHelper.getTimer() == null) {
-                        seekBarProgressUpdater();
-                    }
+                    seekBarProgressUpdater();
                 }
             }
         });
@@ -318,9 +314,8 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
                     musiPlayerHelper.mediaPlayer.start();
                     binding.panel.ivPlayPauseCollpase.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_pause_24px, null));
                     binding.panel.ivPlayPayseExpand.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_pause, null));
-                    if (musiPlayerHelper.getTimer() == null) {
-                        seekBarProgressUpdater();
-                    }
+                    seekBarProgressUpdater();
+
                 }
             }
         });
@@ -554,7 +549,6 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
 
         if (musiPlayerHelper.mediaPlayer != null) {
 
-            musiPlayerHelper.setTimer(new Timer());
             musiPlayerHelper.getTimer().schedule(new TimerTask() {
                 @Override
                 public void run() {
@@ -639,7 +633,10 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
         Bundle bundle = new Bundle();
         switch (item.getItemId()) {
             case R.id.menu_search:
-                startActivity(new Intent(ListActivity.this, com.example.ps.musicps.SearchActivity.class));
+                if (songViewModelList.size() != 0)
+                    startActivity(new Intent(ListActivity.this, SearchActivity.class));
+                else
+                    Toast.makeText(getApplicationContext(), "there is no song to search!!", Toast.LENGTH_LONG).show();
 
                 break;
             case R.id.menu_scan:
@@ -690,9 +687,7 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
 
                 binding.panel.ivPlayPauseCollpase.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_pause_24px, null));
                 binding.panel.ivPlayPayseExpand.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_pause, null));
-                if (musiPlayerHelper.getTimer() == null) {
-                    seekBarProgressUpdater();
-                }
+                seekBarProgressUpdater();
             }
 
         } else {
@@ -707,9 +702,7 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
                 if (binding.slidingPanel.getPanelState() != SlidingUpPanelLayout.PanelState.EXPANDED)
                     binding.slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
                 musiPlayerHelper.FadeIn(2);
-                if (musiPlayerHelper.getTimer() == null) {
-                    seekBarProgressUpdater();
-                }
+                seekBarProgressUpdater();
                 binding.panel.ivPlayPauseCollpase.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_pause_24px, null));
                 binding.panel.ivPlayPayseExpand.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_pause, null));
             }
@@ -719,7 +712,7 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
 
     @Override
     public void onSongRemoved(int id, int size) {
-//hidden
+
         songViewModel.deleteSongById(id);
 
         //this is for when delete first Song multiple(wiich is in curent song)
@@ -804,9 +797,7 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
                     musiPlayerHelper.setupMediaPLayer(ListActivity.this, sharedPrefrenceManager.getSong(), ListActivity.this);
 
                     musiPlayerHelper.FadeIn(2);
-                    if (musiPlayerHelper.getTimer() == null) {
-                        seekBarProgressUpdater();
-                    }
+                    seekBarProgressUpdater();
                     setupPanel(sharedPrefrenceManager.getSong());
                     break;
             }

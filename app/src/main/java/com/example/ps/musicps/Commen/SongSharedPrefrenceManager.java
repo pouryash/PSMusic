@@ -7,7 +7,9 @@ import com.example.ps.musicps.Model.Song;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
+@Singleton
 public class SongSharedPrefrenceManager {
 
     private static final String SONG_SHARED_PREF_NAME = "song_shared_pref";

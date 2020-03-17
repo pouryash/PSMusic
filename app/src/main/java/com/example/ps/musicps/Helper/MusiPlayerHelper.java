@@ -11,7 +11,9 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
+@Singleton
 public class MusiPlayerHelper {
 
     private Timer timer;
@@ -39,6 +41,7 @@ public class MusiPlayerHelper {
                 @Override
                 public void onPrepared(MediaPlayer mediaPlayer) {
                     onMediaPlayerStateChanged.onMediaPlayerPrepared();
+                    setTimer(new Timer());
                 }
             });
 

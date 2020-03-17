@@ -1,81 +1,97 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
-    xmlns:bind="http://schemas.android.com/apk/res-auto"
-    >
+<layout xmlns:bind="http://schemas.android.com/apk/res-auto">
 
     <data>
+
         <variable
             name="songViewModel"
             type="com.example.ps.musicps.viewmodels.SongViewModel" />
     </data>
 
-
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <com.sothree.slidinguppanel.SlidingUpPanelLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/sliding_panel"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/colorPrimary"
-        tools:context="com.example.ps.musicps.View.SearchActivity">
+        android:gravity="bottom"
+        android:layoutDirection="ltr"
+        app:umanoDragView="@+id/rl_slide_panel_top_content"
+        app:umanoInitialState="collapsed"
+        app:umanoOverlay="true"
+        app:umanoPanelHeight="60dp"
+        app:umanoParallaxOffset="100dp"
+        app:umanoShadowHeight="5dp">
 
-
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar_Search"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="@color/colorToolbar"
-            app:contentInsetStart="0dp">
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:padding="@dimen/smallMargin">
-
-                <ImageView
-                    android:id="@+id/iv_back_Search"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:padding="@dimen/smallMargin"
-                    app:srcCompat="@drawable/ic_back_arrow_white" />
-
-                <EditText
-                    android:id="@+id/et_Search"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_margin="@dimen/standardMargin"
-                    android:layout_toEndOf="@+id/iv_back_Search"
-                    android:background="@drawable/search_edittext_background"
-                    android:drawablePadding="@dimen/standardMargin"
-                    android:hint="@string/searchEditText"
-                    android:imeOptions="actionSearch"
-                    android:inputType="text"
-                    android:padding="@dimen/smallMargin"
-                    android:textColor="@color/colorGray"
-                    android:textColorHint="@color/colorGray"
-                    android:textSize="@dimen/standardTextSize_12"
-                    android:typeface="normal" />
-
-            </RelativeLayout>
-
-
-        </androidx.appcompat.widget.Toolbar>
-
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rl_Search"
+        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            xmlns:tools="http://schemas.android.com/tools"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            bind:recyclerBinder="@{songViewModel.mutableSongViewModelList}"
-            bind:context="@{songViewModel.context}"
-            bind:songAdapter="@{songViewModel.songSearchAdapter}"
-            bind:viewModelList="@{songViewModel.userViewModelList1}"
-            android:layout_below="@+id/toolbar_Search" />
+            android:background="@color/colorPrimary"
+            tools:context="com.example.ps.musicps.View.SearchActivity">
 
 
-    </RelativeLayout>
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar_Search"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="@color/colorToolbar"
+                app:contentInsetStart="0dp">
 
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="@dimen/smallMargin">
+
+                    <ImageView
+                        android:id="@+id/iv_back_Search"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:padding="@dimen/smallMargin"
+                        app:srcCompat="@drawable/ic_back_arrow_white" />
+
+                    <EditText
+                        android:id="@+id/et_Search"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_margin="@dimen/standardMargin"
+                        android:layout_toEndOf="@+id/iv_back_Search"
+                        android:background="@drawable/search_edittext_background"
+                        android:drawablePadding="@dimen/standardMargin"
+                        android:hint="@string/searchEditText"
+                        android:imeOptions="actionSearch"
+                        android:inputType="text"
+                        android:padding="@dimen/smallMargin"
+                        android:textColor="@color/colorGray"
+                        android:textColorHint="@color/colorGray"
+                        android:textSize="@dimen/standardTextSize_12"
+                        android:typeface="normal" />
+
+                </RelativeLayout>
+
+
+            </androidx.appcompat.widget.Toolbar>
+
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rl_Search"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@+id/toolbar_Search"
+                bind:context="@{songViewModel.context}"
+                bind:recyclerBinder="@{songViewModel.mutableSongViewModelList}"
+                bind:songAdapter="@{songViewModel.songSearchAdapter}"
+                bind:viewModelList="@{songViewModel.userViewModelList1}" />
+
+
+        </RelativeLayout>
+
+        <include layout="@layout/playing_song_panel"
+            android:id="@+id/panel"/>
+
+    </com.sothree.slidinguppanel.SlidingUpPanelLayout>
 </layout>
