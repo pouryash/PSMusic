@@ -60,5 +60,4 @@ public abstract class RuntimePermissionsActivity extends AppCompatActivity
 
     public abstract void onPermissionsGranted(int requestCode);
     public abstract void onPermissionsDeny(int requestCode);
-
 }
