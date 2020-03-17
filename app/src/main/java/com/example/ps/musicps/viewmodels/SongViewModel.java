@@ -4,7 +4,10 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
+import android.text.SpannableStringBuilder;
+import android.text.style.ForegroundColorSpan;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.databinding.BaseObservable;
@@ -22,13 +25,16 @@ import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
+import com.example.ps.musicps.Adapter.OnSongAdapter;
 import com.example.ps.musicps.Adapter.SongAdapter;
+import com.example.ps.musicps.Adapter.SongSearchAdapter;
 import com.example.ps.musicps.BR;
 import com.example.ps.musicps.Commen.MyApplication;
 import com.example.ps.musicps.Commen.SongSharedPrefrenceManager;
 import com.example.ps.musicps.Di.component.DaggerSongViewModelComponent;
 import com.example.ps.musicps.Di.component.SongViewModelComponent;
 import com.example.ps.musicps.Di.module.SongAdapterModule;
+import com.example.ps.musicps.Di.module.SongSearchAdapterModule;
 import com.example.ps.musicps.Model.Song;
 import com.example.ps.musicps.R;
 import com.example.ps.musicps.Repository.SongRepository;
@@ -52,7 +58,9 @@ public class SongViewModel extends BaseObservable {
     private String songImageUri;
     private int contentID;
     private Context context;
+    private String filterText;
     private SongAdapter songAdapter;
+    private SongSearchAdapter searchAdapter;
     private List<SongViewModel> userViewModelList1 = new ArrayList<>();
     private SongViewModelComponent component;
     private SongSharedPrefrenceManager sharedPrefrenceManager;
@@ -62,10 +70,11 @@ public class SongViewModel extends BaseObservable {
     public SongViewModel(Context context) {
         setContext(context);
         component = DaggerSongViewModelComponent.builder()
-                .songAdapterModule(new SongAdapterModule((SongAdapter.onSongAdapter) context, userViewModelList1, context))
+                .songAdapterModule(new SongAdapterModule((OnSongAdapter) context, userViewModelList1, context))
                 .build();
         songRepository = component.getSongRepository();
         songAdapter = component.getSongAdapter();
+        searchAdapter = component.getSongSearchAdapter();
         sharedPrefrenceManager = ((MyApplication) context.getApplicationContext()).getComponent().getSharedPrefrence();
     }
 
@@ -98,6 +107,24 @@ public class SongViewModel extends BaseObservable {
 
     }
 
+    @BindingAdapter({"bind:recyclerBinder", "bind:context", "bind:songAdapter", "bind:viewModelList"})
+    public static void getSearchRecyclerBinder(RecyclerView recyclerView, MutableLiveData<List<SongViewModel>> mutableSongViewModelList,
+                                               Context context, SongSearchAdapter songSearchAdapter, List<SongViewModel> songViewModels) {
+
+
+        recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext(), LinearLayoutManager.VERTICAL, false));
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setAdapter(songSearchAdapter);
+
+        SongSearchAdapter finalSongAdapter = songSearchAdapter;
+        mutableSongViewModelList.observe((LifecycleOwner) context, songViewModellist -> {
+            songViewModels.clear();
+            songViewModels.addAll(songViewModellist);
+            finalSongAdapter.notifyDataSetChanged();
+        });
+
+    }
+
     @BindingAdapter({"bind:imgaeUri", "bind:context"})
     public static void loadImage(ImageView iv, String uri, Context context) {
         if (uri != null) {
@@ -116,6 +143,29 @@ public class SongViewModel extends BaseObservable {
                         }
                     })
                     .into(iv);
+        }
+    }
+
+    @BindingAdapter({"bind:songName", "bind:filterText"})
+    public static void loadSearchName(TextView tv, String name, String filterText) {
+        if (filterText == null)
+            filterText = "";
+        if (name != null) {
+
+            ForegroundColorSpan fcs = new ForegroundColorSpan(Color.rgb(229, 23, 23));
+
+            int indexSongName = name.toLowerCase().indexOf(filterText.toLowerCase());
+
+            if (indexSongName > -1) {
+                SpannableStringBuilder sb = new SpannableStringBuilder(name);
+
+                sb.setSpan(fcs, indexSongName, indexSongName + filterText.length(), 0);
+                tv.setText(sb);
+
+            } else {
+                tv.setText(name);
+            }
+
         }
     }
 
@@ -140,9 +190,20 @@ public class SongViewModel extends BaseObservable {
 
     }
 
+
+    @Bindable
+    public String getFilterText() {
+        return filterText;
+    }
+
+    public void setFilterText(String filterText) {
+        this.filterText = filterText;
+        notifyPropertyChanged(BR.filterText);
+    }
+
     public void getNextSongById() {
 
-        if (canClick){
+        if (canClick) {
             int songId = sharedPrefrenceManager.getSong().getId() + 1;
 
             if (songId - 1 == mutableSongViewModelList.getValue().get(mutableSongViewModelList.getValue().size() - 1).getId()) {
@@ -163,7 +224,7 @@ public class SongViewModel extends BaseObservable {
 
     public void getPrevSongById() {
 
-        if (canClick){
+        if (canClick) {
             int songId = sharedPrefrenceManager.getSong().getId() - 1;
 
             if (songId + 1 == mutableSongViewModelList.getValue().get(0).getId()) {
@@ -209,7 +270,7 @@ public class SongViewModel extends BaseObservable {
         notifyPropertyChanged(BR.userViewModelList1);
     }
 
-    public Song getViewModelSong(){
+    public Song getViewModelSong() {
         Song song = new Song();
         song.setSongName(songName);
         song.setAlbumName(albumName);
@@ -249,6 +310,10 @@ public class SongViewModel extends BaseObservable {
 
     public SongAdapter getSongAdapter() {
         return songAdapter;
+    }
+
+    public SongSearchAdapter getSongSearchAdapter() {
+        return searchAdapter;
     }
 
     public String getSongImageUri() {

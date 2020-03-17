@@ -59,7 +59,8 @@
             android:maxWidth="260dp"
             android:singleLine="true"
             android:textColor="@color/colorWhite"
-            android:text="@{song.songName}"
+            bind:songName="@{song.songName}"
+            bind:filterText="@{song.filterText}"
             android:textSize="@dimen/standardTextSize_14"
             tools:text="pourya sharifi" />
 
@@ -75,7 +76,8 @@
             android:maxWidth="260dp"
             android:singleLine="true"
             android:textColor="@color/colorGray"
-            android:text="@{song.artistName}"
+            bind:songName="@{song.artistName}"
+            bind:filterText="@{song.filterText}"
             android:textSize="@dimen/standardTextSize_12"
             tools:text="pourya sharifi" />
 

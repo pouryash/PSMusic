@@ -36,11 +36,11 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongVH> {
     private List<SongViewModel> viewModelList = new ArrayList<>();
     private LayoutInflater layoutInflater;
     private Context context;
-    private onSongAdapter onSongAdapter;
+    private OnSongAdapter onSongAdapter;
     private SongsConfigHelper songsConfigHelper;
 
     @Inject
-    public SongAdapter(List<SongViewModel> songViewModels, Context context, onSongAdapter onSongAdapter, SongsConfigHelper songsConfigHelper) {
+    public SongAdapter(List<SongViewModel> songViewModels, Context context, OnSongAdapter onSongAdapter, SongsConfigHelper songsConfigHelper) {
         this.viewModelList = songViewModels;
         this.context = context;
         this.onSongAdapter = onSongAdapter;
@@ -77,7 +77,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongVH> {
         FirebaseAnalytics firebaseAnalytics;
 
 
-        public SongVH(@NonNull SongRowBinding itemView, final onSongAdapter onSongAdapter) {
+        public SongVH(@NonNull SongRowBinding itemView, final OnSongAdapter onSongAdapter) {
             super(itemView.getRoot());
             this.binding = itemView;
 
@@ -192,11 +192,4 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongVH> {
 
     }
 
-    public interface onSongAdapter {
-        void onSongClicked(Song song);
-
-        void onSongRemoved(int id, int size);
-
-        void onMenuInfoClicked(SongInfo songInfo);
-    }
 }

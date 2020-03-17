@@ -6,7 +6,7 @@
     <data>
         <variable
             name="songViewModel"
-            type="com.example.ps.musicps.viewmodels.SearchSongViewModel" />
+            type="com.example.ps.musicps.viewmodels.SongViewModel" />
     </data>
 
 
@@ -71,8 +71,8 @@
             android:layout_height="match_parent"
             bind:recyclerBinder="@{songViewModel.mutableSongViewModelList}"
             bind:context="@{songViewModel.context}"
-            bind:songAdapter="@{songViewModel.songAdapter}"
-            bind:viewModelList="@{songViewModel.searchViewModelList1}"
+            bind:songAdapter="@{songViewModel.songSearchAdapter}"
+            bind:viewModelList="@{songViewModel.userViewModelList1}"
             android:layout_below="@+id/toolbar_Search" />
 
 

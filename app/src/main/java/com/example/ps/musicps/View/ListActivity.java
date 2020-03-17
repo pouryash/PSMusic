@@ -27,6 +27,7 @@ import android.view.WindowManager;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
+import com.example.ps.musicps.Adapter.OnSongAdapter;
 import com.example.ps.musicps.Adapter.SongAdapter;
 import com.example.ps.musicps.Commen.Commen;
 import com.example.ps.musicps.Commen.MyApplication;
@@ -43,6 +44,7 @@ import com.example.ps.musicps.Model.Song;
 import com.example.ps.musicps.Model.SongInfo;
 import com.example.ps.musicps.R;
 import com.example.ps.musicps.Repository.SongRepository;
+import com.example.ps.musicps.SearchActivity;
 import com.example.ps.musicps.View.Dialog.CustomeDialogClass;
 import com.example.ps.musicps.databinding.ActivityListBinding;
 import com.example.ps.musicps.databinding.PlayingSongPanelBinding;
@@ -61,7 +63,7 @@ import java.util.TimerTask;
 
 import javax.inject.Inject;
 
-public class ListActivity extends RuntimePermissionsActivity implements SongAdapter.onSongAdapter,
+public class ListActivity extends RuntimePermissionsActivity implements OnSongAdapter,
         MusiPlayerHelper.onMediaPlayerStateChanged {
 
     private static final int READ_EXTERNAL_STORAGE = 1;
@@ -178,23 +180,23 @@ public class ListActivity extends RuntimePermissionsActivity implements SongAdap
 
     private void setupView() {
         //when song removed from search activity
-        SearchActivity.onSearchedItemRemoved = new SearchActivity.onSearchedItemRemoved() {
-            @Override
-            public void onRemoved(int position, boolean isCurentSong, List<Song> list) {
-//                songAdapter.notifyItemRemoved(position);
-//                songAdapter.notifyItemRangeRemoved(position, songViewModelList.size() - 1);
-//                songAdapter.notifyDataSetChanged();
-//                if (isCurentSong) {
-//                    if (songViewModelList.size() > 0) {
-////                        onDataRecived.onSongRecived(songList.get(0), false);
-//                        //when curent song deleted and then open first song by PlayingSongFragment
-////                        PlaySongActivity.song = songList.get(0);
-//                    } else {
-//                        binding.ivNoItems.setVisibility(View.VISIBLE);
-//                    }
-//                }
-            }
-        };
+//        SearchActivity.onSearchedItemRemoved = new SearchActivity.onSearchedItemRemoved() {
+//            @Override
+//            public void onRemoved(int position, boolean isCurentSong, List<Song> list) {
+////                songAdapter.notifyItemRemoved(position);
+////                songAdapter.notifyItemRangeRemoved(position, songViewModelList.size() - 1);
+////                songAdapter.notifyDataSetChanged();
+////                if (isCurentSong) {
+////                    if (songViewModelList.size() > 0) {
+//////                        onDataRecived.onSongRecived(songList.get(0), false);
+////                        //when curent song deleted and then open first song by PlayingSongFragment
+//////                        PlaySongActivity.song = songList.get(0);
+////                    } else {
+////                        binding.ivNoItems.setVisibility(View.VISIBLE);
+////                    }
+////                }
+//            }
+//        };
 
         songViewModel.getMutableSongViewModelList().observe(this, songViewModels -> {
             if (sharedPrefrenceManager.getSong().getSongName().equals("") && songViewModels.size() > 0) {
@@ -717,38 +719,23 @@ public class ListActivity extends RuntimePermissionsActivity implements SongAdap
 
     @Override
     public void onSongRemoved(int id, int size) {
-
+//hidden
         songViewModel.deleteSongById(id);
 
-//this is for when delete song in serach and then delete in list again(update fragment data)
-        if (SearchActivity.isIntentFromSearch) {
-            fragmentManager = getSupportFragmentManager();
-            fragmentTransaction = fragmentManager.beginTransaction();
-//            fragmentTransaction.replace(R.id.fr_PlayingSong, new PlayingSongFragment());
-            fragmentTransaction.commit();
-            SearchActivity.isIntentFromSearch = false;
+        //this is for when delete first Song multiple(wiich is in curent song)
+        if (size > 0 && id == sharedPrefrenceManager.getSong().getId()) {
+            sharedPrefrenceManager.saveSong(songViewModelList.get(1).getViewModelSong());
+            setupPanel(songViewModelList.get(1).getViewModelSong());
+            musiPlayerHelper.mediaPlayer.release();
+            musiPlayerHelper.setupMediaPLayer(ListActivity.this, songViewModelList.get(1).getViewModelSong(), ListActivity.this);
+            binding.panel.ivPlayPauseCollpase.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_play_24px, null));
+            binding.panel.ivPlayPayseExpand.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_play, null));
         }
 
-//        if (isCurent) {
-//            if (list.size() > 0) {
-////                onDataRecived.onSongRecived(songList.get(0), false);
-//                //when curent song deleted and then open first song by PlayingSongFragment
-////                PlaySongActivity.song = songList.get(0);
-//            } else if (size == 0) {
-//                //this is for when delete last song
-//                binding.ivNoItems.setVisibility(View.VISIBLE);
-//            }
-//        }
-//        //this is for when delete first Song multiple(wiich is in curent song fragment)
-//        if (list.size() < songList.size()) {
-//            if (list.size() > 0) {
-////                onDataRecived.onSongRecived(list.get(0), false);
-////                PlaySongActivity.song = list.get(0);
-//            }
-//        }
         if (size == 0) {
             //this is for when delete last song
             binding.ivNoItems.setVisibility(View.VISIBLE);
+            binding.slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
         }
     }
 

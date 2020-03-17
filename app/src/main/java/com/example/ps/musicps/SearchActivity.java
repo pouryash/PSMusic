@@ -6,7 +6,6 @@ import androidx.core.content.res.ResourcesCompat;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.Editable;
@@ -16,23 +15,22 @@ import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 
+import com.example.ps.musicps.Adapter.OnSongAdapter;
 import com.example.ps.musicps.Adapter.SongSearchAdapter;
 import com.example.ps.musicps.Di.component.DaggerSongSearchComponent;
 import com.example.ps.musicps.Di.component.SongSearchComponent;
 import com.example.ps.musicps.Di.module.SearchActivityModule;
 import com.example.ps.musicps.Model.Song;
 import com.example.ps.musicps.Model.SongInfo;
-import com.example.ps.musicps.View.ListActivity;
 import com.example.ps.musicps.databinding.ActivitySearchBinding;
 import com.example.ps.musicps.databinding.SongInfoDialogBinding;
-import com.example.ps.musicps.viewmodels.SearchSongViewModel;
 import com.example.ps.musicps.viewmodels.SongInfoViewModel;
 import com.example.ps.musicps.viewmodels.SongViewModel;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import javax.inject.Inject;
 
-public class SearchActivity extends AppCompatActivity implements SongSearchAdapter.onSearchAdpSong {
+public class SearchActivity extends AppCompatActivity implements OnSongAdapter {
 
     ActivitySearchBinding binding;
     FirebaseAnalytics firebaseAnalytics;
@@ -43,7 +41,7 @@ public class SearchActivity extends AppCompatActivity implements SongSearchAdapt
     @Inject
     SongInfoViewModel songInfoViewModel;
     @Inject
-    SearchSongViewModel searchSongViewModel;
+    SongViewModel songViewModel;
     SongSearchComponent component;
 
 
@@ -59,7 +57,7 @@ public class SearchActivity extends AppCompatActivity implements SongSearchAdapt
     }
 
     private void setupViews() {
-        searchSongViewModel.getSongs();
+        songViewModel.getSongs();
         imgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imgr.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
         firebaseAnalytics = FirebaseAnalytics.getInstance(this);
@@ -75,7 +73,7 @@ public class SearchActivity extends AppCompatActivity implements SongSearchAdapt
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                searchSongViewModel.getSongAdapter().getFilter().filter(charSequence);
+                songViewModel.getSongSearchAdapter().getFilter().filter(charSequence);
                 searchTerm = charSequence.toString();
             }
 
@@ -101,7 +99,7 @@ public class SearchActivity extends AppCompatActivity implements SongSearchAdapt
         component.inject(this);
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
         songInfoBinding.setSongInfo(songInfoViewModel);
-        binding.setSongViewModel(searchSongViewModel);
+        binding.setSongViewModel(songViewModel);
 
         infoDialog = new Dialog(this, R.style.DialogTheme);
         infoDialog.setTitle("Login");
