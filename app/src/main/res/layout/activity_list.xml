@@ -15,7 +15,7 @@
         android:gravity="bottom"
         android:layoutDirection="ltr"
         app:umanoDragView="@+id/rl_slide_panel_top_content"
-        app:umanoInitialState="collapsed"
+        app:umanoInitialState="hidden"
         app:umanoOverlay="true"
         app:umanoPanelHeight="60dp"
         app:umanoParallaxOffset="100dp"
@@ -43,6 +43,7 @@
                         android:id="@+id/toolbar_songList"
                         android:layout_width="match_parent"
                         android:layout_height="?attr/actionBarSize"
+                        app:titleTextColor="@color/colorTextMain"
                         android:background="@color/colorToolbar"
                         app:layout_scrollFlags="scroll|enterAlways">
 

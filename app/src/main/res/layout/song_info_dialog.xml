@@ -198,7 +198,7 @@
                 android:layout_below="@id/tv_path_SongInfoDialog"
                 android:layout_marginBottom="@dimen/standardMargin_X2"
                 android:layout_centerHorizontal="true"
-                android:textColor="@color/colorAccent"
+                android:textColor="@color/colorRed"
                 android:textSize="@dimen/standardTextSize_15"
                 />
 

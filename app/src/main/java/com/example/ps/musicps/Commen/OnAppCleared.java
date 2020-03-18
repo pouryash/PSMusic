@@ -8,6 +8,8 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
+import com.example.ps.musicps.Helper.MusiPlayerHelper;
+
 
 public class OnAppCleared extends Service {
     @Nullable
@@ -32,6 +34,15 @@ public class OnAppCleared extends Service {
     @Override
     public void onTaskRemoved(Intent rootIntent) {
         Log.e("ClearFromRecentService", "END");
+        MusiPlayerHelper musiPlayerHelper = ((MyApplication)getApplication()).getComponent().getMusicPlayerHelper();
+
+        if (musiPlayerHelper.getTimer() != null) {
+            musiPlayerHelper.getTimer().purge();
+            musiPlayerHelper.getTimer().cancel();
+        }
+        if (musiPlayerHelper.mediaPlayer != null) {
+            musiPlayerHelper.mediaPlayer.release();
+        }
         stopSelf();
     }
 }

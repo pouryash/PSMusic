@@ -1,5 +1,7 @@
 package com.example.ps.musicps.View;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.content.res.ResourcesCompat;
@@ -7,16 +9,21 @@ import androidx.core.content.res.ResourcesCompat;
 import android.Manifest;
 import android.app.Dialog;
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.content.res.Configuration;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.PersistableBundle;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.SeekBar;
 import android.widget.Toast;
@@ -115,6 +122,37 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+
+        int currentNightMode = getResources().getConfiguration().uiMode
+                & Configuration.UI_MODE_NIGHT_MASK;
+        switch (currentNightMode) {
+            case Configuration.UI_MODE_NIGHT_NO:
+                // Night mode is not active, we're in day time
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    Window window = getWindow();
+                    window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                    window.setStatusBarColor(getResources().getColor(R.color.colorWhite));
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+                    }
+                }
+                break;
+            case Configuration.UI_MODE_NIGHT_YES:
+                // Night mode is active, we're at night!
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    Window window = getWindow();
+                    window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                    window.setStatusBarColor(getResources().getColor(R.color.colorBlack));
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        getWindow().getDecorView().setSystemUiVisibility(0);
+                    }
+                }
+        }
+    }
+
+    @Override
     public void onPermissionsDeny(int requestCode) {
         Toast.makeText(this, "We Need Permission To Run!!", Toast.LENGTH_LONG).show();
         this.finish();
@@ -124,17 +162,21 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
     protected void onResume() {
 
         if (musiPlayerHelper.mediaPlayer != null) {
-            if (musiPlayerHelper.mediaPlayer.isPlaying()) {
-                binding.panel.ivPlayPauseCollpase.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_pause_24px, null));
-                binding.panel.ivPlayPayseExpand.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_pause, null));
-                seekBarProgressUpdater();
-            } else {
-                binding.panel.ivPlayPauseCollpase.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_play_24px, null));
-                binding.panel.ivPlayPayseExpand.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_play, null));
-            }
+                if (musiPlayerHelper.mediaPlayer.isPlaying()) {
+                    binding.panel.ivPlayPauseCollpase.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_pause_24px, null));
+                    binding.panel.ivPlayPayseExpand.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_pause, null));
+                    onMediaPlayerPrepared();
+                    seekBarProgressUpdater();
+                } else {
+                    binding.panel.ivPlayPauseCollpase.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_play_24px, null));
+                    binding.panel.ivPlayPayseExpand.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_play, null));
+                }
             if (songPanelViewModel.getId() != sharedPrefrenceManager.getSong().getId())
                 setupPanel(sharedPrefrenceManager.getSong());
         }
+
+        if (binding.slidingPanel.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED)
+            binding.panel.rlSlidePanelTop.setAlpha(0);
 
 //        if (PlaySongActivity.isExternalSource) {
 //
@@ -548,7 +590,8 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
     private void seekBarProgressUpdater() {
 
         if (musiPlayerHelper.mediaPlayer != null) {
-
+            if (musiPlayerHelper.getTimer() == null)
+                musiPlayerHelper.setTimer(new Timer());
             musiPlayerHelper.getTimer().schedule(new TimerTask() {
                 @Override
                 public void run() {
@@ -588,12 +631,12 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
     }
 
     private void initialize() {
-
         firebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
         volumeContentObserver.setSongPanelViewModel(songPanelViewModel);
         binding.panel.setSongPanel(songPanelViewModel);
         binding.panel.setListViewModel(songViewModel);
+        binding.slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
         songInfoBinding.setSongInfo(songInfoViewModel);
         infoDialog = new Dialog(this, R.style.DialogTheme);
         infoDialog.setTitle("Login");
@@ -625,6 +668,7 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.song_list_activity_menu, menu);
+
         return true;
     }
 
@@ -741,14 +785,18 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
     }
 
     @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+    }
+
+    @Override
     protected void onDestroy() {
-        if (musiPlayerHelper.getTimer() != null) {
-            musiPlayerHelper.getTimer().purge();
-            musiPlayerHelper.getTimer().cancel();
-        }
-        if (musiPlayerHelper.mediaPlayer != null) {
-            musiPlayerHelper.mediaPlayer.release();
-        }
+
         sharedPrefrenceManager.setPlayingState("repeatOne");
         if (volumeContentObserver != null) {
             this.getContentResolver().unregisterContentObserver(volumeContentObserver);

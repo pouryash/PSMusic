@@ -47,7 +47,7 @@
                     android:layout_centerVertical="true"
                     android:layout_marginStart="@dimen/standardMargin_X2"
                     app:cardCornerRadius="10dp"
-                    app:cardElevation="2dp"
+                    app:cardElevation="4dp"
                     app:cardPreventCornerOverlap="false"
                     app:contentPaddingBottom="0dp"
                     app:contentPaddingLeft="0dp"
@@ -77,7 +77,7 @@
                     android:paddingTop="@dimen/smallMargin"
                     android:singleLine="true"
                     android:text="@{songPanel.songName}"
-                    android:textColor="@color/colorWhite"
+                    android:textColor="@color/colorTextMain"
                     android:textSize="@dimen/standardTextSize_12"
                     tools:text="pourya sharifi" />
 
@@ -131,9 +131,12 @@
                 android:layout_marginEnd="@dimen/standardMargin_X2"
                 android:layout_toEndOf="@+id/iv_SoundSeekbar_PlaySong"
                 android:background="@null"
+                android:minHeight="2dp"
+                android:maxHeight="2dp"
+                android:padding="@dimen/smallMargin"
+                android:progressDrawable="@drawable/seek_bar_ruler_volume"
                 android:max="@{songPanel.audioManagerMax}"
                 android:progress="@{songPanel.audioManagerProgress}"
-                android:progressTint="#ccc"
                 android:thumb="@null" />
 
             <ImageView
@@ -141,6 +144,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
+                android:tint="@color/colorIconsMain"
                 android:layout_marginStart="@dimen/standardMargin"
                 app:imgaeRes="@{songPanel.soundOn}"
                 app:srcCompat="@drawable/ic_sound_on" />
@@ -159,7 +163,7 @@
                 android:layout_height="250dp"
                 android:layout_centerHorizontal="true"
                 app:cardCornerRadius="10dp"
-                app:cardElevation="4dp"
+                app:cardElevation="8dp"
                 app:cardPreventCornerOverlap="false">
 
                 <ImageView
@@ -185,7 +189,7 @@
                 android:fontFamily="@font/sans_bold"
                 android:singleLine="true"
                 android:text="@{songPanel.songName}"
-                android:textColor="@color/colorWhite"
+                android:textColor="@color/colorTextMain"
                 android:textSize="@dimen/standardTextSize_15"
                 tools:text="pourya sharifi" />
 
@@ -222,7 +226,7 @@
                 android:layout_centerVertical="true"
                 android:text="@{songPanel.duration}"
                 android:layout_marginStart="@dimen/standardMargin"
-                android:textColor="@color/colorWhite"
+                android:textColor="@color/colorTextMain"
                 android:textSize="@dimen/standardTextSize_10"
                 tools:text="05:26" />
 
@@ -232,9 +236,14 @@
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:layout_centerVertical="true"
+                android:tint="@color/colorAccent"
                 android:layout_marginBottom="@dimen/standardMargin"
                 android:max="@{songPanel.maxDuration}"
                 android:progress="@{songPanel.progressDuration}"
+                android:progressDrawable="@drawable/seek_bar_ruler_main"
+                android:thumb="@drawable/seek_bar_slider_main"
+                android:minHeight="2dp"
+                android:maxHeight="2dp"
                 android:layout_toStartOf="@id/tv_duration_expand"
                 android:layout_toEndOf="@id/tv_timePassed_expand" />
 
@@ -246,7 +255,7 @@
                 android:layout_centerVertical="true"
                 android:text="@{songPanel.currentDuration}"
                 android:layout_marginEnd="@dimen/standardMargin"
-                android:textColor="@color/colorWhite"
+                android:textColor="@color/colorTextMain"
                 android:textSize="@dimen/standardTextSize_10"
                 tools:text="05:26" />
 
@@ -284,6 +293,7 @@
                 android:focusable="true"
                 android:onClick="@{() -> listViewModel.getPrevSongById()}"
                 android:padding="@dimen/smallMargin"
+                android:tint="@color/colorAccent"
                 app:srcCompat="@drawable/ic_previous_track" />
 
             <ImageView
@@ -297,6 +307,7 @@
                 android:focusable="true"
                 android:onClick="@{() -> listViewModel.getNextSongById()}"
                 android:padding="@dimen/smallMargin"
+                android:tint="@color/colorAccent"
                 app:srcCompat="@drawable/ic_next_track" />
 
             <ImageView
@@ -309,6 +320,7 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:padding="@dimen/smallMargin"
+                android:tint="@color/colorIconsMain"
                 app:srcCompat="@drawable/ic_repeat_one_24px" />
 
             <ImageView
@@ -322,6 +334,7 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:padding="@dimen/smallMargin"
+                android:tint="@color/colorIconsMain"
                 app:srcCompat="@drawable/ic_forward_30_24px" />
 
         </RelativeLayout>

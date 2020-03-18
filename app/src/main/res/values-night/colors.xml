@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#ffffff</color>
-    <color name="colorPrimaryDark">#ffffff</color>
-    <color name="colorToolbar">#ffffff</color>
+    <color name="colorPrimary">#111015</color>
+    <color name="colorPrimaryDark">#1d1e23</color>
+    <color name="colorToolbar">#1d1e23</color>
     <color name="colorAccent">#3C69AC</color>
     <color name="colorWhite">#ffffff</color>
     <color name="colorBlack">#000000</color>
     <color name="colorGray">#AEAEAE</color>
     <color name="colorNoSong">#d1d9ff</color>
+    <color name="colorTextMain">#ffffff</color>
+    <color name="colorIconsMain">#ffffff</color>
     <color name="colorRed">#F44336</color>
-    <color name="colorTextMain">#000000</color>
-    <color name="colorIconsMain">@color/gray800</color>
-    <color name="colorEtSearch">@color/gray200</color>
+    <color name="colorEtSearch">#111015</color>
     <color name="colorGraySecoundrylSearch">@color/gray600</color>
 
 
@@ -27,5 +27,4 @@
     <color name="gray700">#616161</color>
     <color name="gray800">#424242</color>
     <color name="gray900">#212121</color>
-
 </resources>

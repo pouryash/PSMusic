@@ -99,14 +99,16 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
         super.onResume();
 
         if (musiPlayerHelper.mediaPlayer != null) {
+            onMediaPlayerPrepared();
             if (musiPlayerHelper.mediaPlayer.isPlaying()) {
                 binding.panel.ivPlayPauseCollpase.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_pause_24px, null));
                 binding.panel.ivPlayPayseExpand.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_pause, null));
-                onMediaPlayerPrepared();
                 seekBarProgressUpdater();
             }
             setupPanel(sharedPrefrenceManager.getSong());
         }
+        if (binding.slidingPanel.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED)
+            binding.panel.rlSlidePanelTop.setAlpha(0);
 
     }
 
@@ -214,7 +216,8 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
     private void seekBarProgressUpdater() {
 
         if (musiPlayerHelper.mediaPlayer != null) {
-
+            if (musiPlayerHelper.getTimer() == null)
+                musiPlayerHelper.setTimer(new Timer());
             musiPlayerHelper.getTimer().schedule(new TimerTask() {
                 @Override
                 public void run() {

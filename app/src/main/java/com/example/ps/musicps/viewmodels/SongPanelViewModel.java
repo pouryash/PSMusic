@@ -67,7 +67,7 @@ public class SongPanelViewModel extends BaseObservable {
                         @Override
                         public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
                             if (iv.getId() == R.id.iv_songImage_expand)
-                                iv.setPadding(64, 64, 64, 64);
+                                iv.setPadding(128, 128, 128, 128);
                             iv.setBackgroundColor(Color.parseColor("#d1d9ff"));
                             return false;
                         }

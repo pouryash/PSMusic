@@ -3,6 +3,9 @@ package com.example.ps.musicps.Commen;
 import android.app.Application;
 import android.content.Context;
 import android.media.AudioManager;
+
+import androidx.appcompat.app.AppCompatDelegate;
+
 import com.example.ps.musicps.Di.component.AppComponent;
 import com.example.ps.musicps.Di.component.DaggerAppComponent;
 
@@ -18,7 +21,12 @@ public class MyApplication extends Application {
         context = getApplicationContext();
 
         component = DaggerAppComponent.builder().context(context).build();
+
+        AppCompatDelegate.setDefaultNightMode(
+                AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
     }
+
+
 
     public static AudioManager getAudioManager() {
         return am;

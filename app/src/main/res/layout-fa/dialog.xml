@@ -68,7 +68,7 @@
             android:layout_marginBottom="@dimen/standardMargin_X2"
             android:layout_centerHorizontal="true"
             android:layout_below="@id/tv_scan_dialog"
-            android:textColor="@color/colorAccent"
+            android:textColor="@color/colorRed"
             android:textSize="@dimen/standardTextSize_16"
             />
 
