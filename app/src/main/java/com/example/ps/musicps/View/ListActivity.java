@@ -1,7 +1,6 @@
 package com.example.ps.musicps.View;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.content.res.ResourcesCompat;
@@ -9,7 +8,6 @@ import androidx.core.content.res.ResourcesCompat;
 import android.Manifest;
 import android.app.Dialog;
 import android.content.Intent;
-import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
@@ -17,7 +15,6 @@ import android.media.AudioManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.PersistableBundle;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -85,6 +82,7 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
     boolean isSeekbarTouched = false;
     boolean isInLongTouch;
     boolean isSongComplete = false;
+    boolean iscompleteFromChangeSong;
     int longTouchPosition;
     int curentShuffleSong;
     Drawable drawableRepeatOne;
@@ -283,6 +281,7 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
             @Override
             public void onPanelSlide(View panel, float slideOffset) {
                 binding.panel.rlSlidePanelTop.setAlpha(1 - slideOffset);
+                binding.panel.ivArrowCollpase.setAlpha(slideOffset);
             }
 
             @Override
@@ -423,6 +422,7 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
                 isInLongTouch = true;
                 longTouchPosition = 2000;
                 longTouchForward();
+                iscompleteFromChangeSong = false;
                 return false;
             }
         });
@@ -435,6 +435,7 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
                         isInLongTouch = false;
                         songViewModel.setCanClick(false);
                     }
+                    iscompleteFromChangeSong = true;
                 }
                 return false;
             }
@@ -446,6 +447,7 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
                 isInLongTouch = true;
                 longTouchPosition = 2000;
                 longTouchBackward();
+                iscompleteFromChangeSong = false;
                 return false;
             }
         });
@@ -458,6 +460,7 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
                         songViewModel.setCanClick(false);
                         isInLongTouch = false;
                     }
+                    iscompleteFromChangeSong = true;
                 }
                 return false;
             }
@@ -507,6 +510,14 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
 //                    repeatButton.setImageResource(R.drawable.ic_repeat_one_24px);
 //                    Toast.makeText(getApplicationContext(), "Replay Current Song", Toast.LENGTH_SHORT).show();
 //                }
+            }
+        });
+
+        binding.panel.ivArrowCollpase.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                binding.slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+
             }
         });
 
@@ -720,6 +731,7 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
     @Override
     public void onSongClicked(Song song) {
 
+        iscompleteFromChangeSong = true;
 
         if (song.getId() == sharedPrefrenceManager.getSong().getId() && musiPlayerHelper.mediaPlayer != null) {
 
@@ -798,6 +810,7 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
     protected void onDestroy() {
 
         sharedPrefrenceManager.setPlayingState("repeatOne");
+
         if (volumeContentObserver != null) {
             this.getContentResolver().unregisterContentObserver(volumeContentObserver);
         }
@@ -816,16 +829,20 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
         songPanelViewModel.setCurrentDuration(Commen.changeDurationFormat(musiPlayerHelper.mediaPlayer.getCurrentPosition()));
         songPanelViewModel.setMaxDuration(musiPlayerHelper.mediaPlayer.getDuration());
         songPanelViewModel.setProgressDuration(musiPlayerHelper.mediaPlayer.getCurrentPosition());
+        if (iscompleteFromChangeSong)
+            iscompleteFromChangeSong = false;
     }
 
     @Override
     public void onMediaPlayerCompletion() {
 
-//this is for bug(muti time called onComplete)
-        if (!isSongComplete) {
+//this is for bug(multi time called onComplete)
+        if (!isSongComplete && !iscompleteFromChangeSong) {
 
             switch (sharedPrefrenceManager.getPlayingState()) {
                 case "repeatOne":
+                    musiPlayerHelper.mediaPlayer.setLooping(true);
+                    musiPlayerHelper.FadeIn(2);
                     break;
                 case "repeatList":
                     if (!songViewModel.isCanClick())
@@ -851,8 +868,7 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
             }
 
             isSongComplete = true;
-        } else
-            return;
+        }
 
 
     }

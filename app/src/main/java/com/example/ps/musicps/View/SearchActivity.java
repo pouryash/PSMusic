@@ -75,6 +75,7 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
     boolean isSongComplete = false;
     int longTouchPosition;
     int curentShuffleSong;
+    boolean iscompleteFromChangeSong;
     Drawable drawableRepeatOne;
     Drawable drawableRepeatAll;
     Drawable drawableShuffle;
@@ -416,6 +417,7 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
                 isInLongTouch = true;
                 longTouchPosition = 2000;
                 longTouchForward();
+                iscompleteFromChangeSong = false;
                 return false;
             }
         });
@@ -428,6 +430,7 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
                         isInLongTouch = false;
                         songViewModel.setCanClick(false);
                     }
+                    iscompleteFromChangeSong = true;
                 }
                 return false;
             }
@@ -439,6 +442,7 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
                 isInLongTouch = true;
                 longTouchPosition = 2000;
                 longTouchBackward();
+                iscompleteFromChangeSong = false;
                 return false;
             }
         });
@@ -451,6 +455,7 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
                         songViewModel.setCanClick(false);
                         isInLongTouch = false;
                     }
+                    iscompleteFromChangeSong = true;
                 }
                 return false;
             }
@@ -517,6 +522,14 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
                         break;
 
                 }
+            }
+        });
+
+        binding.panel.ivArrowCollpase.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                binding.slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+
             }
         });
     }
@@ -649,12 +662,14 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
         songPanelViewModel.setCurrentDuration(Commen.changeDurationFormat(musiPlayerHelper.mediaPlayer.getCurrentPosition()));
         songPanelViewModel.setMaxDuration(musiPlayerHelper.mediaPlayer.getDuration());
         songPanelViewModel.setProgressDuration(musiPlayerHelper.mediaPlayer.getCurrentPosition());
+        if (iscompleteFromChangeSong)
+            iscompleteFromChangeSong = false;
     }
 
     @Override
     public void onMediaPlayerCompletion() {
 //this is for bug(muti time called onComplete)
-        if (!isSongComplete) {
+        if (!isSongComplete && !iscompleteFromChangeSong) {
 
             switch (sharedPrefrenceManager.getPlayingState()) {
                 case "repeatOne":

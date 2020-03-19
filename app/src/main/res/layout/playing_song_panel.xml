@@ -22,6 +22,17 @@
         android:clickable="false"
         android:theme="@style/ThemeOverlay.MaterialComponents.Dark">
 
+        <ImageView
+            android:id="@+id/iv_arrow_collpase"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="@dimen/standardMargin"
+            android:rotation="-90"
+            android:layout_margin="@dimen/standardMargin"
+            app:srcCompat="@drawable/ic_back_arrow_white" />
+
 
         <RelativeLayout
             android:id="@+id/rl_slide_panel_top"

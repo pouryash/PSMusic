@@ -69,6 +69,7 @@
                         android:textColor="@color/gray600"
                         android:textColorHint="@color/colorGray"
                         android:textSize="@dimen/standardTextSize_12"
+                        android:textStyle="bold"
                         android:typeface="normal" />
 
                 </RelativeLayout>
