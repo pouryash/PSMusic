@@ -159,7 +159,7 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
     @Override
     protected void onResume() {
 
-        if (musiPlayerHelper.mediaPlayer != null) {
+        if (musiPlayerHelper != null && musiPlayerHelper.mediaPlayer != null) {
                 if (musiPlayerHelper.mediaPlayer.isPlaying()) {
                     binding.panel.ivPlayPauseCollpase.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_pause_24px, null));
                     binding.panel.ivPlayPayseExpand.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_pause, null));

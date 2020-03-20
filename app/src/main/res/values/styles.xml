@@ -19,7 +19,7 @@
     </style>
 
 
-    <style name="DialogTheme" parent="Theme.AppCompat.Dialog.Alert">
+    <style name="DialogTheme" parent="Theme.MaterialComponents.DayNight.Dialog.Alert">
 
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>

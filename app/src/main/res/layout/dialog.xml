@@ -8,6 +8,7 @@
     android:layout_marginEnd="@dimen/standardMargin"
     android:layout_marginBottom="@dimen/standardMargin_X2"
     app:cardElevation="5dp"
+    app:cardBackgroundColor="@color/colorWhite"
     android:orientation="vertical">
 
 

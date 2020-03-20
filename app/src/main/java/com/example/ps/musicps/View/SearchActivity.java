@@ -284,7 +284,11 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
                 bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "Back Button Search");
                 firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
                 onBackPressed();
-                imgr.hideSoftInputFromWindow(SearchActivity.this.getCurrentFocus().getWindowToken(), 0);
+                try {
+                    imgr.hideSoftInputFromWindow(SearchActivity.this.getCurrentFocus().getWindowToken(), 0);
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
             }
         });
 
@@ -502,6 +506,7 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
             @Override
             public void onPanelSlide(View panel, float slideOffset) {
                 binding.panel.rlSlidePanelTop.setAlpha(1 - slideOffset);
+                binding.panel.ivArrowCollpase.setAlpha(slideOffset);
             }
 
             @Override
@@ -532,6 +537,14 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
 
             }
         });
+
+        binding.panel.ivPreviousExpand.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int a =50;
+            }
+        });
+
     }
 
     private void init() {
@@ -541,6 +554,7 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
 
         volumeContentObserver.setSongPanelViewModel(songPanelViewModel);
         binding.panel.setSongPanel(songPanelViewModel);
+        binding.panel.setListViewModel(songViewModel);
         sharedPrefrenceManager = ((MyApplication) getApplication()).getComponent().getSharedPrefrence();
         musiPlayerHelper = ((MyApplication) getApplication()).getComponent().getMusicPlayerHelper();
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
@@ -590,6 +604,8 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
 
     @Override
     public void onSongClicked(Song song) {
+
+        iscompleteFromChangeSong = true;
 
         try {
             imgr.hideSoftInputFromWindow(SearchActivity.this.getCurrentFocus().getWindowToken(), 0);
@@ -673,6 +689,8 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
 
             switch (sharedPrefrenceManager.getPlayingState()) {
                 case "repeatOne":
+                    musiPlayerHelper.mediaPlayer.setLooping(true);
+                    musiPlayerHelper.FadeIn(2);
                     break;
                 case "repeatList":
                     if (!songViewModel.isCanClick())
