@@ -851,7 +851,6 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
                     binding.panel.ivNextExpand.performClick();
                     break;
                 case "shuffle":
-                    sharedPrefrenceManager.saveSong(shuffleList.get(curentShuffleSong).getViewModelSong());
                     if (curentShuffleSong != shuffleList.size() - 1) {
                         curentShuffleSong++;
                     } else {
@@ -859,11 +858,8 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
                         curentShuffleSong = 0;
                     }
 
-                    musiPlayerHelper.setupMediaPLayer(ListActivity.this, sharedPrefrenceManager.getSong(), ListActivity.this);
+                    onSongClicked(shuffleList.get(curentShuffleSong).getViewModelSong());
 
-                    musiPlayerHelper.FadeIn(2);
-                    seekBarProgressUpdater();
-                    setupPanel(sharedPrefrenceManager.getSong());
                     break;
             }
 
