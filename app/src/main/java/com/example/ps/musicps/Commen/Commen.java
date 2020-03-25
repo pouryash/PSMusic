@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
@@ -16,7 +17,10 @@ import android.provider.Settings;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.graphics.drawable.DrawableCompat;
 import com.example.ps.musicps.Model.Song;
+
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -30,9 +34,6 @@ public class Commen {
     private Commen() {
     }
 
-    static {
-        instance = new Commen();
-    }
 
     public static Commen getInstance() {
         return instance;
@@ -51,6 +52,25 @@ public class Commen {
         drawable.draw(canvas);
 
         return bitmap;
+    }
+
+    public static Bitmap decodeUriToBitmap(Context mContext, Uri sendUri) {
+        Bitmap getBitmap = null;
+        try {
+            InputStream image_stream;
+            try {
+                image_stream = mContext.getContentResolver().openInputStream(sendUri);
+                getBitmap = BitmapFactory.decodeStream(image_stream);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return getBitmap;
+    }
+    static {
+        instance = new Commen();
     }
 
     public static boolean isServiceRunning(Class<?> serviceClass, Context context) {

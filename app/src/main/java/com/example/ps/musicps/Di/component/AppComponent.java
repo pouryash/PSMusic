@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.example.ps.musicps.Commen.SongSharedPrefrenceManager;
 import com.example.ps.musicps.Helper.MusiPlayerHelper;
+import com.example.ps.musicps.Helper.ServiceConnectionBinder;
 import com.example.ps.musicps.Repository.DbRepository;
 
 import javax.inject.Named;

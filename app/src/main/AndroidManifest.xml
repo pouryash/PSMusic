@@ -63,7 +63,7 @@
         <!-- <data android:mimeType="audio/*" /> -->
         <!-- </intent-filter> -->
         <!-- </activity> -->
-        <service android:name=".Service.SongService" />
+        <service android:name=".Service.MusicService" />
         <service android:name=".Commen.FireBaseCloudMessagingService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />

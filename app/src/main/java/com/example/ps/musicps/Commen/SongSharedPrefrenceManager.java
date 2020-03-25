@@ -3,7 +3,12 @@ package com.example.ps.musicps.Commen;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import androidx.lifecycle.LiveData;
+
 import com.example.ps.musicps.Model.Song;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -15,16 +20,11 @@ public class SongSharedPrefrenceManager {
     private static final String SONG_SHARED_PREF_NAME = "song_shared_pref";
     private static final String FIRST_IN_SHARED_PREF_NAME = "first_in_shared_pref";
     private static final String KEY_FIRST_IN = "first_in";
-    private static final String KEY_SONG_NAME = "song_name";
-    private static final String KEY_SONG_ARTIST_NAME = "song_artist_name";
-    private static final String KEY_ALBUM_NAME = "album_name";
-    private static final String KEY_SONG_TRACK_FILE = "song_track_file";
-    private static final String KEY_SONG_DURATION = "song_duration";
-    private static final String KEY_SONG_IMAGE_URI = "song_image_uri";
-    private static final String KEY_SONG_ID = "song_id";
+    public static final String KEY_SONG_MODEL = "song_model";
     private static final String KEY_CURENT_PLAYING_STATE = "curentPlayingState";
     private SharedPreferences songSharedPreferences;
     private SharedPreferences firstInSharedPreferences;
+    private SharedPreferenceSongLiveData sharedPreferenceSongLiveData;
 
 
 
@@ -39,18 +39,31 @@ public class SongSharedPrefrenceManager {
         }
     }
 
+    public SharedPreferenceSongLiveData getSharedPrefsSongLiveData(String key) {
+        if (sharedPreferenceSongLiveData == null)
+            sharedPreferenceSongLiveData = new SharedPreferenceSongLiveData(songSharedPreferences, key, new Song());
+        return sharedPreferenceSongLiveData;
+    }
+
 
     public void saveSong(Song song) {
         if (song != null) {
             SharedPreferences.Editor editor = songSharedPreferences.edit();
-            editor.putInt(KEY_SONG_ID, song.getId());
-            editor.putString(KEY_SONG_NAME, song.getSongName());
-            editor.putString(KEY_SONG_ARTIST_NAME, song.getArtistName());
-            editor.putString(KEY_ALBUM_NAME, song.getAlbumName());
-            editor.putString(KEY_SONG_TRACK_FILE, song.getTrackFile());
-            editor.putString(KEY_SONG_DURATION, song.getDuration());
-            editor.putString(KEY_SONG_IMAGE_URI, song.getSongImageUri());
-            editor.apply();
+            JSONObject jsonObject = new JSONObject();
+            try {
+                jsonObject.put("id", song.getId());
+                jsonObject.put("time", song.getDuration());
+                jsonObject.put("songName", song.getSongName());
+                jsonObject.put("imgUrl", song.getSongImageUri());
+                jsonObject.put("albumName", song.getAlbumName());
+                jsonObject.put("artist", song.getArtistName());
+                jsonObject.put("path", song.getTrackFile());
+                jsonObject.put("contentId", song.getContentID());
+                editor.putString(KEY_SONG_MODEL, jsonObject.toString());
+                editor.apply();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -65,15 +78,21 @@ public class SongSharedPrefrenceManager {
     }
 
     public Song getSong() {
-        Song song = new Song();
-        song.setSongName(songSharedPreferences.getString(KEY_SONG_NAME, ""));
-        song.setArtistName(songSharedPreferences.getString(KEY_SONG_ARTIST_NAME, ""));
-        song.setAlbumName(songSharedPreferences.getString(KEY_ALBUM_NAME, ""));
-        song.setTrackFile(songSharedPreferences.getString(KEY_SONG_TRACK_FILE, ""));
-        song.setDuration(songSharedPreferences.getString(KEY_SONG_DURATION, ""));
-        song.setSongImageUri(songSharedPreferences.getString(KEY_SONG_IMAGE_URI, ""));
-        song.setId(songSharedPreferences.getInt(KEY_SONG_ID, 0));
-        return song;
+        Song model = new Song();
+        try {
+            JSONObject jsonObject = new JSONObject(songSharedPreferences.getString(KEY_SONG_MODEL, ""));
+            model.setId(Integer.parseInt(jsonObject.getString("id")));
+            model.setDuration(jsonObject.getString("time"));
+            model.setSongName(jsonObject.getString("songName"));
+            model.setAlbumName(jsonObject.getString("albumName"));
+            model.setTrackFile(jsonObject.getString("path"));
+            model.setArtistName(jsonObject.getString("artist"));
+            model.setSongImageUri(jsonObject.getString("imgUrl"));
+            model.setContentID(Integer.parseInt(jsonObject.getString("contentId")));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return model;
     }
 
     public void setFirstIn(boolean firstIn) {
@@ -85,6 +104,67 @@ public class SongSharedPrefrenceManager {
     public boolean getFirstIn() {
 
         return firstInSharedPreferences.getBoolean(KEY_FIRST_IN, false);
+    }
+
+    public abstract class SharedPreferenceLiveData<T> extends LiveData<T>{
+        SharedPreferences sharedPrefs;
+        String key;
+        public T defValue;
+        private boolean isActive = true;
+
+
+        public SharedPreferenceLiveData(SharedPreferences sharedPrefs, String key, T defValue) {
+            this.sharedPrefs = sharedPrefs;
+            this.key = key;
+            this.defValue = defValue;
+        }
+
+        SharedPreferences.OnSharedPreferenceChangeListener preferenceChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+            @Override
+            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s){
+                if (!isActive)
+                    onActive();
+                if (SharedPreferenceLiveData.this.key.equals(s))
+                    setValue(getValueFromPreferences(s, defValue));
+            }
+        };
+
+        abstract T getValueFromPreferences(String key, T defValue);
+
+//        @Override
+//        protected void onActive() {
+//            super.onActive();
+//            isActive = true;
+//            setValue(getValueFromPreferences(key, defValue));
+//            sharedPrefs.registerOnSharedPreferenceChangeListener(preferenceChangeListener);
+//        }
+//
+//        @Override
+//        protected void onInactive() {
+////            sharedPrefs.unregisterOnSharedPreferenceChangeListener(preferenceChangeListener);
+//            isActive = false;
+//            super.onInactive();
+//        }
+
+        public SharedPreferenceLiveData<Song> getSongLiveData(String key, Song defaultValue) {
+            return new SharedPreferenceSongLiveData(sharedPrefs,key, defaultValue);
+        }
+
+    }
+
+    public class SharedPreferenceSongLiveData extends SharedPreferenceLiveData<Song>{
+
+        public SharedPreferenceSongLiveData(SharedPreferences prefs, String key, Song song) {
+            super(prefs, key, song);
+            sharedPrefs.registerOnSharedPreferenceChangeListener(preferenceChangeListener);
+        }
+
+        @Override
+        Song getValueFromPreferences(String key, Song song) {
+
+            return getSong();
+        }
+
     }
 
 }
