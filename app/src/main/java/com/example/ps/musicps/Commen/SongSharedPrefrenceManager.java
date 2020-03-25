@@ -110,7 +110,6 @@ public class SongSharedPrefrenceManager {
         SharedPreferences sharedPrefs;
         String key;
         public T defValue;
-        private boolean isActive = true;
 
 
         public SharedPreferenceLiveData(SharedPreferences sharedPrefs, String key, T defValue) {
@@ -122,8 +121,6 @@ public class SongSharedPrefrenceManager {
         SharedPreferences.OnSharedPreferenceChangeListener preferenceChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s){
-                if (!isActive)
-                    onActive();
                 if (SharedPreferenceLiveData.this.key.equals(s))
                     setValue(getValueFromPreferences(s, defValue));
             }

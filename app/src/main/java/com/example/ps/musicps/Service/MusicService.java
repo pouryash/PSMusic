@@ -18,6 +18,7 @@ import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.Observer;
 
 import com.example.ps.musicps.Commen.Commen;
 import com.example.ps.musicps.Commen.MyApplication;
@@ -44,6 +45,7 @@ public class MusicService extends Service implements MusiPlayerHelper.onMediaPla
     private NotificationCompat.Action[] playPauseAction;
     MusiPlayerHelper musiPlayerHelper;
     SongSharedPrefrenceManager sharedPrefrenceManager;
+    private Observer<Song> songObserver;
 
     @Override
     public void onCreate() {
@@ -66,6 +68,22 @@ public class MusicService extends Service implements MusiPlayerHelper.onMediaPla
 
     public void registerClient(Activity activity, LifecycleOwner lifecycleOwner) {
         this.callbacks = (Callbacks) activity;
+
+        setUpObserver();
+    }
+
+    public void setUpCallback(Callbacks callback){
+        this.callbacks = callback;
+    }
+
+    public void setUpObserver() {
+
+        songObserver = new Observer<Song>() {
+            @Override
+            public void onChanged(Song song) {
+                onContentChanged();
+            }
+        };
 
         sharedPrefrenceManager.getSharedPrefsSongLiveData(SongSharedPrefrenceManager.KEY_SONG_MODEL).
                 getSongLiveData(SongSharedPrefrenceManager.KEY_SONG_MODEL, new Song()).
@@ -93,7 +111,7 @@ public class MusicService extends Service implements MusiPlayerHelper.onMediaPla
         if (musiPlayerHelper.mediaPlayer.isPlaying()) {
 
             notification.mActions.set(1, playPauseAction[1]);
-            stopForeground(false);
+            startForeground(NOTIFICATION_ID, notification.build());
 
 
         } else {
@@ -152,6 +170,9 @@ public class MusicService extends Service implements MusiPlayerHelper.onMediaPla
 
                     break;
                 case ACTION_NEXT:
+                    if (!sharedPrefrenceManager.getSharedPrefsSongLiveData(SongSharedPrefrenceManager.KEY_SONG_MODEL).
+                        getSongLiveData(SongSharedPrefrenceManager.KEY_SONG_MODEL, new Song()).hasObservers())
+                        setUpObserver();
 
                     if (callbacks != null) {
                         callbacks.onNextButtonClicked();
@@ -161,6 +182,9 @@ public class MusicService extends Service implements MusiPlayerHelper.onMediaPla
 
                     break;
                 case ACTION_PREVIOUS:
+                    if (!sharedPrefrenceManager.getSharedPrefsSongLiveData(SongSharedPrefrenceManager.KEY_SONG_MODEL).
+                            getSongLiveData(SongSharedPrefrenceManager.KEY_SONG_MODEL, new Song()).hasObservers())
+                        setUpObserver();
 
                     if (callbacks != null) {
                         callbacks.onPreviousButtonClicked();
@@ -240,6 +264,10 @@ public class MusicService extends Service implements MusiPlayerHelper.onMediaPla
     public void onDestroy() {
 
         callbacks = null;
+
+        sharedPrefrenceManager
+                .getSharedPrefsSongLiveData(SongSharedPrefrenceManager.KEY_SONG_MODEL)
+                .removeObserver(songObserver);
     }
 
     @Override

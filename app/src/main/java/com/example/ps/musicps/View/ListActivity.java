@@ -167,6 +167,9 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
     @Override
     protected void onResume() {
 
+        if (serviceConnectionBinder.getMusicService() != null)
+            serviceConnectionBinder.getMusicService().setUpCallback(ListActivity.this);
+
         if (serviceConnectionBinder != null && !serviceConnectionBinder.isServiceConnect && Commen.isServiceRunning(MusicService.class, ListActivity.this)) {
 
             serviceIntent = new Intent(ListActivity.this, MusicService.class);
@@ -845,6 +848,7 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
 
     @Override
     protected void onDestroy() {
+        super.onDestroy();
 
         sharedPrefrenceManager.setPlayingState("repeatOne");
 
@@ -860,8 +864,6 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
         stopService(serviceIntent);
 
         songViewModel.getSongMutableLiveData().removeObserver(songObserver);
-
-        super.onDestroy();
 
     }
 
