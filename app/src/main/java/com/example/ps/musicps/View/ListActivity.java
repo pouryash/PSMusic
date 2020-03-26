@@ -771,6 +771,14 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
         } else if (!musiPlayerHelper.mediaPlayer.isPlaying()) {
             serviceConnectionBinder.getMusicService().onPlayPauseClicked();
         }
+
+        //update notification content (reset observer)
+        if (!sharedPrefrenceManager.getSharedPrefsSongLiveData(SongSharedPrefrenceManager.KEY_SONG_MODEL).
+                getSongLiveData(SongSharedPrefrenceManager.KEY_SONG_MODEL, new Song()).hasObservers()
+                && serviceConnectionBinder.getMusicService() != null)
+            serviceConnectionBinder.getMusicService().setUpObserver();
+
+
         iscompleteFromChangeSong = true;
 
         if (song.getId() == sharedPrefrenceManager.getSong().getId() && musiPlayerHelper.mediaPlayer != null) {
@@ -849,6 +857,8 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
+        musiPlayerHelper.mediaPlayer.release();
 
         sharedPrefrenceManager.setPlayingState("repeatOne");
 

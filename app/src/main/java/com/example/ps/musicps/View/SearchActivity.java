@@ -714,6 +714,12 @@ MusicService.Callbacks{
             serviceConnectionBinder.getMusicService().onPlayPauseClicked();
         }
 
+        //update notification content (reset observer)
+        if (!sharedPrefrenceManager.getSharedPrefsSongLiveData(SongSharedPrefrenceManager.KEY_SONG_MODEL).
+                getSongLiveData(SongSharedPrefrenceManager.KEY_SONG_MODEL, new Song()).hasObservers()
+                && serviceConnectionBinder.getMusicService() != null)
+            serviceConnectionBinder.getMusicService().setUpObserver();
+
         iscompleteFromChangeSong = true;
 
         try {
