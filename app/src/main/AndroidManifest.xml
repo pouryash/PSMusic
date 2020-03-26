@@ -20,7 +20,8 @@
         <activity android:name=".View.SearchActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan"
-            tools:ignore="LockedOrientationActivity" />
+            tools:ignore="LockedOrientationActivity"
+            android:launchMode="singleTop"/>
         <activity
             android:name=".View.ListActivity"
             android:launchMode="singleTop"
@@ -70,6 +71,12 @@
             </intent-filter>
         </service>
         <service android:name=".Commen.OnAppCleared" />
+        <receiver android:name=".Helper.RemoteReciver">
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_BUTTON" />
+                <action android:name="android.media.AUDIO_BECOMING_NOISY" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

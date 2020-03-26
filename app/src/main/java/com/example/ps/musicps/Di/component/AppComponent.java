@@ -2,6 +2,7 @@ package com.example.ps.musicps.Di.component;
 
 import android.content.Context;
 
+import com.example.ps.musicps.Commen.AudioFocusControler;
 import com.example.ps.musicps.Commen.SongSharedPrefrenceManager;
 import com.example.ps.musicps.Helper.MusiPlayerHelper;
 import com.example.ps.musicps.Helper.ServiceConnectionBinder;
@@ -22,6 +23,8 @@ public interface AppComponent {
     SongSharedPrefrenceManager getSharedPrefrence();
 
     DbRepository getDbRepo();
+
+    AudioFocusControler getFocusControler();
 
     @Component.Builder
     interface Builder{

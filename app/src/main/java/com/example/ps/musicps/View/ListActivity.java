@@ -28,6 +28,7 @@ import android.widget.SeekBar;
 import android.widget.Toast;
 
 import com.example.ps.musicps.Adapter.OnSongAdapter;
+import com.example.ps.musicps.Commen.AudioFocusControler;
 import com.example.ps.musicps.Commen.Commen;
 import com.example.ps.musicps.Commen.MyApplication;
 import com.example.ps.musicps.Commen.OnAppCleared;
@@ -62,7 +63,7 @@ import java.util.TimerTask;
 import javax.inject.Inject;
 
 public class ListActivity extends RuntimePermissionsActivity implements OnSongAdapter,
-        MusiPlayerHelper.onMediaPlayerStateChanged, MusicService.Callbacks {
+        MusiPlayerHelper.onMediaPlayerStateChanged, MusicService.Callbacks, AudioFocusControler.onAudioFocusChange {
 
     private static final int READ_EXTERNAL_STORAGE = 1;
     ActivityListBinding binding;
@@ -167,7 +168,7 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
     @Override
     protected void onResume() {
 
-        if (serviceConnectionBinder.getMusicService() != null)
+        if (serviceConnectionBinder != null && serviceConnectionBinder.getMusicService() != null)
             serviceConnectionBinder.getMusicService().setUpCallback(ListActivity.this);
 
         if (serviceConnectionBinder != null && !serviceConnectionBinder.isServiceConnect && Commen.isServiceRunning(MusicService.class, ListActivity.this)) {
@@ -412,7 +413,8 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
                 musiPlayerHelper.mediaPlayer.seekTo(seekBar.getProgress());
                 songPanelViewModel.setProgressDuration(musiPlayerHelper.mediaPlayer.getCurrentPosition());
                 songPanelViewModel.setCurrentDuration(Commen.changeDurationFormat(musiPlayerHelper.mediaPlayer.getCurrentPosition()));
-
+                if (serviceConnectionBinder.getMusicService() != null)
+                    serviceConnectionBinder.getMusicService().playBackStateChanged();
             }
         });
 
@@ -574,6 +576,8 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
                         musiPlayerHelper.mediaPlayer.seekTo(musiPlayerHelper.mediaPlayer.getCurrentPosition() - longTouchPosition);
                         songPanelViewModel.setProgressDuration(musiPlayerHelper.mediaPlayer.getCurrentPosition());
                         songPanelViewModel.setCurrentDuration(Commen.changeDurationFormat(musiPlayerHelper.mediaPlayer.getCurrentPosition()));
+                        if (serviceConnectionBinder.getMusicService() != null)
+                            serviceConnectionBinder.getMusicService().playBackStateChanged();
                     }
 
                     if (longTouchPosition >= 20000) {
@@ -611,6 +615,8 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
                         musiPlayerHelper.mediaPlayer.seekTo(musiPlayerHelper.mediaPlayer.getCurrentPosition() + longTouchPosition);
                         songPanelViewModel.setProgressDuration(musiPlayerHelper.mediaPlayer.getCurrentPosition());
                         songPanelViewModel.setCurrentDuration(Commen.changeDurationFormat(musiPlayerHelper.mediaPlayer.getCurrentPosition()));
+                        if (serviceConnectionBinder.getMusicService() != null)
+                            serviceConnectionBinder.getMusicService().playBackStateChanged();
                     }
 
                     if (longTouchPosition >= 20000) {
@@ -672,6 +678,7 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
     }
 
     private void initialize() {
+        AudioFocusControler.onAudioFocusChange = this;
         firebaseAnalytics = FirebaseAnalytics.getInstance(this);
         serviceConnectionBinder = DaggerMusicServiceComponent.builder()
                 .Activity(this)
@@ -858,22 +865,26 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
     protected void onDestroy() {
         super.onDestroy();
 
+
         musiPlayerHelper.mediaPlayer.release();
 
         sharedPrefrenceManager.setPlayingState("repeatOne");
 
-        if (serviceConnectionBinder.isServiceConnect && musiPlayerHelper.mediaPlayer != null && !musiPlayerHelper.mediaPlayer.isPlaying()) {
+        if (serviceConnectionBinder.isServiceConnect && musiPlayerHelper.mediaPlayer != null) {
+            serviceConnectionBinder.getMusicService().stopSelf();
             unbindService(serviceConnectionBinder.getServiceConnection());
-            stopService(new Intent(getApplicationContext(), MusicService.class));
+            stopService(serviceIntent);
         }
 
         if (volumeContentObserver != null) {
             this.getContentResolver().unregisterContentObserver(volumeContentObserver);
         }
 
-        stopService(serviceIntent);
 
         songViewModel.getSongMutableLiveData().removeObserver(songObserver);
+
+        musiPlayerHelper.mediaPlayer = null;
+        musiPlayerHelper = null;
 
     }
 
@@ -884,6 +895,10 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
 
     @Override
     public void onMediaPlayerPrepared() {
+
+        if (serviceConnectionBinder.getMusicService() != null)
+        serviceConnectionBinder.getMusicService().playBackStateChanged();
+
         songPanelViewModel.setCurrentDuration(Commen.changeDurationFormat(musiPlayerHelper.mediaPlayer.getCurrentPosition()));
         songPanelViewModel.setMaxDuration(musiPlayerHelper.mediaPlayer.getDuration());
         songPanelViewModel.setProgressDuration(musiPlayerHelper.mediaPlayer.getCurrentPosition());
@@ -944,5 +959,10 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
     @Override
     public void onPreviousButtonClicked() {
         binding.panel.ivPreviousExpand.performClick();
+    }
+
+    @Override
+    public void onFocusLoss() {
+        binding.panel.ivPlayPauseCollpase.performClick();
     }
 }

@@ -9,10 +9,13 @@ import android.app.Service;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.MediaMetadata;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.IBinder;
+import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
+import android.support.v4.media.session.PlaybackStateCompat;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
@@ -20,6 +23,7 @@ import androidx.core.app.NotificationManagerCompat;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
 
+import com.example.ps.musicps.Commen.AudioFocusControler;
 import com.example.ps.musicps.Commen.Commen;
 import com.example.ps.musicps.Commen.MyApplication;
 import com.example.ps.musicps.Commen.SongSharedPrefrenceManager;
@@ -28,7 +32,8 @@ import com.example.ps.musicps.Model.Song;
 import com.example.ps.musicps.R;
 
 
-public class MusicService extends Service implements MusiPlayerHelper.onMediaPlayerStateChanged {
+public class MusicService extends Service implements MusiPlayerHelper.onMediaPlayerStateChanged,
+        MusiPlayerHelper.onMediaplayerChange {
 
     private static final String ACTION_PLAY = "com.example.ps.musicps.PLAY_MUSIC";
     private static final String ACTION_NEXT = "com.example.ps.musicps.NEXT_MUSIC";
@@ -46,12 +51,16 @@ public class MusicService extends Service implements MusiPlayerHelper.onMediaPla
     MusiPlayerHelper musiPlayerHelper;
     SongSharedPrefrenceManager sharedPrefrenceManager;
     private Observer<Song> songObserver;
+    PlaybackStateCompat.Builder mStateBuilder;
+    MediaSessionCompat mediaSession;
+    MediaMetadataCompat.Builder metadataBuilder;
 
     @Override
     public void onCreate() {
         super.onCreate();
         musiPlayerHelper = ((MyApplication) getApplication()).getComponent().getMusicPlayerHelper();
         sharedPrefrenceManager = ((MyApplication) getApplication()).getComponent().getSharedPrefrence();
+        musiPlayerHelper.setOnMediaplayerChange(MusicService.this);
     }
 
     @Nullable
@@ -59,6 +68,7 @@ public class MusicService extends Service implements MusiPlayerHelper.onMediaPla
     public IBinder onBind(Intent intent) {
         return mBinder;
     }
+
 
     public class ServiceBinder extends Binder {
         public MusicService getMusicService() {
@@ -72,7 +82,7 @@ public class MusicService extends Service implements MusiPlayerHelper.onMediaPla
         setUpObserver();
     }
 
-    public void setUpCallback(Callbacks callback){
+    public void setUpCallback(Callbacks callback) {
         this.callbacks = callback;
     }
 
@@ -171,7 +181,7 @@ public class MusicService extends Service implements MusiPlayerHelper.onMediaPla
                     break;
                 case ACTION_NEXT:
                     if (!sharedPrefrenceManager.getSharedPrefsSongLiveData(SongSharedPrefrenceManager.KEY_SONG_MODEL).
-                        getSongLiveData(SongSharedPrefrenceManager.KEY_SONG_MODEL, new Song()).hasObservers())
+                            getSongLiveData(SongSharedPrefrenceManager.KEY_SONG_MODEL, new Song()).hasObservers())
                         setUpObserver();
 
                     if (callbacks != null) {
@@ -223,14 +233,36 @@ public class MusicService extends Service implements MusiPlayerHelper.onMediaPla
 
                     musicAlbum = Commen.decodeUriToBitmap(getApplicationContext(), Uri.parse(sharedPrefrenceManager.getSong().getSongImageUri()));
 
-                    MediaSessionCompat mediaSession = new MediaSessionCompat(this, "Service");
+                    mediaSession = new MediaSessionCompat(this, "Service");
                     mediaSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
                             MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
+
+
+                    metadataBuilder = new MediaMetadataCompat.Builder();
+
+
+                    mStateBuilder = new PlaybackStateCompat.Builder()
+                            .setState(PlaybackStateCompat.STATE_PLAYING, 1, 1.0f)
+                            .setBufferedPosition(musiPlayerHelper.mediaPlayer.getCurrentPosition())
+                            .setActions(
+                                    PlaybackStateCompat.ACTION_PLAY |
+                                            PlaybackStateCompat.ACTION_PAUSE |
+                                            PlaybackStateCompat.ACTION_SKIP_TO_NEXT |
+                                            PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS |
+                                            PlaybackStateCompat.ACTION_SEEK_TO |
+                                            PlaybackStateCompat.ACTION_PLAY_PAUSE);
+
+                    setUpMediaSession();
+
+                    mediaSession.setPlaybackState(mStateBuilder.build());
+
+                    mediaSession.setCallback(new MySessionCallback());
 
                     playPauseAction = new NotificationCompat.Action[]{
                             new NotificationCompat.Action(android.R.drawable.ic_media_play, "Play", playPendingIntent),
                             new NotificationCompat.Action(android.R.drawable.ic_media_pause, "Pause", playPendingIntent),
                     };
+
 
                     notification = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL)
                             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
@@ -243,7 +275,9 @@ public class MusicService extends Service implements MusiPlayerHelper.onMediaPla
                                     .setMediaSession(mediaSession.getSessionToken()))
                             .setContentTitle(sharedPrefrenceManager.getSong().getSongName())
                             .setContentText(sharedPrefrenceManager.getSong().getAlbumName())
+                            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                             .setOngoing(false)
+                            .setShowWhen(false)
                             .setLargeIcon(musicAlbum);
 
                     startForeground(NOTIFICATION_ID, notification.build());
@@ -260,10 +294,70 @@ public class MusicService extends Service implements MusiPlayerHelper.onMediaPla
         return START_NOT_STICKY;
     }
 
+    public void setUpMediaSession() {
+//        ComponentName receiver = new ComponentName(getPackageName(), RemoteReciver.class.getName());
+
+
+//        mediaSession = new MediaSessionCompat(getApplicationContext(), "StreamService", receiver, null);
+//        final Intent mediaButtonIntent = new Intent(Intent.ACTION_MEDIA_BUTTON);
+//        mediaButtonIntent.setComponent(receiver);
+//        Intent intent = new Intent(getApplicationContext(), ListActivity.class);
+//        PendingIntent pi = PendingIntent.getActivity(getApplicationContext(), 99 /*request code*/,
+//                intent, PendingIntent.FLAG_UPDATE_CURRENT);
+//        mediaSession.setSessionActivity(pi);
+
+        metadataBuilder.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, musiPlayerHelper.mediaPlayer.getDuration());
+//        metadataBuilder.putBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART, musicAlbum)
+//                .putBitmap(MediaMetadata.METADATA_KEY_DISPLAY_ICON, musicAlbum);
+
+//        metadataBuilder = new MediaMetadataCompat.Builder()
+//                .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, "Test Artist")
+//                .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, "Test Album")
+//                .putString(MediaMetadataCompat.METADATA_KEY_TITLE, "Test Track Name")
+//                .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART,
+//                        BitmapFactory.decodeResource(getResources(), R.drawable.icon1))
+//                .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, musiPlayerHelper.mediaPlayer.getDuration());
+
+        mediaSession.setMetadata(metadataBuilder.build());
+
+        mediaSession.setActive(true);
+    }
+
+
+    public void playBackStateChanged() {
+
+        metadataBuilder.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, musiPlayerHelper.mediaPlayer.getDuration());
+
+
+        if (musiPlayerHelper.mediaPlayer.isPlaying()) {
+            mStateBuilder.setState(PlaybackStateCompat.STATE_PLAYING,
+                    musiPlayerHelper.mediaPlayer.getCurrentPosition(), 1f);
+        } else {
+            mStateBuilder.setState(PlaybackStateCompat.STATE_PAUSED,
+                    musiPlayerHelper.mediaPlayer.getCurrentPosition(), 1f);
+        }
+        mediaSession.setMetadata(metadataBuilder.build());
+        mediaSession.setPlaybackState(mStateBuilder.build());
+    }
+
+    private class MySessionCallback extends MediaSessionCompat.Callback {
+
+        @Override
+        public void onSeekTo(long pos) {
+            musiPlayerHelper.mediaPlayer.seekTo((int) pos);
+            playBackStateChanged();
+        }
+
+
+    }
+
+
     @Override
     public void onDestroy() {
 
         callbacks = null;
+
+        mediaSession.release();
 
         sharedPrefrenceManager
                 .getSharedPrefsSongLiveData(SongSharedPrefrenceManager.KEY_SONG_MODEL)
@@ -272,7 +366,8 @@ public class MusicService extends Service implements MusiPlayerHelper.onMediaPla
 
     @Override
     public void onMediaPlayerPrepared() {
-
+        mStateBuilder.setState(PlaybackStateCompat.STATE_PLAYING,
+                musiPlayerHelper.mediaPlayer.getCurrentPosition(), 1f);
     }
 
     @Override
@@ -282,6 +377,10 @@ public class MusicService extends Service implements MusiPlayerHelper.onMediaPla
         stopSelf();
     }
 
+    @Override
+    public void onMediaPlayerChange() {
+        playBackStateChanged();
+    }
 
     public interface Callbacks {
         void onPlayButtonClicked(boolean isPlaying);

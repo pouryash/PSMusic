@@ -440,7 +440,8 @@ MusicService.Callbacks{
                 musiPlayerHelper.mediaPlayer.seekTo(seekBar.getProgress());
                 songPanelViewModel.setProgressDuration(musiPlayerHelper.mediaPlayer.getCurrentPosition());
                 songPanelViewModel.setCurrentDuration(Commen.changeDurationFormat(musiPlayerHelper.mediaPlayer.getCurrentPosition()));
-
+                if (serviceConnectionBinder.getMusicService() != null)
+                    serviceConnectionBinder.getMusicService().playBackStateChanged();
             }
         });
 
@@ -790,6 +791,9 @@ MusicService.Callbacks{
 
     @Override
     public void onMediaPlayerPrepared() {
+        if (serviceConnectionBinder.getMusicService() != null)
+            serviceConnectionBinder.getMusicService().playBackStateChanged();
+
         songPanelViewModel.setCurrentDuration(Commen.changeDurationFormat(musiPlayerHelper.mediaPlayer.getCurrentPosition()));
         songPanelViewModel.setMaxDuration(musiPlayerHelper.mediaPlayer.getDuration());
         songPanelViewModel.setProgressDuration(musiPlayerHelper.mediaPlayer.getCurrentPosition());

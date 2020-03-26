@@ -26,9 +26,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:background="?attr/selectableItemBackgroundBorderless"
             android:padding="@dimen/standardMargin"
             android:rotation="-90"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
             android:layout_margin="@dimen/standardMargin"
             app:srcCompat="@drawable/ic_back_arrow_white" />
 
@@ -125,6 +127,7 @@
 
 
         <RelativeLayout
+            android:id="@+id/rl_seekbar_sound"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/rl_slide_panel_top"
@@ -165,7 +168,9 @@
             android:id="@+id/rl_SongInfo_PlaySong"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true">
+            android:gravity="center"
+            android:layout_below="@+id/rl_seekbar_sound"
+            android:layout_above="@+id/rl_seekbar_expand">
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardV_songImage_expand"
@@ -174,6 +179,7 @@
                 android:layout_centerHorizontal="true"
                 app:cardCornerRadius="10dp"
                 app:cardElevation="8dp"
+                android:layout_marginTop="@dimen/standardMargin"
                 app:cardPreventCornerOverlap="false">
 
                 <ImageView
@@ -225,6 +231,7 @@
             android:id="@+id/rl_seekbar_expand"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/standardMargin"
             android:layout_above="@+id/rl_mediaController">
 
 

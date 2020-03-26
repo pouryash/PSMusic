@@ -4,8 +4,12 @@ import android.content.Context;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Handler;
+
+import com.example.ps.musicps.Commen.AudioFocusControler;
 import com.example.ps.musicps.Commen.Commen;
+import com.example.ps.musicps.Commen.MyApplication;
 import com.example.ps.musicps.Model.Song;
+
 import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -22,6 +26,8 @@ public class MusiPlayerHelper {
     private float speed = 0.02f;
     public MediaPlayer mediaPlayer;
     public Song song;
+    private onMediaplayerChange onMediaplayerChange;
+    AudioFocusControler audioFocusControler;
 
     @Inject
     public MusiPlayerHelper() {
@@ -32,6 +38,9 @@ public class MusiPlayerHelper {
     }
 
     public void setupMediaPLayer(Context context, Song song, final onMediaPlayerStateChanged onMediaPlayerStateChanged) {
+        if (audioFocusControler == null)
+            audioFocusControler = ((MyApplication) context.getApplicationContext()).getComponent().getFocusControler();
+
         this.song = song;
         mediaPlayer = new MediaPlayer();
         try {
@@ -73,14 +82,17 @@ public class MusiPlayerHelper {
                 } else if (volumeOut == 0 || volumeOut < 0) {
                     mediaPlayer.pause();
                     volumeOut = 1;
+                    if (onMediaplayerChange != null)
+                        onMediaplayerChange.onMediaPlayerChange();
                 }
             }
         }, 20);
-
     }
 
     public void FadeIn(final float deltaTime) {
-        mediaPlayer.start();
+        if (audioFocusControler != null)
+            audioFocusControler.RequestAudio();
+            mediaPlayer.start();
         mediaPlayer.setVolume(volumeIn, volumeIn);
         volumeIn += speed * deltaTime;
         new Handler().postDelayed(new Runnable() {
@@ -93,13 +105,26 @@ public class MusiPlayerHelper {
                 }
             }
         }, 20);
+        if (onMediaplayerChange != null)
+            onMediaplayerChange.onMediaPlayerChange();
+    }
 
+    public MusiPlayerHelper.onMediaplayerChange getOnMediaplayerChange() {
+        return onMediaplayerChange;
+    }
+
+    public void setOnMediaplayerChange(MusiPlayerHelper.onMediaplayerChange onMediaplayerChange) {
+        this.onMediaplayerChange = onMediaplayerChange;
     }
 
     public interface onMediaPlayerStateChanged {
         void onMediaPlayerPrepared();
 
         void onMediaPlayerCompletion();
+    }
+
+    public interface onMediaplayerChange {
+        void onMediaPlayerChange();
     }
 
 }
