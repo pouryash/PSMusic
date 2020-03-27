@@ -161,12 +161,13 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
 
     @Override
     public void onPermissionsDeny(int requestCode) {
-        Toast.makeText(this, "We Need Permission To Run!!", Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "We Need Permission To Continue!!", Toast.LENGTH_LONG).show();
         this.finish();
     }
 
     @Override
     protected void onResume() {
+
 
         if (serviceConnectionBinder != null && serviceConnectionBinder.getMusicService() != null)
             serviceConnectionBinder.getMusicService().setUpCallback(ListActivity.this);
@@ -865,8 +866,8 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
     protected void onDestroy() {
         super.onDestroy();
 
-
-        musiPlayerHelper.mediaPlayer.release();
+        if (musiPlayerHelper.mediaPlayer != null)
+            musiPlayerHelper.mediaPlayer.release();
 
         sharedPrefrenceManager.setPlayingState("repeatOne");
 
@@ -895,9 +896,6 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
 
     @Override
     public void onMediaPlayerPrepared() {
-
-        if (serviceConnectionBinder.getMusicService() != null)
-        serviceConnectionBinder.getMusicService().playBackStateChanged();
 
         songPanelViewModel.setCurrentDuration(Commen.changeDurationFormat(musiPlayerHelper.mediaPlayer.getCurrentPosition()));
         songPanelViewModel.setMaxDuration(musiPlayerHelper.mediaPlayer.getDuration());

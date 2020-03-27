@@ -45,8 +45,17 @@ public class DbRepository {
         }
     }
 
+    public int getSize(){
+        return songDao.getSize();
+    }
+
     public Song getSong(String id){
         return songDao.getSongById(Integer.parseInt(id));
+    }
+
+    public Song getSongByPath(String path){
+
+        return songDao.getSongByPath(path);
     }
 
     public Song getMinSong(String id){

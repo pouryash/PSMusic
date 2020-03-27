@@ -65,6 +65,7 @@ public class SongViewModel extends BaseObservable {
     private SongViewModelComponent component;
     private SongSharedPrefrenceManager sharedPrefrenceManager;
     private boolean canClick = true;
+    private boolean isDBNull = false;
 
     @Inject
     public SongViewModel(Context context) {
@@ -170,17 +171,16 @@ public class SongViewModel extends BaseObservable {
     }
 
     public void getSongs() {
-        songRepository.getSongs().observe((LifecycleOwner) context, songsViewModel -> {
-            //TODO startservice
-            if (songsViewModel.size() > 0) {
+        if (songRepository.getSize() > 0) {
+            songRepository.getSongs().observe((LifecycleOwner) context, songsViewModel -> {
+
                 List<SongViewModel> songViewModels = new ArrayList<>();
                 for (int i = 0; i < songsViewModel.size(); i++) {
                     songViewModels.add(new SongViewModel(songsViewModel.get(i)));
                 }
                 mutableSongViewModelList.postValue(songViewModels);
-            } else
-                updateSongs();
-        });
+            });
+        }else updateSongs();
     }
 
     public void updateSongs() {

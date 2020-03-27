@@ -59,7 +59,7 @@ import java.util.TimerTask;
 import javax.inject.Inject;
 
 public class SearchActivity extends AppCompatActivity implements OnSongAdapter, MusiPlayerHelper.onMediaPlayerStateChanged,
-MusicService.Callbacks{
+        MusicService.Callbacks {
 
     ActivitySearchBinding binding;
     FirebaseAnalytics firebaseAnalytics;
@@ -213,6 +213,8 @@ MusicService.Callbacks{
                         musiPlayerHelper.mediaPlayer.seekTo(musiPlayerHelper.mediaPlayer.getCurrentPosition() - longTouchPosition);
                         songPanelViewModel.setProgressDuration(musiPlayerHelper.mediaPlayer.getCurrentPosition());
                         songPanelViewModel.setCurrentDuration(Commen.changeDurationFormat(musiPlayerHelper.mediaPlayer.getCurrentPosition()));
+                        if (serviceConnectionBinder.getMusicService() != null)
+                            serviceConnectionBinder.getMusicService().playBackStateChanged();
                     }
 
                     if (longTouchPosition >= 20000) {
@@ -250,6 +252,8 @@ MusicService.Callbacks{
                         musiPlayerHelper.mediaPlayer.seekTo(musiPlayerHelper.mediaPlayer.getCurrentPosition() + longTouchPosition);
                         songPanelViewModel.setProgressDuration(musiPlayerHelper.mediaPlayer.getCurrentPosition());
                         songPanelViewModel.setCurrentDuration(Commen.changeDurationFormat(musiPlayerHelper.mediaPlayer.getCurrentPosition()));
+                        if (serviceConnectionBinder.getMusicService() != null)
+                            serviceConnectionBinder.getMusicService().playBackStateChanged();
                     }
 
                     if (longTouchPosition >= 20000) {
@@ -350,7 +354,7 @@ MusicService.Callbacks{
                 onBackPressed();
                 try {
                     imgr.hideSoftInputFromWindow(SearchActivity.this.getCurrentFocus().getWindowToken(), 0);
-                }catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -537,7 +541,7 @@ MusicService.Callbacks{
             }
         };
 
-        songViewModel.getSongMutableLiveData().observeForever( songObserver);
+        songViewModel.getSongMutableLiveData().observeForever(songObserver);
 
         binding.panel.ivPlayPauseCollpase.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -617,7 +621,7 @@ MusicService.Callbacks{
         binding.panel.ivPreviousExpand.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                int a =50;
+                int a = 50;
             }
         });
 
@@ -689,6 +693,7 @@ MusicService.Callbacks{
         super.onDestroy();
 
         if (serviceConnectionBinder.isServiceConnect && musiPlayerHelper.mediaPlayer != null && !musiPlayerHelper.mediaPlayer.isPlaying()) {
+            serviceConnectionBinder.getMusicService().stopSelf();
             unbindService(serviceConnectionBinder.getServiceConnection());
             stopService(new Intent(getApplicationContext(), MusicService.class));
         }
@@ -699,7 +704,8 @@ MusicService.Callbacks{
 
         songViewModel.getSongMutableLiveData().removeObserver(songObserver);
 
-        stopService(serviceIntent);
+        if (serviceIntent != null)
+            stopService(serviceIntent);
 
         songViewModel.getSongMutableLiveData().removeObserver(songObserver);
     }
@@ -791,8 +797,6 @@ MusicService.Callbacks{
 
     @Override
     public void onMediaPlayerPrepared() {
-        if (serviceConnectionBinder.getMusicService() != null)
-            serviceConnectionBinder.getMusicService().playBackStateChanged();
 
         songPanelViewModel.setCurrentDuration(Commen.changeDurationFormat(musiPlayerHelper.mediaPlayer.getCurrentPosition()));
         songPanelViewModel.setMaxDuration(musiPlayerHelper.mediaPlayer.getDuration());

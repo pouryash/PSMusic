@@ -102,11 +102,11 @@ public class MusiPlayerHelper {
                     FadeIn(deltaTime);
                 } else if (volumeIn == 1 || volumeIn > 1) {
                     volumeIn = 0;
+                    if (onMediaplayerChange != null)
+                        onMediaplayerChange.onMediaPlayerChange();
                 }
             }
         }, 20);
-        if (onMediaplayerChange != null)
-            onMediaplayerChange.onMediaPlayerChange();
     }
 
     public MusiPlayerHelper.onMediaplayerChange getOnMediaplayerChange() {

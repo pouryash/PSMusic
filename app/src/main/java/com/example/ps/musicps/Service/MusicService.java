@@ -55,6 +55,7 @@ public class MusicService extends Service implements MusiPlayerHelper.onMediaPla
     MediaSessionCompat mediaSession;
     MediaMetadataCompat.Builder metadataBuilder;
 
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -62,6 +63,7 @@ public class MusicService extends Service implements MusiPlayerHelper.onMediaPla
         sharedPrefrenceManager = ((MyApplication) getApplication()).getComponent().getSharedPrefrence();
         musiPlayerHelper.setOnMediaplayerChange(MusicService.this);
     }
+
 
     @Nullable
     @Override
@@ -238,8 +240,7 @@ public class MusicService extends Service implements MusiPlayerHelper.onMediaPla
                             MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
 
 
-                    metadataBuilder = new MediaMetadataCompat.Builder();
-
+                    setUpMediaSession();
 
                     mStateBuilder = new PlaybackStateCompat.Builder()
                             .setState(PlaybackStateCompat.STATE_PLAYING, 1, 1.0f)
@@ -252,7 +253,6 @@ public class MusicService extends Service implements MusiPlayerHelper.onMediaPla
                                             PlaybackStateCompat.ACTION_SEEK_TO |
                                             PlaybackStateCompat.ACTION_PLAY_PAUSE);
 
-                    setUpMediaSession();
 
                     mediaSession.setPlaybackState(mStateBuilder.build());
 
@@ -295,6 +295,9 @@ public class MusicService extends Service implements MusiPlayerHelper.onMediaPla
     }
 
     public void setUpMediaSession() {
+
+        metadataBuilder = new MediaMetadataCompat.Builder();
+
 //        ComponentName receiver = new ComponentName(getPackageName(), RemoteReciver.class.getName());
 
 
@@ -305,6 +308,7 @@ public class MusicService extends Service implements MusiPlayerHelper.onMediaPla
 //        PendingIntent pi = PendingIntent.getActivity(getApplicationContext(), 99 /*request code*/,
 //                intent, PendingIntent.FLAG_UPDATE_CURRENT);
 //        mediaSession.setSessionActivity(pi);
+
 
         metadataBuilder.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, musiPlayerHelper.mediaPlayer.getDuration());
 //        metadataBuilder.putBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART, musicAlbum)
@@ -325,6 +329,7 @@ public class MusicService extends Service implements MusiPlayerHelper.onMediaPla
 
 
     public void playBackStateChanged() {
+
 
         metadataBuilder.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, musiPlayerHelper.mediaPlayer.getDuration());
 

@@ -28,6 +28,12 @@ public interface SongDao {
     @Query("SELECT * FROM tbl_song WHERE id = :id")
     Song getSongById(int id);
 
+    @Query("SELECT COUNT(*) FROM tbl_song")
+    int getSize();
+
+    @Query("SELECT * FROM tbl_song WHERE trackFile = :path")
+    Song getSongByPath(String path);
+
     @Insert
     void insertSong(Song song);
 

@@ -15,6 +15,7 @@ import com.example.ps.musicps.Commen.MyApplication;
 import com.example.ps.musicps.Model.Song;
 import com.example.ps.musicps.viewmodels.SongViewModel;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -43,10 +44,10 @@ public class SongRepository {
 
     public MutableLiveData<List<SongViewModel>> updateSongs() {
 
-        final List<SongViewModel> songList = new ArrayList<>();
+        List<SongViewModel> songList = new ArrayList<>();
         MutableLiveData<List<SongViewModel>> mutableLiveData = new MutableLiveData<>();
 
-        Observable observable = Observable.create(new ObservableOnSubscribe() {
+        ObservableOnSubscribe observableOnSubscribe = new ObservableOnSubscribe() {
             @Override
             public void subscribe(ObservableEmitter emitter) throws Exception {
 
@@ -89,10 +90,11 @@ public class SongRepository {
                             song.setAlbumName(cur.getString(cur.getColumnIndex(MediaStore.Audio.Media.ALBUM)));
                             int albumId = cur.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID);
                             song.setSongImageUri(ContentUris.withAppendedId(albumArtUri, cur.getLong(albumId)).toString());
-                            emitter.onNext(song);
-                            if(!dbRepository.isSongExist(song.getTrackFile())){
+                            if (!dbRepository.isSongExist(song.getTrackFile())) {
                                 dbRepository.insertSong(song);
                             }
+                            song.setId(dbRepository.getSongByPath(song.getTrackFile()).getId());
+                            emitter.onNext(song);
 
                         }
                     }
@@ -101,7 +103,9 @@ public class SongRepository {
                 }
 
             }
-        });
+        };
+
+        Observable observable = Observable.create(observableOnSubscribe);
 
         observable.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -131,25 +135,69 @@ public class SongRepository {
     }
 
     public LiveData<List<Song>> getSongs() {
+        List<Song> list = new ArrayList<>();
+        MutableLiveData<List<Song>> modelMutableLiveData = new MutableLiveData<>();
 
-        return dbRepository.getSongs();
+        dbRepository.getSongs().observeForever(songs -> {
+            Observable.fromArray(songs)
+                    .flatMapIterable(songs1 -> songs1)
+                    .map(song -> {
+                        File songFile = new File(song.getTrackFile());
+                            if (songFile.exists()){
+                                return song;
+                            }else {
+                                dbRepository.deleteSong(song);
+                                return new Song();
+                            }
+
+                    })
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Observer<Song>() {
+                        @Override
+                        public void onSubscribe(Disposable d) {
+
+                        }
+
+                        @Override
+                        public void onNext(Song song) {
+                            list.add(song);
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+
+                        }
+
+                        @Override
+                        public void onComplete() {
+                            modelMutableLiveData.postValue(list);
+                        }
+                    });
+
+        });
+
+        return modelMutableLiveData;
 
     }
 
-    public void deleteSong(int id){
+    public void deleteSong(int id) {
         dbRepository.deleteById(id);
     }
 
-    public Song getSong(String id){
-       return dbRepository.getSong(id);
+    public Song getSong(String id) {
+        return dbRepository.getSong(id);
     }
 
-    public Song getMinSong(String id){
+    public Song getMinSong(String id) {
         return dbRepository.getMinSong(id);
     }
 
-    public Song getMaxSong(String id){
+    public Song getMaxSong(String id) {
         return dbRepository.getMaxSong(id);
     }
 
+    public int getSize(){
+        return dbRepository.getSize();
+    }
 }
