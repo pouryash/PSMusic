@@ -42,6 +42,7 @@ public class MusicService extends Service implements MusiPlayerHelper.onMediaPla
     private final static String NOTIFICATION_CHANNEL = "channel_name";
     private final static int NOTIFICATION_ID = 101;
 
+    public boolean isBind = false;
     private Bitmap musicAlbum;
     private final IBinder mBinder = new ServiceBinder();
     public static Callbacks callbacks;
@@ -68,6 +69,7 @@ public class MusicService extends Service implements MusiPlayerHelper.onMediaPla
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
+        isBind = true;
         return mBinder;
     }
 
@@ -84,6 +86,17 @@ public class MusicService extends Service implements MusiPlayerHelper.onMediaPla
         setUpObserver();
     }
 
+    @Override
+    public boolean onUnbind(Intent intent) {
+        isBind = false;
+        return super.onUnbind(intent);
+    }
+
+    @Override
+    public void onRebind(Intent intent) {
+        super.onRebind(intent);
+    }
+
     public void setUpCallback(Callbacks callback) {
         this.callbacks = callback;
     }
@@ -93,13 +106,13 @@ public class MusicService extends Service implements MusiPlayerHelper.onMediaPla
         songObserver = new Observer<Song>() {
             @Override
             public void onChanged(Song song) {
-                onContentChanged();
+//                onContentChanged();
             }
         };
 
         sharedPrefrenceManager.getSharedPrefsSongLiveData(SongSharedPrefrenceManager.KEY_SONG_MODEL).
                 getSongLiveData(SongSharedPrefrenceManager.KEY_SONG_MODEL, new Song()).
-                observeForever(song -> onContentChanged());
+                observeForever(songObserver);
     }
 
     public void onPlayPauseClicked() {
@@ -144,7 +157,7 @@ public class MusicService extends Service implements MusiPlayerHelper.onMediaPla
         notification.setLargeIcon(musicAlbum);
         notification.setContentTitle(sharedPrefrenceManager.getSong().getSongName());
         notification.setContentText(sharedPrefrenceManager.getSong().getAlbumName());
-        notificationManager.notify(NOTIFICATION_ID, notification.build());
+//        notificationManager.notify(NOTIFICATION_ID, notification.build());
     }
 
     @Override
@@ -233,8 +246,6 @@ public class MusicService extends Service implements MusiPlayerHelper.onMediaPla
                     }
 
 
-                    musicAlbum = Commen.decodeUriToBitmap(getApplicationContext(), Uri.parse(sharedPrefrenceManager.getSong().getSongImageUri()));
-
                     mediaSession = new MediaSessionCompat(this, "Service");
                     mediaSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
                             MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
@@ -279,6 +290,9 @@ public class MusicService extends Service implements MusiPlayerHelper.onMediaPla
                             .setOngoing(false)
                             .setShowWhen(false)
                             .setLargeIcon(musicAlbum);
+
+                    onContentChanged();
+                    playBackStateChanged();
 
                     startForeground(NOTIFICATION_ID, notification.build());
 
@@ -367,6 +381,11 @@ public class MusicService extends Service implements MusiPlayerHelper.onMediaPla
         sharedPrefrenceManager
                 .getSharedPrefsSongLiveData(SongSharedPrefrenceManager.KEY_SONG_MODEL)
                 .removeObserver(songObserver);
+    }
+
+    public void removeNotification(){
+        stopForeground(false);
+        notificationManager.cancel(NOTIFICATION_ID);
     }
 
     @Override

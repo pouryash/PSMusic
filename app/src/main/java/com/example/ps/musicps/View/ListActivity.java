@@ -168,7 +168,6 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
     @Override
     protected void onResume() {
 
-
         if (serviceConnectionBinder != null && serviceConnectionBinder.getMusicService() != null)
             serviceConnectionBinder.getMusicService().setUpCallback(ListActivity.this);
 
@@ -177,6 +176,7 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
             serviceIntent = new Intent(ListActivity.this, MusicService.class);
             startService(serviceIntent);
             bindService(serviceIntent, serviceConnectionBinder.getServiceConnection(), Context.BIND_AUTO_CREATE);
+            serviceConnectionBinder.getMusicService().playBackStateChanged();
         }
 
         if (musiPlayerHelper != null && musiPlayerHelper.mediaPlayer != null) {
@@ -351,7 +351,6 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
                 } else {
                     serviceConnectionCheck();
                     musiPlayerHelper.FadeIn(2);
-                    musiPlayerHelper.mediaPlayer.start();
                     binding.panel.ivPlayPauseCollpase.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_pause_24px, null));
                     binding.panel.ivPlayPayseExpand.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_pause, null));
                     seekBarProgressUpdater();
@@ -370,7 +369,6 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
                 } else {
                     serviceConnectionCheck();
                     musiPlayerHelper.FadeIn(2);
-                    musiPlayerHelper.mediaPlayer.start();
                     binding.panel.ivPlayPauseCollpase.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_pause_24px, null));
                     binding.panel.ivPlayPayseExpand.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_pause, null));
                     seekBarProgressUpdater();
@@ -432,12 +430,14 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
                 }
             }
         });
+
         songObserver = new Observer<Song>() {
             @Override
             public void onChanged(Song song) {
                 onSongClicked(song);
             }
         };
+
         songViewModel.getSongMutableLiveData().observeForever(songObserver);
 
         binding.panel.ivNextExpand.setOnLongClickListener(new View.OnLongClickListener() {
@@ -730,9 +730,17 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
         Bundle bundle = new Bundle();
         switch (item.getItemId()) {
             case R.id.menu_search:
-                if (songViewModelList.size() != 0)
-                    startActivity(new Intent(ListActivity.this, SearchActivity.class));
-                else
+                if (songViewModelList.size() != 0) {
+                    Intent intent = new Intent(ListActivity.this, SearchActivity.class);
+                    if (serviceConnectionBinder.isServiceConnect && serviceConnectionBinder.getMusicService().isBind && musiPlayerHelper.mediaPlayer != null) {
+                        serviceConnectionBinder.getMusicService().stopSelf();
+                        unbindService(serviceConnectionBinder.getServiceConnection());
+                        serviceConnectionBinder.getMusicService().removeNotification();
+                        stopService(serviceIntent);
+                        intent.putExtra("shouldBind",true);
+                    }
+                    startActivity(intent);
+                }else
                     Toast.makeText(getApplicationContext(), "there is no song to search!!", Toast.LENGTH_LONG).show();
 
                 break;
@@ -772,12 +780,11 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
     @Override
     public void onSongClicked(Song song) {
 
-        if (!serviceConnectionBinder.isServiceConnect) {
-            serviceIntent = new Intent(ListActivity.this, MusicService.class);
-            startService(serviceIntent);
-            bindService(serviceIntent, serviceConnectionBinder.getServiceConnection(), Context.BIND_AUTO_CREATE);
-        } else if (!musiPlayerHelper.mediaPlayer.isPlaying()) {
-            serviceConnectionBinder.getMusicService().onPlayPauseClicked();
+        if (serviceConnectionBinder.isServiceConnect && serviceConnectionBinder.getMusicService().isBind && musiPlayerHelper.mediaPlayer != null) {
+            serviceConnectionBinder.getMusicService().stopSelf();
+            unbindService(serviceConnectionBinder.getServiceConnection());
+            serviceConnectionBinder.getMusicService().removeNotification();
+            stopService(serviceIntent);
         }
 
         //update notification content (reset observer)
@@ -874,6 +881,7 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
         if (serviceConnectionBinder.isServiceConnect && musiPlayerHelper.mediaPlayer != null) {
             serviceConnectionBinder.getMusicService().stopSelf();
             unbindService(serviceConnectionBinder.getServiceConnection());
+            serviceConnectionBinder.getMusicService().removeNotification();
             stopService(serviceIntent);
         }
 
@@ -886,6 +894,8 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
 
         musiPlayerHelper.mediaPlayer = null;
         musiPlayerHelper = null;
+
+        sharedPrefrenceManager.setFirstIn(true);
 
     }
 
@@ -902,6 +912,20 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
         songPanelViewModel.setProgressDuration(musiPlayerHelper.mediaPlayer.getCurrentPosition());
         if (iscompleteFromChangeSong)
             iscompleteFromChangeSong = false;
+
+        if (!serviceConnectionBinder.isServiceConnect && !sharedPrefrenceManager.getFirstIn()) {
+            serviceIntent = new Intent(ListActivity.this, MusicService.class);
+            startService(serviceIntent);
+            bindService(serviceIntent, serviceConnectionBinder.getServiceConnection(), Context.BIND_AUTO_CREATE);
+        }else if (serviceConnectionBinder.isServiceConnect && !sharedPrefrenceManager.getFirstIn() && !serviceConnectionBinder.getMusicService().isBind){
+            serviceIntent = new Intent(ListActivity.this, MusicService.class);
+            startService(serviceIntent);
+            bindService(serviceIntent, serviceConnectionBinder.getServiceConnection(), Context.BIND_AUTO_CREATE);
+        }
+
+        if (sharedPrefrenceManager.getFirstIn()) {
+            sharedPrefrenceManager.setFirstIn(false);
+        }
     }
 
     @Override
@@ -936,7 +960,6 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
 
             isSongComplete = true;
         }
-
 
     }
 

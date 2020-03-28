@@ -103,7 +103,7 @@ public class SongSharedPrefrenceManager {
 
     public boolean getFirstIn() {
 
-        return firstInSharedPreferences.getBoolean(KEY_FIRST_IN, false);
+        return firstInSharedPreferences.getBoolean(KEY_FIRST_IN, true);
     }
 
     public abstract class SharedPreferenceLiveData<T> extends LiveData<T>{

@@ -142,10 +142,12 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
     protected void onResume() {
         super.onResume();
 
+        boolean shouldBind = getIntent().getBooleanExtra("shouldBind", false);
+
         if (serviceConnectionBinder.getMusicService() != null)
             serviceConnectionBinder.getMusicService().setUpCallback(SearchActivity.this);
 
-        if (serviceConnectionBinder != null && !serviceConnectionBinder.isServiceConnect && Commen.isServiceRunning(MusicService.class, SearchActivity.this)) {
+        if (serviceConnectionBinder != null && !serviceConnectionBinder.isServiceConnect && shouldBind) {
 
             serviceIntent = new Intent(SearchActivity.this, MusicService.class);
             startService(serviceIntent);
@@ -330,6 +332,7 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
             @Override
             public void onServiceConnected() {
                 serviceConnectionBinder.getMusicService().firstTimeSetup();
+
             }
 
             @Override
@@ -695,7 +698,7 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
         if (serviceConnectionBinder.isServiceConnect && musiPlayerHelper.mediaPlayer != null && !musiPlayerHelper.mediaPlayer.isPlaying()) {
             serviceConnectionBinder.getMusicService().stopSelf();
             unbindService(serviceConnectionBinder.getServiceConnection());
-            stopService(new Intent(getApplicationContext(), MusicService.class));
+            stopService(serviceIntent);
         }
 
         if (volumeContentObserver != null) {
@@ -704,8 +707,6 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
 
         songViewModel.getSongMutableLiveData().removeObserver(songObserver);
 
-        if (serviceIntent != null)
-            stopService(serviceIntent);
 
         songViewModel.getSongMutableLiveData().removeObserver(songObserver);
     }
@@ -713,12 +714,11 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
     @Override
     public void onSongClicked(Song song) {
 
-        if (!serviceConnectionBinder.isServiceConnect) {
-            serviceIntent = new Intent(SearchActivity.this, MusicService.class);
-            startService(serviceIntent);
-            bindService(serviceIntent, serviceConnectionBinder.getServiceConnection(), Context.BIND_AUTO_CREATE);
-        } else if (!musiPlayerHelper.mediaPlayer.isPlaying()) {
-            serviceConnectionBinder.getMusicService().onPlayPauseClicked();
+        if (serviceConnectionBinder.isServiceConnect && serviceConnectionBinder.getMusicService().isBind && musiPlayerHelper.mediaPlayer != null) {
+            serviceConnectionBinder.getMusicService().stopSelf();
+            unbindService(serviceConnectionBinder.getServiceConnection());
+            serviceConnectionBinder.getMusicService().removeNotification();
+            stopService(serviceIntent);
         }
 
         //update notification content (reset observer)
@@ -803,6 +803,12 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
         songPanelViewModel.setProgressDuration(musiPlayerHelper.mediaPlayer.getCurrentPosition());
         if (iscompleteFromChangeSong)
             iscompleteFromChangeSong = false;
+
+        if (serviceConnectionBinder.isServiceConnect && !serviceConnectionBinder.getMusicService().isBind) {
+            serviceIntent = new Intent(SearchActivity.this, MusicService.class);
+            startService(serviceIntent);
+            bindService(serviceIntent, serviceConnectionBinder.getServiceConnection(), Context.BIND_AUTO_CREATE);
+        }
     }
 
     @Override
