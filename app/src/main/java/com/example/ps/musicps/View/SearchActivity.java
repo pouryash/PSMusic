@@ -698,6 +698,7 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
         if (serviceConnectionBinder.isServiceConnect && musiPlayerHelper.mediaPlayer != null && !musiPlayerHelper.mediaPlayer.isPlaying()) {
             serviceConnectionBinder.getMusicService().stopSelf();
             unbindService(serviceConnectionBinder.getServiceConnection());
+            serviceConnectionBinder.getMusicService().removeNotification();
             stopService(serviceIntent);
         }
 

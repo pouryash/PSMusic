@@ -176,7 +176,6 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
             serviceIntent = new Intent(ListActivity.this, MusicService.class);
             startService(serviceIntent);
             bindService(serviceIntent, serviceConnectionBinder.getServiceConnection(), Context.BIND_AUTO_CREATE);
-            serviceConnectionBinder.getMusicService().playBackStateChanged();
         }
 
         if (musiPlayerHelper != null && musiPlayerHelper.mediaPlayer != null) {
@@ -873,27 +872,21 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
     protected void onDestroy() {
         super.onDestroy();
 
-        if (musiPlayerHelper.mediaPlayer != null)
-            musiPlayerHelper.mediaPlayer.release();
-
-        sharedPrefrenceManager.setPlayingState("repeatOne");
-
-        if (serviceConnectionBinder.isServiceConnect && musiPlayerHelper.mediaPlayer != null) {
+        if (serviceConnectionBinder.isServiceConnect && serviceConnectionBinder.getMusicService().isBind && musiPlayerHelper.mediaPlayer != null) {
             serviceConnectionBinder.getMusicService().stopSelf();
             unbindService(serviceConnectionBinder.getServiceConnection());
             serviceConnectionBinder.getMusicService().removeNotification();
             stopService(serviceIntent);
         }
 
+
+        songViewModel.getSongMutableLiveData().removeObserver(songObserver);
+
         if (volumeContentObserver != null) {
             this.getContentResolver().unregisterContentObserver(volumeContentObserver);
         }
 
-
-        songViewModel.getSongMutableLiveData().removeObserver(songObserver);
-
-        musiPlayerHelper.mediaPlayer = null;
-        musiPlayerHelper = null;
+//        musiPlayerHelper = null;
 
         sharedPrefrenceManager.setFirstIn(true);
 

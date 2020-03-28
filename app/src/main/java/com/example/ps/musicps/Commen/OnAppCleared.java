@@ -35,6 +35,9 @@ public class OnAppCleared extends Service {
     public void onTaskRemoved(Intent rootIntent) {
         Log.e("ClearFromRecentService", "END");
         MusiPlayerHelper musiPlayerHelper = ((MyApplication)getApplication()).getComponent().getMusicPlayerHelper();
+        SongSharedPrefrenceManager songSharedPrefrenceManager = ((MyApplication)getApplication()).getComponent().getSharedPrefrence();
+
+        songSharedPrefrenceManager.setPlayingState("repeatOne");
 
         if (musiPlayerHelper.getTimer() != null) {
             musiPlayerHelper.getTimer().purge();
@@ -42,6 +45,7 @@ public class OnAppCleared extends Service {
         }
         if (musiPlayerHelper.mediaPlayer != null) {
             musiPlayerHelper.mediaPlayer.release();
+            musiPlayerHelper.mediaPlayer = null;
         }
         stopSelf();
     }

@@ -17,14 +17,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".View.SearchActivity"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustPan"
-            tools:ignore="LockedOrientationActivity"
-            android:launchMode="singleTop"/>
-        <activity
-            android:name=".View.ListActivity"
-            android:launchMode="singleTop"
+        <activity android:name=".SplashScreen"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity">
             <intent-filter>
@@ -32,6 +25,23 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".View.SearchActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan"
+            tools:ignore="LockedOrientationActivity" />
+        <activity
+            android:name=".View.ListActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity">
+<!--            <intent-filter>-->
+<!--                <action android:name="android.intent.action.MAIN" />-->
+
+<!--                <category android:name="android.intent.category.LAUNCHER" />-->
+<!--            </intent-filter>-->
         </activity>
 
         <meta-data
@@ -49,9 +59,7 @@
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/psmusic_widget_info" />
-        </receiver>
-
-        <!-- <activity -->
+        </receiver> <!-- <activity -->
         <!-- android:name=".View.PlaySongActivity" -->
         <!-- android:launchMode="singleTop" -->
         <!-- android:screenOrientation="portrait" -->
@@ -71,6 +79,7 @@
             </intent-filter>
         </service>
         <service android:name=".Commen.OnAppCleared" />
+
         <receiver android:name=".Helper.RemoteReciver">
             <intent-filter>
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
