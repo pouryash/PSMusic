@@ -30,6 +30,7 @@ import android.widget.Toast;
 import com.example.ps.musicps.Adapter.OnSongAdapter;
 import com.example.ps.musicps.Commen.Commen;
 import com.example.ps.musicps.Commen.MyApplication;
+import com.example.ps.musicps.Commen.OnAppCleared;
 import com.example.ps.musicps.Commen.SongSharedPrefrenceManager;
 import com.example.ps.musicps.Commen.VolumeContentObserver;
 import com.example.ps.musicps.Di.component.DaggerMusicServiceComponent;
@@ -93,6 +94,8 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
     private Intent serviceIntent;
     private ServiceConnectionBinder serviceConnectionBinder;
     private Observer<Song> songObserver;
+    private boolean isFirstIn = true;
+    boolean isBackClicked = false;
 
 
     @Override
@@ -689,13 +692,15 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
         } else {
             super.onBackPressed();
         }
+        //for on resume in listActivity because onDestroy called after that
+        isBackClicked = true;
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
 
-        if (serviceConnectionBinder.isServiceConnect && musiPlayerHelper.mediaPlayer != null && !musiPlayerHelper.mediaPlayer.isPlaying()) {
+        if (serviceConnectionBinder.isServiceConnect && musiPlayerHelper.mediaPlayer != null && !isBackClicked) {
             serviceConnectionBinder.getMusicService().stopSelf();
             unbindService(serviceConnectionBinder.getServiceConnection());
             serviceConnectionBinder.getMusicService().removeNotification();
@@ -805,11 +810,18 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
         if (iscompleteFromChangeSong)
             iscompleteFromChangeSong = false;
 
-        if (serviceConnectionBinder.isServiceConnect && !serviceConnectionBinder.getMusicService().isBind) {
+        if (!serviceConnectionBinder.isServiceConnect && !isFirstIn){
+            serviceIntent = new Intent(SearchActivity.this, MusicService.class);
+            startService(serviceIntent);
+            bindService(serviceIntent, serviceConnectionBinder.getServiceConnection(), Context.BIND_AUTO_CREATE);
+        }else if (serviceConnectionBinder.getMusicService() != null && !serviceConnectionBinder.getMusicService().isBind && musiPlayerHelper.mediaPlayer != null) {
             serviceIntent = new Intent(SearchActivity.this, MusicService.class);
             startService(serviceIntent);
             bindService(serviceIntent, serviceConnectionBinder.getServiceConnection(), Context.BIND_AUTO_CREATE);
         }
+
+        if (isFirstIn)
+            isFirstIn = false;
     }
 
     @Override
@@ -836,13 +848,8 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
                         Collections.shuffle(shuffleList);
                         curentShuffleSong = 0;
                     }
+                    onSongClicked(shuffleList.get(curentShuffleSong).getViewModelSong());
 
-                    musiPlayerHelper.setupMediaPLayer(SearchActivity.this, sharedPrefrenceManager.getSong(), SearchActivity.this);
-
-                    musiPlayerHelper.FadeIn(2);
-                    seekBarProgressUpdater();
-
-                    setupPanel(sharedPrefrenceManager.getSong());
                     break;
             }
 

@@ -30,6 +30,7 @@ import com.example.ps.musicps.Commen.SongSharedPrefrenceManager;
 import com.example.ps.musicps.Helper.MusiPlayerHelper;
 import com.example.ps.musicps.Model.Song;
 import com.example.ps.musicps.R;
+import com.example.ps.musicps.View.SearchActivity;
 
 
 public class MusicService extends Service implements MusiPlayerHelper.onMediaPlayerStateChanged,
@@ -38,6 +39,7 @@ public class MusicService extends Service implements MusiPlayerHelper.onMediaPla
     private static final String ACTION_PLAY = "com.example.ps.musicps.PLAY_MUSIC";
     private static final String ACTION_NEXT = "com.example.ps.musicps.NEXT_MUSIC";
     private static final String ACTION_PREVIOUS = "com.example.ps.musicps.PREVIOUS_MUSIC";
+    private static final String ACTION_CONTENT = "com.example.ps.musicps.ACTION_CONTENT";
     private final static String CHANNEL_DESCRIPTION_SONG = "channel_description_Song";
     private final static String NOTIFICATION_CHANNEL = "channel_name";
     private final static int NOTIFICATION_ID = 101;
@@ -55,6 +57,8 @@ public class MusicService extends Service implements MusiPlayerHelper.onMediaPla
     PlaybackStateCompat.Builder mStateBuilder;
     MediaSessionCompat mediaSession;
     MediaMetadataCompat.Builder metadataBuilder;
+    Intent intentContent;
+    PendingIntent contentPendingIntent;
 
 
     @Override
@@ -81,7 +85,7 @@ public class MusicService extends Service implements MusiPlayerHelper.onMediaPla
     }
 
     public void registerClient(Activity activity, LifecycleOwner lifecycleOwner) {
-        this.callbacks = (Callbacks) activity;
+        setUpCallback((Callbacks) activity);
 
         setUpObserver();
     }
@@ -99,6 +103,7 @@ public class MusicService extends Service implements MusiPlayerHelper.onMediaPla
 
     public void setUpCallback(Callbacks callback) {
         this.callbacks = callback;
+
     }
 
     public void setUpObserver() {
@@ -219,11 +224,26 @@ public class MusicService extends Service implements MusiPlayerHelper.onMediaPla
 
                     notificationManager.notify(NOTIFICATION_ID, notification.build());
                     break;
+                case ACTION_CONTENT:
+
+                    if (callbacks.getClass().equals(SearchActivity.class)) {
+                        intentContent = new Intent(this, SearchActivity.class);
+                        intentContent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+                                | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    } else {
+                        intentContent = new Intent(this, ListActivity.class);
+                        intentContent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+                                | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    }
+                   PendingIntent contentPendingIntent = PendingIntent.getService(this, 0, intentContent, 0);
+                    try {
+                        contentPendingIntent.send(this, 0, intentContent);
+                    } catch (PendingIntent.CanceledException e) {
+                        e.printStackTrace();
+                    }
+                    break;
 
                 default:
-                    Intent showMusicPlayerActivityIntent = new Intent(this, ListActivity.class);
-                    showMusicPlayerActivityIntent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                    showMusicPlayerActivityIntent.putExtra("notification", true);
 
                     Intent playIntent = new Intent(this, MusicService.class);
                     playIntent.setAction(ACTION_PLAY);
@@ -236,6 +256,11 @@ public class MusicService extends Service implements MusiPlayerHelper.onMediaPla
                     Intent rewindIntent = new Intent(this, MusicService.class);
                     rewindIntent.setAction(ACTION_PREVIOUS);
                     PendingIntent previousPendingIntent = PendingIntent.getService(this, 0, rewindIntent, 0);
+
+                    intentContent = new Intent(this, MusicService.class);
+                    intentContent.setAction(ACTION_CONTENT);
+                    contentPendingIntent = PendingIntent.getService(this, 0, intentContent, 0);
+
 
                     notificationManager = NotificationManagerCompat.from(getApplicationContext());
 
@@ -289,6 +314,7 @@ public class MusicService extends Service implements MusiPlayerHelper.onMediaPla
                             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                             .setOngoing(false)
                             .setShowWhen(false)
+                            .setContentIntent(contentPendingIntent)
                             .setLargeIcon(musicAlbum);
 
                     onContentChanged();
@@ -383,7 +409,7 @@ public class MusicService extends Service implements MusiPlayerHelper.onMediaPla
                 .removeObserver(songObserver);
     }
 
-    public void removeNotification(){
+    public void removeNotification() {
         stopForeground(false);
         notificationManager.cancel(NOTIFICATION_ID);
     }

@@ -171,7 +171,7 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
         if (serviceConnectionBinder != null && serviceConnectionBinder.getMusicService() != null)
             serviceConnectionBinder.getMusicService().setUpCallback(ListActivity.this);
 
-        if (serviceConnectionBinder != null && !serviceConnectionBinder.isServiceConnect && Commen.isServiceRunning(MusicService.class, ListActivity.this)) {
+        if (serviceConnectionBinder != null && serviceConnectionBinder.isServiceConnect && musiPlayerHelper.mediaPlayer != null ) {
 
             serviceIntent = new Intent(ListActivity.this, MusicService.class);
             startService(serviceIntent);

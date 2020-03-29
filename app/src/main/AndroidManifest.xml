@@ -22,26 +22,26 @@
             tools:ignore="LockedOrientationActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name=".View.SearchActivity"
-            android:launchMode="singleTop"
+            android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan"
+            android:excludeFromRecents="true"
             tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".View.ListActivity"
-            android:launchMode="singleTop"
+            android:launchMode="singleTask"
             android:screenOrientation="portrait"
+            android:excludeFromRecents="true"
             tools:ignore="LockedOrientationActivity">
-<!--            <intent-filter>-->
-<!--                <action android:name="android.intent.action.MAIN" />-->
-
-<!--                <category android:name="android.intent.category.LAUNCHER" />-->
-<!--            </intent-filter>-->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
         </activity>
 
         <meta-data
@@ -59,19 +59,8 @@
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/psmusic_widget_info" />
-        </receiver> <!-- <activity -->
-        <!-- android:name=".View.PlaySongActivity" -->
-        <!-- android:launchMode="singleTop" -->
-        <!-- android:screenOrientation="portrait" -->
-        <!-- tools:ignore="LockedOrientationActivity"> -->
-        <!-- <intent-filter> -->
-        <!-- <action android:name="android.intent.action.VIEW" /> -->
-        <!-- <category android:name="android.intent.category.DEFAULT" /> -->
-        <!-- <data android:scheme="content" /> -->
-        <!-- <data android:scheme="file" /> -->
-        <!-- <data android:mimeType="audio/*" /> -->
-        <!-- </intent-filter> -->
-        <!-- </activity> -->
+        </receiver>
+
         <service android:name=".Service.MusicService" />
         <service android:name=".Commen.FireBaseCloudMessagingService">
             <intent-filter>
