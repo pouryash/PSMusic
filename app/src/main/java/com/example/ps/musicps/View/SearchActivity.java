@@ -155,6 +155,7 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
             serviceIntent = new Intent(SearchActivity.this, MusicService.class);
             startService(serviceIntent);
             bindService(serviceIntent, serviceConnectionBinder.getServiceConnection(), Context.BIND_AUTO_CREATE);
+
         }
 
         if (musiPlayerHelper.mediaPlayer != null) {
@@ -690,6 +691,12 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
         if (binding.slidingPanel.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED) {
             binding.slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
         } else {
+            if (serviceConnectionBinder.isServiceConnect && musiPlayerHelper.mediaPlayer != null) {
+                serviceConnectionBinder.getMusicService().stopSelf();
+                unbindService(serviceConnectionBinder.getServiceConnection());
+                serviceConnectionBinder.getMusicService().removeNotification();
+                stopService(serviceIntent);
+            }
             super.onBackPressed();
         }
         //for on resume in listActivity because onDestroy called after that

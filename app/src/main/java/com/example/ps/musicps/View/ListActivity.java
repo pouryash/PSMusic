@@ -171,11 +171,13 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
         if (serviceConnectionBinder != null && serviceConnectionBinder.getMusicService() != null)
             serviceConnectionBinder.getMusicService().setUpCallback(ListActivity.this);
 
-        if (serviceConnectionBinder != null && serviceConnectionBinder.isServiceConnect && musiPlayerHelper.mediaPlayer != null ) {
+        if (serviceConnectionBinder != null && serviceConnectionBinder.isServiceConnect && musiPlayerHelper.mediaPlayer != null
+        && !serviceConnectionBinder.getMusicService().isBind && musiPlayerHelper.mediaPlayer.isPlaying()) {
 
             serviceIntent = new Intent(ListActivity.this, MusicService.class);
             startService(serviceIntent);
             bindService(serviceIntent, serviceConnectionBinder.getServiceConnection(), Context.BIND_AUTO_CREATE);
+
         }
 
         if (musiPlayerHelper != null && musiPlayerHelper.mediaPlayer != null) {
@@ -547,7 +549,8 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
     }
 
     private void serviceConnectionCheck() {
-        if (!serviceConnectionBinder.isServiceConnect) {
+        if (!serviceConnectionBinder.isServiceConnect || (serviceConnectionBinder.isServiceConnect &&
+                serviceConnectionBinder.getMusicService() != null && !serviceConnectionBinder.getMusicService().isBind)) {
             serviceIntent = new Intent(ListActivity.this, MusicService.class);
             startService(serviceIntent);
             bindService(serviceIntent, serviceConnectionBinder.getServiceConnection(), Context.BIND_AUTO_CREATE);
@@ -736,6 +739,7 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
                         unbindService(serviceConnectionBinder.getServiceConnection());
                         serviceConnectionBinder.getMusicService().removeNotification();
                         stopService(serviceIntent);
+                        if (musiPlayerHelper.mediaPlayer.isPlaying())
                         intent.putExtra("shouldBind",true);
                     }
                     startActivity(intent);

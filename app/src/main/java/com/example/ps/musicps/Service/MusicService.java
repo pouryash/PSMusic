@@ -103,7 +103,18 @@ public class MusicService extends Service implements MusiPlayerHelper.onMediaPla
 
     public void setUpCallback(Callbacks callback) {
         this.callbacks = callback;
-
+//        if (callbacks.getClass().equals(SearchActivity.class)) {
+//            intentContent = new Intent(this, SearchActivity.class);
+//            intentContent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+//                    | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//        } else {
+//            intentContent = new Intent(this, ListActivity.class);
+//            intentContent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+//                    | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//        }
+//        contentPendingIntent = PendingIntent.getService(this, 0, intentContent, PendingIntent.FLAG_UPDATE_CURRENT);
+//        notification.setContentIntent(contentPendingIntent);
+//        notificationManager.notify(NOTIFICATION_ID, notification.build());
     }
 
     public void setUpObserver() {
@@ -224,24 +235,6 @@ public class MusicService extends Service implements MusiPlayerHelper.onMediaPla
 
                     notificationManager.notify(NOTIFICATION_ID, notification.build());
                     break;
-                case ACTION_CONTENT:
-
-                    if (callbacks.getClass().equals(SearchActivity.class)) {
-                        intentContent = new Intent(this, SearchActivity.class);
-                        intentContent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-                                | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    } else {
-                        intentContent = new Intent(this, ListActivity.class);
-                        intentContent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-                                | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    }
-                   PendingIntent contentPendingIntent = PendingIntent.getService(this, 0, intentContent, 0);
-                    try {
-                        contentPendingIntent.send(this, 0, intentContent);
-                    } catch (PendingIntent.CanceledException e) {
-                        e.printStackTrace();
-                    }
-                    break;
 
                 default:
 
@@ -257,9 +250,11 @@ public class MusicService extends Service implements MusiPlayerHelper.onMediaPla
                     rewindIntent.setAction(ACTION_PREVIOUS);
                     PendingIntent previousPendingIntent = PendingIntent.getService(this, 0, rewindIntent, 0);
 
-                    intentContent = new Intent(this, MusicService.class);
-                    intentContent.setAction(ACTION_CONTENT);
-                    contentPendingIntent = PendingIntent.getService(this, 0, intentContent, 0);
+                    intentContent = new Intent(this, ListActivity.class);
+                    intentContent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+                            | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    int requestID = (int) System.currentTimeMillis();
+                    contentPendingIntent = PendingIntent.getService(this, requestID, intentContent, PendingIntent.FLAG_UPDATE_CURRENT);
 
 
                     notificationManager = NotificationManagerCompat.from(getApplicationContext());
