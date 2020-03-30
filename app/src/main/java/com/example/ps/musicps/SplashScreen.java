@@ -14,6 +14,8 @@ import com.example.ps.musicps.databinding.ActivitySplashScreenBinding;
 public class SplashScreen extends AppCompatActivity {
 
     ActivitySplashScreenBinding binding;
+    boolean shouldLaunch = true;
+    boolean isTimerFinished = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,14 +27,33 @@ public class SplashScreen extends AppCompatActivity {
         setup();
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        shouldLaunch = false;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        shouldLaunch = true;
+        if (isTimerFinished) {
+            startActivity(new Intent(SplashScreen.this, ListActivity.class));
+            SplashScreen.this.finish();
+        }
+    }
+
     private void setup() {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                startActivity(new Intent(SplashScreen.this, ListActivity.class));
-
+                if (shouldLaunch) {
+                    startActivity(new Intent(SplashScreen.this, ListActivity.class));
+                    SplashScreen.this.finish();
+                }
+                isTimerFinished = true;
             }
-        },3000);
+        }, 3000);
     }
 
     private void initialize() {

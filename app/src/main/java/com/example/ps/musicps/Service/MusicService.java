@@ -251,10 +251,9 @@ public class MusicService extends Service implements MusiPlayerHelper.onMediaPla
                     PendingIntent previousPendingIntent = PendingIntent.getService(this, 0, rewindIntent, 0);
 
                     intentContent = new Intent(this, ListActivity.class);
-                    intentContent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-                            | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    int requestID = (int) System.currentTimeMillis();
-                    contentPendingIntent = PendingIntent.getService(this, requestID, intentContent, PendingIntent.FLAG_UPDATE_CURRENT);
+//                    intentContent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+//                            | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    contentPendingIntent = PendingIntent.getService(this, 0, intentContent, PendingIntent.FLAG_ONE_SHOT);
 
 
                     notificationManager = NotificationManagerCompat.from(getApplicationContext());
@@ -296,7 +295,6 @@ public class MusicService extends Service implements MusiPlayerHelper.onMediaPla
 
 
                     notification = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL)
-                            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                             .setSmallIcon(R.drawable.icon1)
                             .addAction(android.R.drawable.ic_media_previous, "Previous", previousPendingIntent)
                             .addAction(playPauseAction[0])
@@ -309,6 +307,7 @@ public class MusicService extends Service implements MusiPlayerHelper.onMediaPla
                             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                             .setOngoing(false)
                             .setShowWhen(false)
+                            .setAutoCancel(true)
                             .setContentIntent(contentPendingIntent)
                             .setLargeIcon(musicAlbum);
 
@@ -388,9 +387,7 @@ public class MusicService extends Service implements MusiPlayerHelper.onMediaPla
             playBackStateChanged();
         }
 
-
     }
-
 
     @Override
     public void onDestroy() {

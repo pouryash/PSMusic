@@ -73,6 +73,7 @@ public class AudioFocusControler implements AudioManager.OnAudioFocusChangeListe
                 Log.e(TAG, "AUDIOFOCUS_LOSS");
                 break;
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
+                onAudioFocusChange.onFocusLoss();
                 Log.e(TAG, "AUDIOFOCUS_LOSS_TRANSIENT");
                 break;
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
