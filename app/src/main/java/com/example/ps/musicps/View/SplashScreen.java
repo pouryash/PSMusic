@@ -1,4 +1,4 @@
-package com.example.ps.musicps;
+package com.example.ps.musicps.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -8,7 +8,7 @@ import android.os.Handler;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 
-import com.example.ps.musicps.View.ListActivity;
+import com.example.ps.musicps.R;
 import com.example.ps.musicps.databinding.ActivitySplashScreenBinding;
 
 public class SplashScreen extends AppCompatActivity {

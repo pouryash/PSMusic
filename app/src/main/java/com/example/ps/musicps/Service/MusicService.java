@@ -1,7 +1,6 @@
 package com.example.ps.musicps.Service;
 
 import android.app.Activity;
-import android.app.ListActivity;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -9,7 +8,6 @@ import android.app.Service;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.MediaMetadata;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.IBinder;
@@ -23,13 +21,13 @@ import androidx.core.app.NotificationManagerCompat;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
 
-import com.example.ps.musicps.Commen.AudioFocusControler;
 import com.example.ps.musicps.Commen.Commen;
 import com.example.ps.musicps.Commen.MyApplication;
 import com.example.ps.musicps.Commen.SongSharedPrefrenceManager;
 import com.example.ps.musicps.Helper.MusiPlayerHelper;
 import com.example.ps.musicps.Model.Song;
 import com.example.ps.musicps.R;
+import com.example.ps.musicps.View.ListActivity;
 import com.example.ps.musicps.View.SearchActivity;
 
 
@@ -103,18 +101,16 @@ public class MusicService extends Service implements MusiPlayerHelper.onMediaPla
 
     public void setUpCallback(Callbacks callback) {
         this.callbacks = callback;
-//        if (callbacks.getClass().equals(SearchActivity.class)) {
-//            intentContent = new Intent(this, SearchActivity.class);
-//            intentContent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-//                    | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//        } else {
-//            intentContent = new Intent(this, ListActivity.class);
-//            intentContent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-//                    | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//        }
-//        contentPendingIntent = PendingIntent.getService(this, 0, intentContent, PendingIntent.FLAG_UPDATE_CURRENT);
-//        notification.setContentIntent(contentPendingIntent);
-//        notificationManager.notify(NOTIFICATION_ID, notification.build());
+        if (callbacks.getClass().equals(SearchActivity.class)) {
+            intentContent = new Intent(this, SearchActivity.class);
+            intentContent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        } else {
+            intentContent = new Intent(this, ListActivity.class);
+            intentContent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        }
+        contentPendingIntent = PendingIntent.getActivity(this, 0, intentContent, PendingIntent.FLAG_UPDATE_CURRENT);
+        notification.setContentIntent(contentPendingIntent);
+        notificationManager.notify(NOTIFICATION_ID, notification.build());
     }
 
     public void setUpObserver() {
@@ -251,10 +247,8 @@ public class MusicService extends Service implements MusiPlayerHelper.onMediaPla
                     PendingIntent previousPendingIntent = PendingIntent.getService(this, 0, rewindIntent, 0);
 
                     intentContent = new Intent(this, ListActivity.class);
-//                    intentContent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-//                            | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    contentPendingIntent = PendingIntent.getService(this, 0, intentContent, PendingIntent.FLAG_ONE_SHOT);
-
+                    intentContent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                    contentPendingIntent = PendingIntent.getActivity(this, 0, intentContent, 0);
 
                     notificationManager = NotificationManagerCompat.from(getApplicationContext());
 

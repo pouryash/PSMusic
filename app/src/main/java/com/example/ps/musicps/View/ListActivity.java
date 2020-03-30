@@ -110,6 +110,7 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
                 .build();
         component.inject(this);
 
+
         binding.setSong(songViewModel);
         songInfoBinding = SongInfoDialogBinding.inflate(getLayoutInflater());
         startService(new Intent(getBaseContext(), OnAppCleared.class));
@@ -172,7 +173,7 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
             serviceConnectionBinder.getMusicService().setUpCallback(ListActivity.this);
 
         if (serviceConnectionBinder != null && serviceConnectionBinder.isServiceConnect && musiPlayerHelper.mediaPlayer != null
-        && !serviceConnectionBinder.getMusicService().isBind && musiPlayerHelper.mediaPlayer.isPlaying()) {
+                && !serviceConnectionBinder.getMusicService().isBind && musiPlayerHelper.mediaPlayer.isPlaying()) {
 
             serviceIntent = new Intent(ListActivity.this, MusicService.class);
             startService(serviceIntent);
@@ -740,10 +741,10 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
                         serviceConnectionBinder.getMusicService().removeNotification();
                         stopService(serviceIntent);
                         if (musiPlayerHelper.mediaPlayer.isPlaying())
-                        intent.putExtra("shouldBind",true);
+                            intent.putExtra("shouldBind", true);
                     }
                     startActivity(intent);
-                }else
+                } else
                     Toast.makeText(getApplicationContext(), "there is no song to search!!", Toast.LENGTH_LONG).show();
 
                 break;
@@ -914,7 +915,7 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
             serviceIntent = new Intent(ListActivity.this, MusicService.class);
             startService(serviceIntent);
             bindService(serviceIntent, serviceConnectionBinder.getServiceConnection(), Context.BIND_AUTO_CREATE);
-        }else if (serviceConnectionBinder.isServiceConnect && !sharedPrefrenceManager.getFirstIn() && !serviceConnectionBinder.getMusicService().isBind){
+        } else if (serviceConnectionBinder.isServiceConnect && !sharedPrefrenceManager.getFirstIn() && !serviceConnectionBinder.getMusicService().isBind) {
             serviceIntent = new Intent(ListActivity.this, MusicService.class);
             startService(serviceIntent);
             bindService(serviceIntent, serviceConnectionBinder.getServiceConnection(), Context.BIND_AUTO_CREATE);
@@ -984,3 +985,4 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
         binding.panel.ivPlayPauseCollpase.performClick();
     }
 }
+
