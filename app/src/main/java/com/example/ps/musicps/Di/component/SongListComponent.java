@@ -11,7 +11,6 @@ import dagger.Component;
 @ActivityScop
 public interface SongListComponent {
 
-
     void inject(ListActivity listActivity);
 
 }

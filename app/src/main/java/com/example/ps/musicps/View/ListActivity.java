@@ -806,11 +806,7 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
             binding.slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
 
             if (!musiPlayerHelper.mediaPlayer.isPlaying()) {
-                musiPlayerHelper.FadeIn(2);
-
-                binding.panel.ivPlayPauseCollpase.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_pause_24px, null));
-                binding.panel.ivPlayPayseExpand.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_pause, null));
-                seekBarProgressUpdater();
+                binding.panel.ivPlayPauseCollpase.performClick();
             }
 
         } else {
