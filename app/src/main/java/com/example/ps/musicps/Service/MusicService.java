@@ -163,7 +163,11 @@ public class MusicService extends Service implements MusiPlayerHelper.onMediaPla
 
     private void onContentChanged() {
 
-        musicAlbum = Commen.decodeUriToBitmap(getApplicationContext(), Uri.parse(sharedPrefrenceManager.getSong().getSongImageUri()));
+        if(sharedPrefrenceManager.getSong().getSongImageUri() != null)
+            musicAlbum = Commen.decodeUriToBitmap(getApplicationContext(), Uri.parse(sharedPrefrenceManager.getSong().getSongImageUri()));
+        else
+            musicAlbum = null;
+
         if (musicAlbum == null)
             musicAlbum = BitmapFactory.decodeResource(getResources(), R.drawable.icon1);
         notification.setLargeIcon(musicAlbum);

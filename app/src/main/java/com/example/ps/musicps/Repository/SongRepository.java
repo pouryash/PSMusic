@@ -188,6 +188,9 @@ public class SongRepository {
     public Song getSong(String id) {
         return dbRepository.getSong(id);
     }
+    public Song getSongByPath(String path) {
+        return dbRepository.getSongByPath(path);
+    }
 
     public Song getMinSong(String id) {
         return dbRepository.getMinSong(id);
@@ -195,6 +198,10 @@ public class SongRepository {
 
     public Song getMaxSong(String id) {
         return dbRepository.getMaxSong(id);
+    }
+
+    public boolean isSongExist(String path) {
+        return dbRepository.isSongExist(path);
     }
 
     public int getSize(){

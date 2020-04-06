@@ -14,6 +14,7 @@ public class MyApplication extends Application {
     private AppComponent component;
     private static AudioManager am;
     static Context context;
+    public static boolean isExternalSource = false;
 
     public void onCreate() {
         super.onCreate();

@@ -42,11 +42,13 @@ public class OnAppCleared extends Service {
         if (musiPlayerHelper.getTimer() != null) {
             musiPlayerHelper.getTimer().purge();
             musiPlayerHelper.getTimer().cancel();
+            musiPlayerHelper.setTimer(null);
         }
         if (musiPlayerHelper.mediaPlayer != null) {
             musiPlayerHelper.mediaPlayer.release();
             musiPlayerHelper.mediaPlayer = null;
         }
+        MyApplication.isExternalSource = false;
         stopSelf();
     }
 }

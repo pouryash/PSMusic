@@ -65,7 +65,6 @@ public class SongViewModel extends BaseObservable {
     private SongViewModelComponent component;
     private SongSharedPrefrenceManager sharedPrefrenceManager;
     private boolean canClick = true;
-    private boolean isDBNull = false;
 
     @Inject
     public SongViewModel(Context context) {
@@ -180,7 +179,7 @@ public class SongViewModel extends BaseObservable {
                 }
                 mutableSongViewModelList.postValue(songViewModels);
             });
-        }else updateSongs();
+        } else updateSongs();
     }
 
     public void updateSongs() {
@@ -203,7 +202,7 @@ public class SongViewModel extends BaseObservable {
 
     public void getNextSongById() {
 
-        if (canClick) {
+        if (canClick && !MyApplication.isExternalSource) {
             int songId = sharedPrefrenceManager.getSong().getId() + 1;
 
             if (songId - 1 == mutableSongViewModelList.getValue().get(mutableSongViewModelList.getValue().size() - 1).getId()) {
@@ -217,6 +216,8 @@ public class SongViewModel extends BaseObservable {
             }
             songMutableLiveData.postValue(song);
 
+        } else if (MyApplication.isExternalSource) {
+            songMutableLiveData.postValue(null);
         }
 
         setCanClick(true);
@@ -224,7 +225,7 @@ public class SongViewModel extends BaseObservable {
 
     public void getPrevSongById() {
 
-        if (canClick) {
+        if (canClick && !MyApplication.isExternalSource) {
             int songId = sharedPrefrenceManager.getSong().getId() - 1;
 
             if (songId + 1 == mutableSongViewModelList.getValue().get(0).getId()) {
@@ -240,8 +241,18 @@ public class SongViewModel extends BaseObservable {
 
             songMutableLiveData.postValue(song);
 
+        } else if (MyApplication.isExternalSource) {
+            songMutableLiveData.postValue(null);
         }
         setCanClick(true);
+    }
+
+    public boolean isSongExist(String path) {
+        return songRepository.isSongExist(path);
+    }
+
+    public Song getSongByPath(String path) {
+        return songRepository.getSongByPath(path);
     }
 
     public boolean isCanClick() {

@@ -197,6 +197,11 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
             binding.panel.ivPlayPayseExpand.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_pause, null));
             seekBarProgressUpdater();
         }
+
+        if (MyApplication.isExternalSource) {
+            binding.panel.ivRepeatExpand.setEnabled(false);
+            binding.panel.ivRepeatExpand.setImageAlpha(75);
+        }
     }
 
     public void longTouchBackward() {
@@ -544,7 +549,10 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
         songObserver = new Observer<Song>() {
             @Override
             public void onChanged(Song song) {
-                onSongClicked(song);
+                if (song != null) {
+                    onSongClicked(song);
+                } else
+                    musiPlayerHelper.mediaPlayer.seekTo(0);
             }
         };
 
@@ -727,6 +735,12 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
     @Override
     public void onSongClicked(Song song) {
 
+        if (!binding.panel.ivRepeatExpand.isEnabled()) {
+            binding.panel.ivRepeatExpand.setEnabled(true);
+            binding.panel.ivRepeatExpand.setImageAlpha(255);
+            MyApplication.isExternalSource = false;
+        }
+
         if (serviceConnectionBinder.isServiceConnect && serviceConnectionBinder.getMusicService().isBind && musiPlayerHelper.mediaPlayer != null) {
             serviceConnectionBinder.getMusicService().stopSelf();
             unbindService(serviceConnectionBinder.getServiceConnection());
@@ -817,11 +831,11 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
         if (iscompleteFromChangeSong)
             iscompleteFromChangeSong = false;
 
-        if (!serviceConnectionBinder.isServiceConnect && !isFirstIn){
+        if (!serviceConnectionBinder.isServiceConnect && !isFirstIn) {
             serviceIntent = new Intent(SearchActivity.this, MusicService.class);
             startService(serviceIntent);
             bindService(serviceIntent, serviceConnectionBinder.getServiceConnection(), Context.BIND_AUTO_CREATE);
-        }else if (serviceConnectionBinder.getMusicService() != null && !serviceConnectionBinder.getMusicService().isBind && musiPlayerHelper.mediaPlayer != null) {
+        } else if (serviceConnectionBinder.getMusicService() != null && !serviceConnectionBinder.getMusicService().isBind && musiPlayerHelper.mediaPlayer != null) {
             serviceIntent = new Intent(SearchActivity.this, MusicService.class);
             startService(serviceIntent);
             bindService(serviceIntent, serviceConnectionBinder.getServiceConnection(), Context.BIND_AUTO_CREATE);
