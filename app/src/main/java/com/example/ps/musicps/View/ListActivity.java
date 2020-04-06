@@ -170,9 +170,6 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
                 }
             }
 
-            if (binding.slidingPanel.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED)
-                binding.panel.rlSlidePanelTop.setAlpha(0);
-
             song = songViewModel.getSongByPath(path);
 
             if (song == null) {
@@ -275,8 +272,10 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
                 setupPanel(sharedPrefrenceManager.getSong());
         }
 
-        if (binding.slidingPanel.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED)
+        if (binding.slidingPanel.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED) {
             binding.panel.rlSlidePanelTop.setAlpha(0);
+            binding.panel.ivPlayPauseCollpase.setClickable(false);
+        }
 
         setUpExternalSong();
 
@@ -299,8 +298,13 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
 
     private void setupPanel(Song song) {
 
-        if (song.getId() == songPanelViewModel.getId())
+        if (song.getId() == songPanelViewModel.getId() && song.getTrackFile().equals(songPanelViewModel.getPath()))
             return;
+
+        if (binding.slidingPanel.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED) {
+            binding.panel.rlSlidePanelTop.setAlpha(0);
+            binding.panel.ivPlayPauseCollpase.setClickable(false);
+        }
 
         if (!songViewModel.isSongExist(song.getTrackFile()) && binding.panel.ivRepeatExpand.isEnabled()) {
             binding.panel.ivRepeatExpand.setEnabled(false);
@@ -398,9 +402,11 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
                 switch (newState) {
                     case EXPANDED:
                         binding.panel.rlSlidePanelTop.setClickable(false);
+                        binding.panel.ivPlayPauseCollpase.setClickable(false);
                         break;
                     case COLLAPSED:
                         binding.panel.rlSlidePanelTop.setClickable(true);
+                        binding.panel.ivPlayPauseCollpase.setClickable(true);
                         break;
                     case HIDDEN:
                         break;
@@ -953,15 +959,17 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
 
         musiPlayerHelper.setupMediaPLayer(ListActivity.this, song, ListActivity.this);
         sharedPrefrenceManager.saveSong(song);
-        if (binding.slidingPanel.getPanelState() != SlidingUpPanelLayout.PanelState.EXPANDED)
+        if (binding.slidingPanel.getPanelState() != SlidingUpPanelLayout.PanelState.EXPANDED) {
             binding.slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
+            binding.panel.rlSlidePanelTop.setAlpha(0);
+            binding.panel.ivPlayPauseCollpase.setClickable(false);
+        }
         musiPlayerHelper.FadeIn(2);
         seekBarProgressUpdater();
         binding.panel.ivPlayPauseCollpase.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_pause_24px, null));
         binding.panel.ivPlayPayseExpand.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_pause, null));
 
     }
-
 
     @Override
     public void onSongRemoved(int id, int size) {
