@@ -59,6 +59,22 @@ public class Commen {
         return bitmap;
     }
 
+    public static Uri getImageByteUri(byte[] bytes,int length, Context context){
+        Uri albumUri = Uri.EMPTY;
+        if (bytes != null) {
+
+            Bitmap songBitmapAlbum = BitmapFactory
+                    .decodeByteArray(bytes, 0, length);
+
+            String paths = MediaStore.Images.Media.insertImage
+                    (context.getContentResolver(), songBitmapAlbum, "Title", null);
+            if (paths != null) {
+                albumUri = Uri.parse(paths);
+            }
+        }
+        return albumUri;
+    }
+
     public static String getRealPathFromURI(Context context, Uri contentUri) {
         Cursor cursor = null;
 

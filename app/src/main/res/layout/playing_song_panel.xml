@@ -228,10 +228,44 @@
 
 
         <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_above="@id/rl_seekbar_expand">
+
+            <ImageView
+                android:id="@+id/iv_Share_expand"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/standardMargin"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                android:layout_toRightOf="@id/iv_Faverate_expand"
+                android:layout_centerVertical="true"
+                android:padding="@dimen/smallMargin"
+                android:tint="@color/colorIconsMain"
+                app:srcCompat="@drawable/ic_share_black_24dp" />
+
+            <ImageView
+                android:id="@+id/iv_Faverate_expand"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/standardMargin"
+                android:clickable="true"
+                android:focusable="true"
+                android:layout_centerVertical="true"
+                android:padding="@dimen/smallMargin"
+                android:tint="@color/colorIconsMain"
+                app:srcCompat="@drawable/ic_favorite_border_black_24dp" />
+
+
+        </RelativeLayout>
+
+        <RelativeLayout
             android:id="@+id/rl_seekbar_expand"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/standardMargin"
             android:layout_above="@+id/rl_mediaController">
 
 
@@ -284,6 +318,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true">
+
 
             <ImageView
                 android:id="@+id/iv_playPayse_expand"
@@ -339,6 +374,7 @@
                 android:padding="@dimen/smallMargin"
                 android:tint="@color/colorIconsMain"
                 app:srcCompat="@drawable/ic_repeat_one_24px" />
+
 
             <ImageView
                 android:id="@+id/iv_forward_expand"

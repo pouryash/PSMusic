@@ -3,6 +3,7 @@ package com.example.ps.musicps.View;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.content.res.AppCompatResources;
+import androidx.core.content.FileProvider;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.lifecycle.Observer;
 
@@ -20,6 +21,7 @@ import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.view.Gravity;
@@ -121,7 +123,6 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
                 .build();
         component.inject(this);
 
-
         binding.setSong(songViewModel);
         songInfoBinding = SongInfoDialogBinding.inflate(getLayoutInflater());
         startService(new Intent(getBaseContext(), OnAppCleared.class));
@@ -136,7 +137,6 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
     private Song getExtrnalSong() {
         Song song = new Song();
         String path;
-        byte[] art;
         if (Intent.ACTION_VIEW.equals(getIntent().getAction()) && getIntent().getData() != null) {
             MyApplication.isExternalSource = true;
 
@@ -154,21 +154,7 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
             File filePath = new File(path);
             metaRetriver.setDataSource(path);
 
-            art = metaRetriver.getEmbeddedPicture();
-
-            Uri albumUri = Uri.EMPTY;
-            art = metaRetriver.getEmbeddedPicture();
-            if (art != null) {
-
-                Bitmap songBitmapAlbum = BitmapFactory
-                        .decodeByteArray(art, 0, metaRetriver.getEmbeddedPicture().length);
-
-                String paths = MediaStore.Images.Media.insertImage
-                        (this.getContentResolver(), songBitmapAlbum, "Title", null);
-                if (paths != null) {
-                    albumUri = Uri.parse(paths);
-                }
-            }
+            Uri albumUri = Commen.getImageByteUri(metaRetriver.getEmbeddedPicture(), metaRetriver.getEmbeddedPicture().length, this);
 
             song = songViewModel.getSongByPath(path);
 
@@ -416,6 +402,16 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
 
                 }
             }
+        });
+
+        binding.panel.ivShareExpand.setOnClickListener(view -> {
+            File file = new File(songPanelViewModel.getPath());
+            Uri uri = FileProvider.getUriForFile(ListActivity.this, getApplicationContext().getPackageName()+".provider", file);
+            Intent share = new Intent(Intent.ACTION_SEND);
+            share.setType("audio/*");
+            share.putExtra(Intent.EXTRA_STREAM, uri);
+            share.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            startActivity(Intent.createChooser(share, "Share Sound File"));
         });
 
         binding.panel.sbSoundPlaySong.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -770,6 +766,13 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
         bindService(serviceIntent, serviceConnectionBinder.getServiceConnection(), Context.BIND_AUTO_CREATE);
     }
 
+    private void stopService(){
+        serviceConnectionBinder.getMusicService().stopSelf();
+        unbindService(serviceConnectionBinder.getServiceConnection());
+        serviceConnectionBinder.getMusicService().removeNotification();
+        stopService(serviceIntent);
+    }
+
     @Override
     public void onBackPressed() {
         if (binding.slidingPanel.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED) {
@@ -841,10 +844,7 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
                 if (songViewModelList.size() != 0) {
                     Intent intent = new Intent(ListActivity.this, SearchActivity.class);
                     if (serviceConnectionBinder.isServiceConnect && serviceConnectionBinder.getMusicService().isBind && musiPlayerHelper.mediaPlayer != null) {
-                        serviceConnectionBinder.getMusicService().stopSelf();
-                        unbindService(serviceConnectionBinder.getServiceConnection());
-                        serviceConnectionBinder.getMusicService().removeNotification();
-                        stopService(serviceIntent);
+                        stopService();
                         if (musiPlayerHelper.mediaPlayer.isPlaying())
                             intent.putExtra("shouldBind", true);
                     }
@@ -895,10 +895,7 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
         }
 
         if (serviceConnectionBinder.isServiceConnect && serviceConnectionBinder.getMusicService().isBind && musiPlayerHelper.mediaPlayer != null) {
-            serviceConnectionBinder.getMusicService().stopSelf();
-            unbindService(serviceConnectionBinder.getServiceConnection());
-            serviceConnectionBinder.getMusicService().removeNotification();
-            stopService(serviceIntent);
+            stopService();
         }
 
         //update notification content (reset observer)
@@ -943,10 +940,7 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
         setupPanel(song);
 
         if (serviceConnectionBinder.isServiceConnect && serviceConnectionBinder.getMusicService().isBind && musiPlayerHelper.mediaPlayer != null) {
-            serviceConnectionBinder.getMusicService().stopSelf();
-            unbindService(serviceConnectionBinder.getServiceConnection());
-            serviceConnectionBinder.getMusicService().removeNotification();
-            stopService(serviceIntent);
+            stopService();
         }
 
         //update notification content (reset observer)
@@ -1019,10 +1013,7 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
         super.onDestroy();
 
         if (serviceConnectionBinder.isServiceConnect && serviceConnectionBinder.getMusicService().isBind && musiPlayerHelper.mediaPlayer != null) {
-            serviceConnectionBinder.getMusicService().stopSelf();
-            unbindService(serviceConnectionBinder.getServiceConnection());
-            serviceConnectionBinder.getMusicService().removeNotification();
-            stopService(serviceIntent);
+            stopService();
         }
 
         if (metaRetriver != null) {
@@ -1057,7 +1048,7 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
         if (iscompleteFromChangeSong)
             iscompleteFromChangeSong = false;
 
-        if ((!serviceConnectionBinder.isServiceConnect && (!sharedPrefrenceManager.getFirstIn() || MyApplication.isExternalSource))
+        if ((!serviceConnectionBinder.isServiceConnect && (!sharedPrefrenceManager.getFirstIn() || MyApplication.isExternalSource || musiPlayerHelper.mediaPlayer.isPlaying()))
         || (serviceConnectionBinder.isServiceConnect && !sharedPrefrenceManager.getFirstIn() && !serviceConnectionBinder.getMusicService().isBind)) {
             startService();
         }
