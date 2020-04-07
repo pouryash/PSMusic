@@ -251,11 +251,7 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
 
         if (serviceConnectionBinder != null && serviceConnectionBinder.isServiceConnect && musiPlayerHelper.mediaPlayer != null
                 && !serviceConnectionBinder.getMusicService().isBind && musiPlayerHelper.mediaPlayer.isPlaying()) {
-
-            serviceIntent = new Intent(ListActivity.this, MusicService.class);
-            startService(serviceIntent);
-            bindService(serviceIntent, serviceConnectionBinder.getServiceConnection(), Context.BIND_AUTO_CREATE);
-
+            startService();
         }
 
         if (musiPlayerHelper != null && musiPlayerHelper.mediaPlayer != null) {
@@ -283,16 +279,19 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
     }
 
     private void setUpExternalSong() {
-        Song tempSong = getExtrnalSong();
-        if (MyApplication.isExternalSource && (externalSong.getTrackFile() == null
-                || !externalSong.getTrackFile().equals(tempSong.getTrackFile()))) {
-            externalSong = tempSong;
-            initExternalSong(externalSong);
-        }
+        if (getIntent().getData() != null) {
+            Song tempSong = getExtrnalSong();
+            if (MyApplication.isExternalSource && (externalSong.getTrackFile() == null
+                    || !externalSong.getTrackFile().equals(tempSong.getTrackFile()))) {
+                externalSong = tempSong;
+                initExternalSong(externalSong);
+            }
 
-        if (!MyApplication.isExternalSource && !binding.panel.ivRepeatExpand.isEnabled()) {
-            binding.panel.ivRepeatExpand.setEnabled(true);
-            binding.panel.ivRepeatExpand.setImageAlpha(250);
+            if (!MyApplication.isExternalSource && !binding.panel.ivRepeatExpand.isEnabled()) {
+                binding.panel.ivRepeatExpand.setEnabled(true);
+                binding.panel.ivRepeatExpand.setImageAlpha(250);
+            }
+
         }
     }
 
@@ -653,9 +652,7 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
     private void serviceConnectionCheck() {
         if (!serviceConnectionBinder.isServiceConnect || (serviceConnectionBinder.isServiceConnect &&
                 serviceConnectionBinder.getMusicService() != null && !serviceConnectionBinder.getMusicService().isBind)) {
-            serviceIntent = new Intent(ListActivity.this, MusicService.class);
-            startService(serviceIntent);
-            bindService(serviceIntent, serviceConnectionBinder.getServiceConnection(), Context.BIND_AUTO_CREATE);
+            startService();
         } else {
             serviceConnectionBinder.getMusicService().onPlayPauseClicked();
         }
@@ -765,6 +762,12 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
         }
 
 
+    }
+
+    private void startService(){
+        serviceIntent = new Intent(ListActivity.this, MusicService.class);
+        startService(serviceIntent);
+        bindService(serviceIntent, serviceConnectionBinder.getServiceConnection(), Context.BIND_AUTO_CREATE);
     }
 
     @Override
@@ -1054,14 +1057,9 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
         if (iscompleteFromChangeSong)
             iscompleteFromChangeSong = false;
 
-        if (!serviceConnectionBinder.isServiceConnect && !sharedPrefrenceManager.getFirstIn()) {
-            serviceIntent = new Intent(ListActivity.this, MusicService.class);
-            startService(serviceIntent);
-            bindService(serviceIntent, serviceConnectionBinder.getServiceConnection(), Context.BIND_AUTO_CREATE);
-        } else if (serviceConnectionBinder.isServiceConnect && !sharedPrefrenceManager.getFirstIn() && !serviceConnectionBinder.getMusicService().isBind) {
-            serviceIntent = new Intent(ListActivity.this, MusicService.class);
-            startService(serviceIntent);
-            bindService(serviceIntent, serviceConnectionBinder.getServiceConnection(), Context.BIND_AUTO_CREATE);
+        if ((!serviceConnectionBinder.isServiceConnect && (!sharedPrefrenceManager.getFirstIn() || MyApplication.isExternalSource))
+        || (serviceConnectionBinder.isServiceConnect && !sharedPrefrenceManager.getFirstIn() && !serviceConnectionBinder.getMusicService().isBind)) {
+            startService();
         }
 
         if (sharedPrefrenceManager.getFirstIn()) {
