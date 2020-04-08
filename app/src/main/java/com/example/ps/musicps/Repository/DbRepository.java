@@ -37,6 +37,16 @@ public class DbRepository {
         return null;
     }
 
+    public LiveData<List<Song>> getFaverateSongs() {
+
+        try {
+            return new GetFaverateSongsAsyncTask().execute().get();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public boolean isSongExist(String path){
         if (songDao.getSong(path) != null){
             return true;
@@ -89,7 +99,10 @@ public class DbRepository {
     }
 
     public void updateSong(String location, int id) {
-        songDao.updateSong(location, id);
+        songDao.updateSongLocation(location, id);
+    }
+    public void updateFaverateSong(int faverate, int id) {
+        songDao.updateFaverateSong(faverate, id);
     }
 
     @SuppressLint("StaticFieldLeak")
@@ -97,6 +110,14 @@ public class DbRepository {
         @Override
         protected LiveData<List<Song>> doInBackground(Void... voids) {
             return songDao.getSongs();
+        }
+    }
+
+    @SuppressLint("StaticFieldLeak")
+    private class GetFaverateSongsAsyncTask extends AsyncTask<Void, Void, LiveData<List<Song>>> {
+        @Override
+        protected LiveData<List<Song>> doInBackground(Void... voids) {
+            return songDao.getFaverateSong();
         }
     }
 

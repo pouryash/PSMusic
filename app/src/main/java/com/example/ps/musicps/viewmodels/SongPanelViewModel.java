@@ -41,6 +41,7 @@ public class SongPanelViewModel extends BaseObservable {
     private int audioManagerMax;
     private int audioManagerProgress;
     private boolean isSoundOn = true;
+    private boolean faverate = false;
 
     public SongPanelViewModel(Song song) {
         this.songName = song.getSongName();
@@ -140,6 +141,16 @@ public class SongPanelViewModel extends BaseObservable {
     public void setImageUri(String imageUri) {
         this.imageUri = imageUri;
         notifyPropertyChanged(BR.imageUri);
+    }
+
+    @Bindable
+    public boolean isFaverate() {
+        return faverate;
+    }
+
+    public void setFaverate(boolean faverate) {
+        this.faverate = faverate;
+        notifyPropertyChanged(BR.faverate);
     }
 
     @Bindable

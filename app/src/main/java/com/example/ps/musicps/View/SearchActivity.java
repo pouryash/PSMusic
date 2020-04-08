@@ -3,6 +3,7 @@ package com.example.ps.musicps.View;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.content.res.AppCompatResources;
+import androidx.core.content.FileProvider;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.lifecycle.Observer;
 
@@ -13,6 +14,7 @@ import android.content.res.Configuration;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -49,8 +51,11 @@ import com.example.ps.musicps.viewmodels.SongInfoViewModel;
 import com.example.ps.musicps.viewmodels.SongPanelViewModel;
 import com.example.ps.musicps.viewmodels.SongViewModel;
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.like.LikeButton;
+import com.like.OnLikeListener;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -201,6 +206,8 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
         if (MyApplication.isExternalSource) {
             binding.panel.ivRepeatExpand.setEnabled(false);
             binding.panel.ivRepeatExpand.setImageAlpha(75);
+            binding.panel.ivFaverateExpand.setEnabled(false);
+            binding.panel.ivFaverateExpand.setAlpha(0.70f);
         }
     }
 
@@ -334,6 +341,33 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
             @Override
             public void afterTextChanged(Editable editable) {
 
+            }
+        });
+
+        binding.panel.ivFaverateExpand.setOnLikeListener(new OnLikeListener() {
+            @Override
+            public void liked(LikeButton likeButton) {
+                songViewModel.updateFaverateSong(1, songPanelViewModel.getId());
+            }
+
+            @Override
+            public void unLiked(LikeButton likeButton) {
+                songViewModel.updateFaverateSong(0, songPanelViewModel.getId());
+            }
+        });
+
+        binding.panel.ivShareExpand.setOnClickListener(view -> {
+            try {
+                File file = new File(songPanelViewModel.getPath());
+                Uri uri = FileProvider.getUriForFile(SearchActivity.this, getApplicationContext().getPackageName() + ".provider", file);
+                Intent share = new Intent(Intent.ACTION_SEND);
+                share.setType("audio/*");
+                share.putExtra(Intent.EXTRA_STREAM, uri);
+                share.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                startActivity(Intent.createChooser(share, "Share Sound File"));
+            }catch (Exception e){
+                e.printStackTrace();
+                Toast.makeText(SearchActivity.this, "cant share this file, something wrong", Toast.LENGTH_LONG).show();
             }
         });
 
@@ -550,7 +584,7 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
             @Override
             public void onChanged(Song song) {
                 if (song != null) {
-                    onSongClicked(song);
+                    onSongClicked(song, false);
                 } else
                     musiPlayerHelper.mediaPlayer.seekTo(0);
             }
@@ -733,11 +767,13 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
     }
 
     @Override
-    public void onSongClicked(Song song) {
+    public void onSongClicked(Song song, boolean shouldExpand) {
 
         if (!binding.panel.ivRepeatExpand.isEnabled()) {
             binding.panel.ivRepeatExpand.setEnabled(true);
             binding.panel.ivRepeatExpand.setImageAlpha(255);
+            binding.panel.ivFaverateExpand.setEnabled(true);
+            binding.panel.ivFaverateExpand.setAlpha(1);
             MyApplication.isExternalSource = false;
         }
 
@@ -869,7 +905,7 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
                         Collections.shuffle(shuffleList);
                         curentShuffleSong = 0;
                     }
-                    onSongClicked(shuffleList.get(curentShuffleSong).getViewModelSong());
+                    onSongClicked(shuffleList.get(curentShuffleSong).getViewModelSong(), false);
 
                     break;
             }

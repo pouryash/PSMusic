@@ -184,7 +184,8 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongVH> {
                     song.setArtistName(viewModelList.get(position).getArtistName());
                     song.setAlbumName(viewModelList.get(position).getAlbumName());
                     song.setSongName(viewModelList.get(position).getSongName());
-                    onSongAdapter.onSongClicked(song);
+                    song.setIsFaverate(viewModelList.get(position).getFaverate());
+                    onSongAdapter.onSongClicked(song, true);
                 }
             });
         }

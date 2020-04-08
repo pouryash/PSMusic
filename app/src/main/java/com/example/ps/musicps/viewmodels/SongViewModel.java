@@ -65,6 +65,7 @@ public class SongViewModel extends BaseObservable {
     private SongViewModelComponent component;
     private SongSharedPrefrenceManager sharedPrefrenceManager;
     private boolean canClick = true;
+    private int faverate;
 
     @Inject
     public SongViewModel(Context context) {
@@ -86,6 +87,7 @@ public class SongViewModel extends BaseObservable {
         this.albumName = song.getAlbumName();
         this.duration = song.getDuration();
         this.songImageUri = song.getSongImageUri();
+        this.faverate = song.getIsFaverate();
         contentID = song.getContentID();
     }
 
@@ -182,6 +184,17 @@ public class SongViewModel extends BaseObservable {
         } else updateSongs();
     }
 
+    public void getFaverateSongs() {
+        songRepository.getFaverateSongs().observe((LifecycleOwner) context, songsViewModel -> {
+
+            List<SongViewModel> songViewModels = new ArrayList<>();
+            for (int i = 0; i < songsViewModel.size(); i++) {
+                songViewModels.add(new SongViewModel(songsViewModel.get(i)));
+            }
+            mutableSongViewModelList.postValue(songViewModels);
+        });
+    }
+
     public void updateSongs() {
         songRepository.updateSongs().observe((LifecycleOwner) context, songViewModels -> {
             mutableSongViewModelList.postValue(songViewModels);
@@ -189,6 +202,9 @@ public class SongViewModel extends BaseObservable {
 
     }
 
+    public void updateFaverateSong(int faverate, int id) {
+        songRepository.updateFaverateSong(faverate, id);
+    }
 
     @Bindable
     public String getFilterText() {
@@ -245,6 +261,14 @@ public class SongViewModel extends BaseObservable {
             songMutableLiveData.postValue(null);
         }
         setCanClick(true);
+    }
+
+    public int getFaverate() {
+        return faverate;
+    }
+
+    public void setFaverate(int faverate) {
+        this.faverate = faverate;
     }
 
     public boolean isSongExist(String path) {

@@ -87,5 +87,7 @@ dependencies {
     implementation 'com.sothree.slidinguppanel:library:3.4.0'
     //Mockito
     testImplementation 'org.mockito:mockito-core:2.28.2'
+    //Like Animation
+    implementation 'com.github.jd-alexander:LikeButton:0.2.3'
 
 }

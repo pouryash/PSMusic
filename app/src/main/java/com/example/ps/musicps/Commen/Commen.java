@@ -14,11 +14,14 @@ import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.provider.Settings;
+
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.graphics.drawable.DrawableCompat;
+
 import com.example.ps.musicps.Model.Song;
 
 import java.io.File;
@@ -44,6 +47,7 @@ public class Commen {
         return instance;
     }
 
+
     public static Bitmap getBitmapFromVectorDrawable(Context context, Drawable drawableId) {
         Drawable drawable = drawableId;
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
@@ -59,7 +63,7 @@ public class Commen {
         return bitmap;
     }
 
-    public static Uri getImageByteUri(byte[] bytes,int length, Context context){
+    public static Uri getImageByteUri(byte[] bytes, int length, Context context) {
         Uri albumUri = Uri.EMPTY;
         if (bytes != null) {
 
@@ -109,6 +113,7 @@ public class Commen {
         }
         return getBitmap;
     }
+
     static {
         instance = new Commen();
     }

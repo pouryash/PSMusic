@@ -81,6 +81,7 @@ public class SongSharedPrefrenceManager {
                 else
                     jsonObject.put("path", "");
 
+                jsonObject.put("isFaverate", song.getIsFaverate());
                 jsonObject.put("contentId", song.getContentID());
 
                 editor.putString(KEY_SONG_MODEL, jsonObject.toString());
@@ -113,6 +114,7 @@ public class SongSharedPrefrenceManager {
             model.setSongImageUri(jsonObject.getString("imgUrl"));
             model.setContentID(Integer.parseInt(jsonObject.getString("contentId")));
             model.setAlbumName(jsonObject.getString("albumName"));
+            model.setIsFaverate(Integer.parseInt(jsonObject.getString("isFaverate")));
         } catch (JSONException e) {
             e.printStackTrace();
         }

@@ -31,6 +31,8 @@ public class Song implements Parcelable {
     private String songImageUri;
     @ColumnInfo(name = "ContentId")
     private int ContentID;
+    @ColumnInfo(name = "isFaverate")
+    private int isFaverate;
 
     public int getContentID() {
         return ContentID;
@@ -51,6 +53,14 @@ public class Song implements Parcelable {
             return new Song[size];
         }
     };
+
+    public int getIsFaverate() {
+        return isFaverate;
+    }
+
+    public void setIsFaverate(int isFaverate) {
+        this.isFaverate = isFaverate;
+    }
 
     public int getId() {
         return id;

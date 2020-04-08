@@ -181,6 +181,57 @@ public class SongRepository {
 
     }
 
+    public LiveData<List<Song>> getFaverateSongs() {
+        List<Song> list = new ArrayList<>();
+        MutableLiveData<List<Song>> modelMutableLiveData = new MutableLiveData<>();
+
+        dbRepository.getFaverateSongs().observeForever(songs -> {
+            Observable.fromArray(songs)
+                    .flatMapIterable(songs1 -> songs1)
+                    .map(song -> {
+                        File songFile = new File(song.getTrackFile());
+                        if (songFile.exists()){
+                            return song;
+                        }else {
+                            dbRepository.deleteSong(song);
+                            return new Song();
+                        }
+
+                    })
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Observer<Song>() {
+                        @Override
+                        public void onSubscribe(Disposable d) {
+
+                        }
+
+                        @Override
+                        public void onNext(Song song) {
+                            list.add(song);
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+
+                        }
+
+                        @Override
+                        public void onComplete() {
+                            modelMutableLiveData.postValue(list);
+                        }
+                    });
+
+        });
+
+        return modelMutableLiveData;
+
+    }
+
+    public void updateFaverateSong(int faverate, int id){
+        dbRepository.updateFaverateSong(faverate, id);
+    }
+
     public void deleteSong(int id) {
         dbRepository.deleteById(id);
     }

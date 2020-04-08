@@ -215,7 +215,8 @@ public class SongSearchAdapter extends RecyclerView.Adapter<SongSearchAdapter.So
                     song.setArtistName(songListFiltered.get(position).getArtistName());
                     song.setAlbumName(songListFiltered.get(position).getAlbumName());
                     song.setSongName(songListFiltered.get(position).getSongName());
-                    onSearchAdpSong.onSongClicked(song);
+                    song.setIsFaverate(songListFiltered.get(position).getFaverate());
+                    onSearchAdpSong.onSongClicked(song, true);
                 }
             });
 

@@ -23,6 +23,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.view.Gravity;
 import android.view.Menu;
@@ -59,6 +60,8 @@ import com.example.ps.musicps.viewmodels.SongInfoViewModel;
 import com.example.ps.musicps.viewmodels.SongPanelViewModel;
 import com.example.ps.musicps.viewmodels.SongViewModel;
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.like.LikeButton;
+import com.like.OnLikeListener;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import java.io.File;
@@ -154,7 +157,9 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
             File filePath = new File(path);
             metaRetriver.setDataSource(path);
 
-            Uri albumUri = Commen.getImageByteUri(metaRetriver.getEmbeddedPicture(), metaRetriver.getEmbeddedPicture().length, this);
+            Uri albumUri = Uri.EMPTY;
+            if (metaRetriver.getEmbeddedPicture() != null)
+                albumUri = Commen.getImageByteUri(metaRetriver.getEmbeddedPicture(), metaRetriver.getEmbeddedPicture().length, this);
 
             song = songViewModel.getSongByPath(path);
 
@@ -172,16 +177,21 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
 
             binding.panel.ivRepeatExpand.setEnabled(false);
             binding.panel.ivRepeatExpand.setImageAlpha(75);
+            binding.panel.ivFaverateExpand.setEnabled(false);
+            binding.panel.ivFaverateExpand.setAlpha(0.70f);
         }
         return song;
     }
 
     @Override
     public void onPermissionsGranted(int requestCode) {
-
+        boolean isFaverateClicked = getIntent().getBooleanExtra("isFaverateClicked", false);
         initialize();
         setupView();
-        songViewModel.getSongs();
+        if (isFaverateClicked)
+            songViewModel.getFaverateSongs();
+        else
+            songViewModel.getSongs();
     }
 
     @Override
@@ -224,9 +234,27 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        if (intent.getData() != null)
+        if (intent.getData() != null) {
             this.setIntent(intent);
-
+            externalSong = new Song();
+        }
+        if (intent.getBooleanExtra("isFaverateClicked", false)) {
+            songViewModel.getFaverateSongs();
+            setTitle(getResources().getString(R.string.favourites));
+            binding.toolbarSongList.getMenu().getItem(0).setVisible(false);
+            binding.toolbarSongList.getMenu().getItem(1).setVisible(false);
+            binding.appBarList.setExpanded(true);
+        }else if (intent.getBooleanExtra("isListClicked", false)){
+            songViewModel.getSongs();
+            setTitle(getResources().getString(R.string.app_name));
+            binding.toolbarSongList.getMenu().getItem(0).setVisible(true);
+            binding.toolbarSongList.getMenu().getItem(1).setVisible(true);
+            binding.appBarList.setExpanded(true);
+            if (binding.ivNoItems.getVisibility() == View.VISIBLE) {
+                binding.ivNoItems.setVisibility(View.GONE);
+                binding.slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+            }
+        }
     }
 
     @Override
@@ -275,7 +303,9 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
 
             if (!MyApplication.isExternalSource && !binding.panel.ivRepeatExpand.isEnabled()) {
                 binding.panel.ivRepeatExpand.setEnabled(true);
+                binding.panel.ivFaverateExpand.setEnabled(true);
                 binding.panel.ivRepeatExpand.setImageAlpha(250);
+                binding.panel.ivFaverateExpand.setAlpha(1);
             }
 
         }
@@ -293,6 +323,8 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
 
         if (!songViewModel.isSongExist(song.getTrackFile()) && binding.panel.ivRepeatExpand.isEnabled()) {
             binding.panel.ivRepeatExpand.setEnabled(false);
+            binding.panel.ivFaverateExpand.setEnabled(false);
+            binding.panel.ivFaverateExpand.setAlpha(0.70f);
             binding.panel.ivRepeatExpand.setImageAlpha(75);
             MyApplication.isExternalSource = true;
         }
@@ -303,6 +335,9 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
         songPanelViewModel.setAlbumName(song.getAlbumName());
         songPanelViewModel.setDuration(song.getDuration());
         songPanelViewModel.setPath(song.getTrackFile());
+        boolean isFaverate = (song.getIsFaverate() == 1);
+        if (!MyApplication.isExternalSource)
+            songPanelViewModel.setFaverate(isFaverate);
 
 
         isSetupedPanel = true;
@@ -356,7 +391,7 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
                     }
                 }
             }
-            if (!isSetupedPanel) {
+            if (!isSetupedPanel && songViewModels.size() != 0) {
                 musiPlayerHelper.setupMediaPLayer(this, sharedPrefrenceManager.getSong(), ListActivity.this);
                 setupPanel(sharedPrefrenceManager.getSong());
             }
@@ -373,6 +408,18 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
 
         setSupportActionBar(binding.toolbarSongList);
+
+        binding.panel.ivFaverateExpand.setOnLikeListener(new OnLikeListener() {
+            @Override
+            public void liked(LikeButton likeButton) {
+                songViewModel.updateFaverateSong(1, songPanelViewModel.getId());
+            }
+
+            @Override
+            public void unLiked(LikeButton likeButton) {
+                songViewModel.updateFaverateSong(0, songPanelViewModel.getId());
+            }
+        });
 
         binding.slidingPanel.addPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
             @Override
@@ -405,13 +452,18 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
         });
 
         binding.panel.ivShareExpand.setOnClickListener(view -> {
-            File file = new File(songPanelViewModel.getPath());
-            Uri uri = FileProvider.getUriForFile(ListActivity.this, getApplicationContext().getPackageName()+".provider", file);
-            Intent share = new Intent(Intent.ACTION_SEND);
-            share.setType("audio/*");
-            share.putExtra(Intent.EXTRA_STREAM, uri);
-            share.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            startActivity(Intent.createChooser(share, "Share Sound File"));
+            try {
+                File file = new File(songPanelViewModel.getPath());
+                Uri uri = FileProvider.getUriForFile(ListActivity.this, getApplicationContext().getPackageName() + ".provider", file);
+                Intent share = new Intent(Intent.ACTION_SEND);
+                share.setType("audio/*");
+                share.putExtra(Intent.EXTRA_STREAM, uri);
+                share.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                startActivity(Intent.createChooser(share, "Share Sound File"));
+            }catch (Exception e){
+                e.printStackTrace();
+                Toast.makeText(ListActivity.this, "cant share this file, something wrong", Toast.LENGTH_LONG).show();
+            }
         });
 
         binding.panel.sbSoundPlaySong.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -530,7 +582,7 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
             @Override
             public void onChanged(Song song) {
                 if (song != null) {
-                    onSongClicked(song);
+                    onSongClicked(song, false);
                 } else
                     musiPlayerHelper.mediaPlayer.seekTo(0);
             }
@@ -760,17 +812,19 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
 
     }
 
-    private void startService(){
+    private void startService() {
         serviceIntent = new Intent(ListActivity.this, MusicService.class);
         startService(serviceIntent);
         bindService(serviceIntent, serviceConnectionBinder.getServiceConnection(), Context.BIND_AUTO_CREATE);
     }
 
-    private void stopService(){
-        serviceConnectionBinder.getMusicService().stopSelf();
-        unbindService(serviceConnectionBinder.getServiceConnection());
-        serviceConnectionBinder.getMusicService().removeNotification();
-        stopService(serviceIntent);
+    private void stopService() {
+        try {
+            serviceConnectionBinder.getMusicService().stopSelf();
+            unbindService(serviceConnectionBinder.getServiceConnection());
+            serviceConnectionBinder.getMusicService().removeNotification();
+            stopService(serviceIntent);
+        }catch (Exception e){}
     }
 
     @Override
@@ -778,12 +832,9 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
         if (binding.slidingPanel.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED) {
             binding.slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
         } else {
-            //TODO if you want to still play on backpressed
-            Intent intent = new Intent(Intent.ACTION_MAIN);
-            intent.addCategory(Intent.CATEGORY_HOME);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            Intent intent = new Intent(ListActivity.this, MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
             startActivity(intent);
-//        super.onBackPressed();
         }
 
     }
@@ -832,7 +883,6 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.song_list_activity_menu, menu);
-
         return true;
     }
 
@@ -887,10 +937,12 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
     }
 
     @Override
-    public void onSongClicked(Song song) {
+    public void onSongClicked(Song song, boolean shouldExpand) {
         if (!binding.panel.ivRepeatExpand.isEnabled()) {
             binding.panel.ivRepeatExpand.setEnabled(true);
+            binding.panel.ivFaverateExpand.setEnabled(true);
             binding.panel.ivRepeatExpand.setImageAlpha(255);
+            binding.panel.ivFaverateExpand.setAlpha(1);
             MyApplication.isExternalSource = false;
         }
 
@@ -926,7 +978,7 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
             musiPlayerHelper.setupMediaPLayer(ListActivity.this, song, ListActivity.this);
             sharedPrefrenceManager.saveSong(song);
             setupPanel(song);
-            if (binding.slidingPanel.getPanelState() != SlidingUpPanelLayout.PanelState.EXPANDED)
+            if (binding.slidingPanel.getPanelState() != SlidingUpPanelLayout.PanelState.EXPANDED && shouldExpand)
                 binding.slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
             musiPlayerHelper.FadeIn(2);
             seekBarProgressUpdater();
@@ -1028,7 +1080,6 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
             this.getContentResolver().unregisterContentObserver(volumeContentObserver);
         }
 
-//        musiPlayerHelper = null;
 
         sharedPrefrenceManager.setFirstIn(true);
 
@@ -1049,7 +1100,7 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
             iscompleteFromChangeSong = false;
 
         if ((!serviceConnectionBinder.isServiceConnect && (!sharedPrefrenceManager.getFirstIn() || MyApplication.isExternalSource || musiPlayerHelper.mediaPlayer.isPlaying()))
-        || (serviceConnectionBinder.isServiceConnect && !sharedPrefrenceManager.getFirstIn() && !serviceConnectionBinder.getMusicService().isBind)) {
+                || (serviceConnectionBinder.isServiceConnect && !sharedPrefrenceManager.getFirstIn() && !serviceConnectionBinder.getMusicService().isBind)) {
             startService();
         }
 
@@ -1083,7 +1134,7 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
                         curentShuffleSong = 0;
                     }
 
-                    onSongClicked(shuffleList.get(curentShuffleSong).getViewModelSong());
+                    onSongClicked(shuffleList.get(curentShuffleSong).getViewModelSong(), false);
 
                     break;
             }
