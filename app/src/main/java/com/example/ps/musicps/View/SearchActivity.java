@@ -188,6 +188,9 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
         songPanelViewModel.setAlbumName(song.getAlbumName());
         songPanelViewModel.setDuration(song.getDuration());
         songPanelViewModel.setPath(song.getTrackFile());
+        boolean isFaverate = (song.getIsFaverate() == 1);
+        if (!MyApplication.isExternalSource)
+            songPanelViewModel.setFaverate(isFaverate);
 
 
         isSetupedPanel = true;

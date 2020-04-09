@@ -16,6 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.RecyclerView;
 import com.crashlytics.android.Crashlytics;
+import com.example.ps.musicps.Commen.MyApplication;
 import com.example.ps.musicps.Helper.SongsConfigHelper;
 import com.example.ps.musicps.Model.Song;
 import com.example.ps.musicps.Model.SongInfo;
@@ -186,6 +187,11 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongVH> {
                     song.setSongName(viewModelList.get(position).getSongName());
                     song.setIsFaverate(viewModelList.get(position).getFaverate());
                     onSongAdapter.onSongClicked(song, true);
+
+                    if (viewModelList.get(position).getFaverate() == 1)
+                        MyApplication.canPlayFaverate = true;
+                    else
+                        MyApplication.canPlayFaverate = false;
                 }
             });
         }

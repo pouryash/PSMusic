@@ -13,6 +13,8 @@
     <color name="colorRed">#F44336</color>
     <color name="colorEtSearch">#111015</color>
     <color name="colorGraySecoundrylSearch">@color/gray600</color>
+    <color name="colorInverse">#fff</color>
+    <color name="colorNoAlbum">#d1d9ff</color>
 
 
     <!-- gray family-->

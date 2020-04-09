@@ -3,9 +3,8 @@ package com.example.ps.musicps.View;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
@@ -21,18 +20,14 @@ import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
+import com.example.ps.musicps.AboutActivity;
 import com.example.ps.musicps.Commen.MyApplication;
 import com.example.ps.musicps.Commen.SongSharedPrefrenceManager;
 import com.example.ps.musicps.Di.component.DaggerMainActivityComponent;
-import com.example.ps.musicps.Di.component.DaggerMusicServiceComponent;
-import com.example.ps.musicps.Di.component.DaggerSongListComponent;
 import com.example.ps.musicps.Di.component.MainActivityComponent;
-import com.example.ps.musicps.Di.module.ListActivityModule;
 import com.example.ps.musicps.Di.module.MainActivityModule;
 import com.example.ps.musicps.Helper.MusiPlayerHelper;
-import com.example.ps.musicps.Helper.ServiceConnectionBinder;
 import com.example.ps.musicps.R;
-import com.example.ps.musicps.Service.MusicService;
 import com.example.ps.musicps.databinding.ActivityMainBinding;
 import com.example.ps.musicps.viewmodels.SongViewModel;
 
@@ -69,19 +64,33 @@ public class MainActivity extends AppCompatActivity {
 
     private void setUp() {
 
+        sharedPrefrenceManager.getSharedPrefsSongLiveData(SongSharedPrefrenceManager.KEY_SONG_MODEL)
+                .observe(this, song -> {
+                    setUpMainImage(song.getSongImageUri());
+                });
+
         setUpMainImage(sharedPrefrenceManager.getSong().getSongImageUri());
 
         binding.cvAllSongMain.setOnClickListener(view -> {
+            MyApplication.canPlayFaverate = false;
             Intent intent = new Intent(MainActivity.this, ListActivity.class);
             intent.putExtra("isListClicked", true);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
+            ((MyApplication)getApplicationContext()).setState(MyApplication.LIST_STATE);
         });
 
         binding.cvFaverateMain.setOnClickListener(view -> {
+            MyApplication.canPlayFaverate = sharedPrefrenceManager.getSong().getIsFaverate() == 1;
             Intent intent = new Intent(MainActivity.this, ListActivity.class);
             intent.putExtra("isFaverateClicked", true);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+            ((MyApplication)getApplicationContext()).setState(MyApplication.FAVERATE_STATE);
+        });
+
+        binding.cvAboutMain.setOnClickListener(view -> {
+            Intent intent = new Intent(MainActivity.this, AboutActivity.class);
             startActivity(intent);
         });
 
@@ -120,13 +129,30 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Window window = getWindow();
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.setStatusBarColor(getResources().getColor(R.color.colorWhite));
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-            }
+        int currentNightMode = getResources().getConfiguration().uiMode
+                & Configuration.UI_MODE_NIGHT_MASK;
+        switch (currentNightMode) {
+            case Configuration.UI_MODE_NIGHT_NO:
+                // Night mode is not active, we're in day time
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    Window window = getWindow();
+                    window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                    window.setStatusBarColor(getResources().getColor(R.color.colorWhite));
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+                    }
+                }
+                break;
+            case Configuration.UI_MODE_NIGHT_YES:
+                // Night mode is active, we're at night!
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    Window window = getWindow();
+                    window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                    window.setStatusBarColor(getResources().getColor(R.color.colorBlack));
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        getWindow().getDecorView().setSystemUiVisibility(0);
+                    }
+                }
         }
     }
 

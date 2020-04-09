@@ -23,6 +23,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.core.graphics.drawable.DrawableCompat;
 
 import com.example.ps.musicps.Model.Song;
+import com.example.ps.musicps.viewmodels.SongViewModel;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -77,6 +78,15 @@ public class Commen {
             }
         }
         return albumUri;
+    }
+
+    public static int getListItemIndex(List<SongViewModel> modelList, int id) {
+        for (int i = 0; i < modelList.size(); i++) {
+            if (modelList.get(i).getId() == id) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     public static String getRealPathFromURI(Context context, Uri contentUri) {

@@ -13,6 +13,9 @@
     <color name="colorIconsMain">@color/gray800</color>
     <color name="colorEtSearch">@color/gray200</color>
     <color name="colorGraySecoundrylSearch">@color/gray600</color>
+    <color name="colorInverse">#000000</color>
+    <color name="colorNoAlbum">#d1d9ff</color>
+
 
 
     <!-- gray family-->

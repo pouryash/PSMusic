@@ -241,14 +241,18 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
         if (intent.getBooleanExtra("isFaverateClicked", false)) {
             songViewModel.getFaverateSongs();
             setTitle(getResources().getString(R.string.favourites));
-            binding.toolbarSongList.getMenu().getItem(0).setVisible(false);
-            binding.toolbarSongList.getMenu().getItem(1).setVisible(false);
+            if (binding.toolbarSongList.getMenu().size() > 0) {
+                binding.toolbarSongList.getMenu().getItem(0).setVisible(false);
+                binding.toolbarSongList.getMenu().getItem(1).setVisible(false);
+            }
             binding.appBarList.setExpanded(true);
-        }else if (intent.getBooleanExtra("isListClicked", false)){
+        } else if (intent.getBooleanExtra("isListClicked", false)) {
             songViewModel.getSongs();
             setTitle(getResources().getString(R.string.app_name));
-            binding.toolbarSongList.getMenu().getItem(0).setVisible(true);
-            binding.toolbarSongList.getMenu().getItem(1).setVisible(true);
+            if (binding.toolbarSongList.getMenu().size() > 0) {
+                binding.toolbarSongList.getMenu().getItem(0).setVisible(true);
+                binding.toolbarSongList.getMenu().getItem(1).setVisible(true);
+            }
             binding.appBarList.setExpanded(true);
             if (binding.ivNoItems.getVisibility() == View.VISIBLE) {
                 binding.ivNoItems.setVisibility(View.GONE);
@@ -385,7 +389,7 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
             if (customeDialog != null && customeDialog.isShowing()) {
                 customeDialog.dismiss();
                 if (songViewModels.size() > 0) {
-                    Toast.makeText(this, "scan for song is successfuly complete", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, R.string.Scan_Complete, Toast.LENGTH_LONG).show();
                     if (binding.ivNoItems.getVisibility() == View.VISIBLE) {
                         binding.ivNoItems.setVisibility(View.GONE);
                     }
@@ -395,13 +399,19 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
                 musiPlayerHelper.setupMediaPLayer(this, sharedPrefrenceManager.getSong(), ListActivity.this);
                 setupPanel(sharedPrefrenceManager.getSong());
             }
-            if (songViewModels.size() == 0) {
-                Toast.makeText(this, "No songs found, try again later", Toast.LENGTH_LONG).show();
+            if (songViewModels.size() == 0 && (musiPlayerHelper.mediaPlayer != null && !musiPlayerHelper.mediaPlayer.isPlaying())
+                    || musiPlayerHelper.mediaPlayer == null) {
+                if (((MyApplication)getApplication()).getState() == MyApplication.LIST_STATE)
+                    Toast.makeText(this, R.string.Songs_Not_Found_List, Toast.LENGTH_LONG).show();
+                else
+                    Toast.makeText(this, R.string.Faverate_Song_Empty, Toast.LENGTH_LONG).show();
                 if (binding.ivNoItems.getVisibility() != View.VISIBLE) {
                     binding.ivNoItems.setVisibility(View.VISIBLE);
                     binding.slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
                 }
-
+            } else if (songViewModels.size() == 0) {
+                if (binding.ivNoItems.getVisibility() != View.VISIBLE)
+                    binding.ivNoItems.setVisibility(View.VISIBLE);
             }
         });
 
@@ -460,7 +470,7 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
                 share.putExtra(Intent.EXTRA_STREAM, uri);
                 share.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 startActivity(Intent.createChooser(share, "Share Sound File"));
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
                 Toast.makeText(ListActivity.this, "cant share this file, something wrong", Toast.LENGTH_LONG).show();
             }
@@ -824,7 +834,8 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
             unbindService(serviceConnectionBinder.getServiceConnection());
             serviceConnectionBinder.getMusicService().removeNotification();
             stopService(serviceIntent);
-        }catch (Exception e){}
+        } catch (Exception e) {
+        }
     }
 
     @Override

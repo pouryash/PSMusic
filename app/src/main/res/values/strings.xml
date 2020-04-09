@@ -13,5 +13,9 @@
     <string name="all_songs">All Songs</string>
     <string name="setting">Setting</string>
     <string name="about">About</string>
+    <string name="version">version</string>
+    <string name="Songs_Not_Found_List">No songs found, try again later</string>
+    <string name="Faverate_Song_Empty">Your Faverate List Is Empty</string>
+    <string name="Scan_Complete">scan for song is successfuly complete</string>
 
 </resources>

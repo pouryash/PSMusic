@@ -109,7 +109,6 @@ public class SongPanelViewModel extends BaseObservable {
                 .into(iv);
     }
 
-
     @Inject
     public SongPanelViewModel(Context context) {
         this.context = context;

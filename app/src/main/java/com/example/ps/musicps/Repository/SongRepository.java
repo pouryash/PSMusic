@@ -139,6 +139,7 @@ public class SongRepository {
         MutableLiveData<List<Song>> modelMutableLiveData = new MutableLiveData<>();
 
         dbRepository.getSongs().observeForever(songs -> {
+            list.clear();
             Observable.fromArray(songs)
                     .flatMapIterable(songs1 -> songs1)
                     .map(song -> {
@@ -186,6 +187,7 @@ public class SongRepository {
         MutableLiveData<List<Song>> modelMutableLiveData = new MutableLiveData<>();
 
         dbRepository.getFaverateSongs().observeForever(songs -> {
+            list.clear();
             Observable.fromArray(songs)
                     .flatMapIterable(songs1 -> songs1)
                     .map(song -> {
