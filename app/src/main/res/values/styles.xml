@@ -29,5 +29,5 @@
         <item name="android:layout_marginBottom">@dimen/standardMargin_X2</item>
 
     </style>
-
+    
 </resources>

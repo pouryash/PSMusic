@@ -8,11 +8,6 @@
     app:shape_roundRect_topLeftRadius="20dp"
     app:shape_roundRect_topRightRadius="20dp">
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        >
-
         <TextView
             android:id="@+id/fr_Name_top"
             android:layout_width="match_parent"
@@ -134,6 +129,5 @@
             android:textColor="#4CAF50"
             android:text="\u2713"/>
 
-    </RelativeLayout>
 </RelativeLayout>
 

@@ -86,6 +86,7 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
     CustomeDialogClass customeDialog;
     FirebaseAnalytics firebaseAnalytics;
     List<SongViewModel> shuffleList = new ArrayList<>();
+    float upX;
     @Inject
     SongViewModel songViewModel;
     @Inject
@@ -357,6 +358,15 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
         }
     }
 
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        if (ev.getAction() == MotionEvent.ACTION_UP) {
+            upX = Math.round(ev.getX());
+        }
+        return super.dispatchTouchEvent(ev);
+
+    }
+
     private void setupView() {
 
         serviceConnectionBinder.setOnServiceConnectionChanged(new ServiceConnectionBinder.onServiceConnectionChanged() {
@@ -611,15 +621,18 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
             }
         });
 
+
         binding.panel.ivNextExpand.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
+
                 if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
                     if (isInLongTouch) {
                         isInLongTouch = false;
                         songViewModel.setCanClick(false);
+                        if (!(upX > view.getLeft()) || !(upX < view.getRight()) || (motionEvent.getY() > view.getTop()) || (motionEvent.getY() < view.getBottom() && motionEvent.getY() < 0))
+                            binding.panel.ivNextExpand.performClick();
                     }
-                    iscompleteFromChangeSong = true;
                 }
                 return false;
             }
@@ -639,12 +652,15 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
         binding.panel.ivPreviousExpand.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
+
                 if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
                     if (isInLongTouch) {
                         songViewModel.setCanClick(false);
                         isInLongTouch = false;
+                        if (!(upX > view.getLeft()) || !(upX < view.getRight()) || (motionEvent.getY() > view.getTop()) || (motionEvent.getY() < view.getBottom() && motionEvent.getY() < 0))
+                            binding.panel.ivPreviousExpand.performClick();
                     }
-                    iscompleteFromChangeSong = true;
+
                 }
                 return false;
             }
@@ -725,11 +741,10 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
                         if (musiPlayerHelper.mediaPlayer.isLooping()) {
                             musiPlayerHelper.mediaPlayer.seekTo(0);
                         } else {
-//                            if (!isExternalSource) {
-                            binding.panel.ivPlayPayseExpand.performClick();
-//                            } else {
-//                                setupMediaPLayer();
-//                            }
+                            if (sharedPrefrenceManager.getPlayingState().equals("repeatList"))
+                                binding.panel.ivPreviousExpand.performClick();
+                            else if (sharedPrefrenceManager.getPlayingState().equals("repeatOne"))
+                                musiPlayerHelper.mediaPlayer.seekTo(0);
 
                         }
                     } else {
@@ -762,13 +777,11 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
                         if (musiPlayerHelper.mediaPlayer.isLooping()) {
                             musiPlayerHelper.mediaPlayer.seekTo(0);
                         } else {
-                            //TODO
-//                            if (!isExternalSource) {
-//                                    mPresenter.getSong(Commen.song.getId() + 1);
-                            binding.panel.ivNextExpand.performClick();
-//                            } else {
-//                                setupMediaPLayer();
-//                            }
+
+                            if (sharedPrefrenceManager.getPlayingState().equals("repeatList"))
+                                binding.panel.ivNextExpand.performClick();
+                            else if (sharedPrefrenceManager.getPlayingState().equals("repeatOne"))
+                                musiPlayerHelper.mediaPlayer.seekTo(0);
 
                         }
                     } else {

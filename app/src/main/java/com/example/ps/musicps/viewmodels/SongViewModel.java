@@ -222,7 +222,17 @@ public class SongViewModel extends BaseObservable {
 
     public void getNextSongById() {
 
-        if (canClick && !MyApplication.isExternalSource && ((MyApplication) context.getApplicationContext()).getState()
+        if (!canClick){
+            setCanClick(true);
+            return;
+        }
+
+        if (MyApplication.isExternalSource) {
+            songMutableLiveData.postValue(null);
+            return;
+        }
+
+        if (((MyApplication) context.getApplicationContext()).getState()
                 == MyApplication.LIST_STATE || !MyApplication.canPlayFaverate) {
             int songId = sharedPrefrenceManager.getSong().getId() + 1;
 
@@ -237,8 +247,6 @@ public class SongViewModel extends BaseObservable {
             }
             songMutableLiveData.postValue(song);
 
-        } else if (MyApplication.isExternalSource) {
-            songMutableLiveData.postValue(null);
         } else if (((MyApplication) context.getApplicationContext()).getState()
                 == MyApplication.FAVERATE_STATE && MyApplication.canPlayFaverate) {
 
@@ -248,13 +256,18 @@ public class SongViewModel extends BaseObservable {
             } else
                 songMutableLiveData.postValue(mutableSongViewModelList.getValue().get(index + 1).getViewModelSong());
         }
-
-        setCanClick(true);
     }
 
     public void getPrevSongById() {
-
-        if (canClick && !MyApplication.isExternalSource && (((MyApplication) context.getApplicationContext()).getState()
+        if (!canClick){
+            setCanClick(true);
+            return;
+        }
+        if (MyApplication.isExternalSource) {
+            songMutableLiveData.postValue(null);
+            return;
+        }
+        if ((((MyApplication) context.getApplicationContext()).getState()
                 == MyApplication.LIST_STATE || sharedPrefrenceManager.getSong().getIsFaverate() == 0)) {
             int songId = sharedPrefrenceManager.getSong().getId() - 1;
 
@@ -271,8 +284,6 @@ public class SongViewModel extends BaseObservable {
 
             songMutableLiveData.postValue(song);
 
-        } else if (MyApplication.isExternalSource) {
-            songMutableLiveData.postValue(null);
         } else if (((MyApplication) context.getApplicationContext()).getState()
                 == MyApplication.FAVERATE_STATE) {
             int index = Commen.getListItemIndex(mutableSongViewModelList.getValue(), sharedPrefrenceManager.getSong().getId());
@@ -282,7 +293,6 @@ public class SongViewModel extends BaseObservable {
                 songMutableLiveData.postValue(mutableSongViewModelList.getValue().get(index - 1).getViewModelSong());
         }
 
-        setCanClick(true);
     }
 
     public int getFaverate() {

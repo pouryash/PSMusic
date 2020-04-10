@@ -73,6 +73,7 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
     String searchTerm;
     SongInfoDialogBinding songInfoBinding;
     Dialog infoDialog;
+    float upX;
     @Inject
     SongInfoViewModel songInfoViewModel;
     @Inject
@@ -223,11 +224,10 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
                         if (musiPlayerHelper.mediaPlayer.isLooping()) {
                             musiPlayerHelper.mediaPlayer.seekTo(0);
                         } else {
-//                            if (!isExternalSource) {
-                            binding.panel.ivPlayPayseExpand.performClick();
-//                            } else {
-//                                setupMediaPLayer();
-//                            }
+                            if (sharedPrefrenceManager.getPlayingState().equals("repeatList"))
+                                binding.panel.ivPreviousExpand.performClick();
+                            else if (sharedPrefrenceManager.getPlayingState().equals("repeatOne"))
+                                musiPlayerHelper.mediaPlayer.seekTo(0);
 
                         }
                     } else {
@@ -260,13 +260,11 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
                         if (musiPlayerHelper.mediaPlayer.isLooping()) {
                             musiPlayerHelper.mediaPlayer.seekTo(0);
                         } else {
-                            //TODO
-//                            if (!isExternalSource) {
-//                                    mPresenter.getSong(Commen.song.getId() + 1);
-                            binding.panel.ivNextExpand.performClick();
-//                            } else {
-//                                setupMediaPLayer();
-//                            }
+
+                            if (sharedPrefrenceManager.getPlayingState().equals("repeatList"))
+                                binding.panel.ivNextExpand.performClick();
+                            else if (sharedPrefrenceManager.getPlayingState().equals("repeatOne"))
+                                musiPlayerHelper.mediaPlayer.seekTo(0);
 
                         }
                     } else {
@@ -317,6 +315,15 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
             }, 0, 1000);
         }
 
+
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        if (ev.getAction() == MotionEvent.ACTION_UP) {
+            upX = Math.round(ev.getX());
+        }
+        return super.dispatchTouchEvent(ev);
 
     }
 
@@ -551,8 +558,9 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
                     if (isInLongTouch) {
                         isInLongTouch = false;
                         songViewModel.setCanClick(false);
+                        if (!(upX > view.getLeft()) || !(upX < view.getRight()) || (motionEvent.getY() > view.getTop()) || (motionEvent.getY() < view.getBottom() && motionEvent.getY() < 0))
+                            binding.panel.ivNextExpand.performClick();
                     }
-                    iscompleteFromChangeSong = true;
                 }
                 return false;
             }
@@ -576,8 +584,9 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
                     if (isInLongTouch) {
                         songViewModel.setCanClick(false);
                         isInLongTouch = false;
+                        if (!(upX > view.getLeft()) || !(upX < view.getRight()) || (motionEvent.getY() > view.getTop()) || (motionEvent.getY() < view.getBottom() && motionEvent.getY() < 0))
+                            binding.panel.ivPreviousExpand.performClick();
                     }
-                    iscompleteFromChangeSong = true;
                 }
                 return false;
             }
