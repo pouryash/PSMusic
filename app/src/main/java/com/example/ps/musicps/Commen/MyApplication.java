@@ -27,8 +27,7 @@ public class MyApplication extends Application {
 
         component = DaggerAppComponent.builder().context(context).build();
 
-        AppCompatDelegate.setDefaultNightMode(
-                AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+        AppCompatDelegate.setDefaultNightMode(component.getSharedPrefrence().getNightMode());
 
         canPlayFaverate = component.getSharedPrefrence().getSong().getIsFaverate() == 1;
     }

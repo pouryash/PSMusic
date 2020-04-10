@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".View.SettingActivity">
+
+    <ImageView
+        android:id="@+id/arow_back_setting"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:layout_margin="@dimen/standardMargin"
+        app:srcCompat="@drawable/ic_back_arrow_white"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/arow_back_setting"
+        android:layout_alignBottom="@id/arow_back_setting"
+        android:layout_alignTop="@id/arow_back_setting"
+        android:gravity="center"
+        android:textStyle="bold"
+        android:textColor="@color/colorTextMain"
+        android:textSize="@dimen/standardTextSize_18"
+        android:text="@string/setting"/>
+
+    <LinearLayout
+        android:id="@+id/lin_dark_mode_setting"
+        android:background="?attr/selectableItemBackground"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/arow_back_setting"
+        android:paddingTop="@dimen/standardMargin_X2"
+        android:paddingBottom="@dimen/standardMargin_X2"
+        android:paddingStart="@dimen/standardMargin"
+        android:paddingEnd="@dimen/standardMargin"
+        android:weightSum="2"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="@dimen/standardMargin_X2"
+            android:layout_toEndOf="@id/arow_back_setting"
+            android:layout_alignBottom="@id/arow_back_setting"
+            android:layout_alignTop="@id/arow_back_setting"
+            android:gravity="start"
+            android:layout_weight="2"
+            android:textColor="@color/colorTextMain"
+            android:textSize="@dimen/standardTextSize_15"
+            android:text="@string/dark_mode"/>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/ic_back_arrow_white"
+            android:rotation="180"
+            android:layout_gravity="end"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/divider1_setting"
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:layout_marginStart="@dimen/standardMargin_X2"
+        android:layout_marginEnd="@dimen/standardMargin_X2"
+        android:layout_below="@id/lin_dark_mode_setting"
+        android:orientation="horizontal"
+        android:background="@color/gray300"/>
+
+    <LinearLayout
+        android:id="@+id/lin_clear_cache_setting"
+        android:background="?attr/selectableItemBackground"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/divider1_setting"
+        android:paddingTop="@dimen/standardMargin_X2"
+        android:paddingBottom="@dimen/standardMargin_X2"
+        android:paddingStart="@dimen/standardMargin"
+        android:paddingEnd="@dimen/standardMargin"
+        android:weightSum="2"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="@dimen/standardMargin_X2"
+            android:layout_toEndOf="@id/arow_back_setting"
+            android:layout_alignBottom="@id/arow_back_setting"
+            android:layout_alignTop="@id/arow_back_setting"
+            android:gravity="start"
+            android:layout_weight="2"
+            android:textColor="@color/colorTextMain"
+            android:textSize="@dimen/standardTextSize_15"
+            android:text="@string/clear_cache"/>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/ic_back_arrow_white"
+            android:rotation="180"
+            android:layout_weight="1"
+            android:layout_gravity="end"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/divider2_setting"
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:orientation="horizontal"
+        android:layout_marginStart="@dimen/standardMargin_X2"
+        android:layout_marginEnd="@dimen/standardMargin_X2"
+        android:layout_below="@id/lin_clear_cache_setting"
+        android:background="@color/gray300"/>
+
+</RelativeLayout>

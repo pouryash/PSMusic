@@ -15,6 +15,7 @@
     <color name="colorGraySecoundrylSearch">@color/gray600</color>
     <color name="colorInverse">#000000</color>
     <color name="colorNoAlbum">#d1d9ff</color>
+    <color name="colorGreen">#4CAF50</color>
 
 
 

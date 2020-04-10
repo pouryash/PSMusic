@@ -67,7 +67,7 @@ dependencies {
     implementation 'com.android.volley:volley:1.1.1'
     implementation 'com.github.bumptech.glide:glide:4.8.0'
     implementation 'androidx.palette:palette:1.0.0'
-    implementation 'com.google.android.material:material:1.1.0'
+    implementation 'com.google.android.material:material:1.2.0-alpha05'
     //firebase
     implementation 'com.google.firebase:firebase-messaging:20.1.2'
     implementation 'com.google.firebase:firebase-core:17.2.3'
@@ -89,5 +89,7 @@ dependencies {
     testImplementation 'org.mockito:mockito-core:2.28.2'
     //Like Animation
     implementation 'com.github.jd-alexander:LikeButton:0.2.3'
+    //shape
+    implementation 'com.github.florent37:shapeofview:1.4.6'
 
 }

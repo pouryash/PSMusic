@@ -2,9 +2,12 @@ package com.example.ps.musicps.View.Dialog;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.TextView;
 
 import com.example.ps.musicps.R;
@@ -31,6 +34,14 @@ public class CustomeAlertDialogClass extends Dialog implements View.OnClickListe
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.alert_dialog_custom);
+
+        getWindow().getAttributes().dimAmount = 0.7f;
+        getWindow().getAttributes().gravity = Gravity.BOTTOM;
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+        getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+        getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+        setCanceledOnTouchOutside(false);
+
         yes = (TextView) findViewById(R.id.tv_AlertDialog_Yes);
         yes.setOnClickListener(this);
         no = (TextView) findViewById(R.id.tv_AlertDialog_No);
@@ -44,7 +55,6 @@ public class CustomeAlertDialogClass extends Dialog implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.tv_AlertDialog_No:
-                dismiss();
                 onAlertDialogCliscked.onNegetive();
                 break;
                 case R.id.tv_AlertDialog_Yes:

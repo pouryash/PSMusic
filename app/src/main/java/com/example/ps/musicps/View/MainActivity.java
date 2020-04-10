@@ -20,7 +20,6 @@ import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
-import com.example.ps.musicps.AboutActivity;
 import com.example.ps.musicps.Commen.MyApplication;
 import com.example.ps.musicps.Commen.SongSharedPrefrenceManager;
 import com.example.ps.musicps.Di.component.DaggerMainActivityComponent;
@@ -91,6 +90,11 @@ public class MainActivity extends AppCompatActivity {
 
         binding.cvAboutMain.setOnClickListener(view -> {
             Intent intent = new Intent(MainActivity.this, AboutActivity.class);
+            startActivity(intent);
+        });
+
+        binding.cvSettingMain.setOnClickListener(view -> {
+            Intent intent = new Intent(MainActivity.this, SettingActivity.class);
             startActivity(intent);
         });
 

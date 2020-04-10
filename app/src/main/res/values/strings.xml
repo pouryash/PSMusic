@@ -17,5 +17,10 @@
     <string name="Songs_Not_Found_List">No songs found, try again later</string>
     <string name="Faverate_Song_Empty">Your Faverate List Is Empty</string>
     <string name="Scan_Complete">scan for song is successfuly complete</string>
+    <string name="dark_mode">Dark Mode</string>
+    <string name="clear_cache">Clear Cache</string>
+    <string name="default_dark_mode">Default</string>
+    <string name="off">off</string>
+    <string name="on">on</string>
 
 </resources>

@@ -17,6 +17,7 @@ import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.RecyclerView;
 import com.crashlytics.android.Crashlytics;
 import com.example.ps.musicps.Commen.MyApplication;
+import com.example.ps.musicps.Helper.DialogHelper;
 import com.example.ps.musicps.Helper.SongsConfigHelper;
 import com.example.ps.musicps.Model.Song;
 import com.example.ps.musicps.Model.SongInfo;
@@ -116,35 +117,24 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongVH> {
                             bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "menu item delete list");
                             firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
 
-                            CustomeAlertDialogClass customeAlertDialog = new
-                                    CustomeAlertDialogClass((Activity) context,
-                                    "Do you want to delete this Song?",
-                                    new CustomeAlertDialogClass.onAlertDialogCliscked() {
-                                        @Override
-                                        public void onPosetive() {
-                                            if (songsConfigHelper.deleteSong(songViewModel.getTrackFile())) {
-                                                viewModelList.remove(position);
-                                                notifyItemRemoved(position);
-                                                notifyItemRangeRemoved(position, viewModelList.size());
-                                                notifyDataSetChanged();
-                                                onSongAdapter.onSongRemoved(songViewModel.getId(), viewModelList.size());
-                                            }
+                            DialogHelper.alertDialog((Activity) context, 0, "Do you want to delete this Song?", new CustomeAlertDialogClass.onAlertDialogCliscked() {
+                                @Override
+                                public void onPosetive() {
+                                    if (songsConfigHelper.deleteSong(songViewModel.getTrackFile())) {
+                                        viewModelList.remove(position);
+                                        notifyItemRemoved(position);
+                                        notifyItemRangeRemoved(position, viewModelList.size());
+                                        notifyDataSetChanged();
+                                        onSongAdapter.onSongRemoved(songViewModel.getId(), viewModelList.size());
+                                    }
+                                }
 
-                                        }
+                                @Override
+                                public void onNegetive() {
 
-                                        @Override
-                                        public void onNegetive() {
+                                }
+                            });
 
-                                        }
-                                    });
-                            WindowManager.LayoutParams lp = customeAlertDialog.getWindow().getAttributes();
-                            lp.dimAmount = 0.7f;
-                            lp.gravity = Gravity.BOTTOM;
-                            customeAlertDialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
-                            customeAlertDialog.show();
-                            customeAlertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-                            customeAlertDialog.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
-                            customeAlertDialog.setCanceledOnTouchOutside(false);
 
 
                             break;

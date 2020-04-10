@@ -20,6 +20,7 @@ public class SongSharedPrefrenceManager {
     private static final String SONG_SHARED_PREF_NAME = "song_shared_pref";
     private static final String FIRST_IN_SHARED_PREF_NAME = "first_in_shared_pref";
     private static final String KEY_FIRST_IN = "first_in";
+    private static final String KEY_Night_MODE = "night_mode";
     public static final String KEY_SONG_MODEL = "song_model";
     private static final String KEY_CURENT_PLAYING_STATE = "curentPlayingState";
     private SharedPreferences songSharedPreferences;
@@ -130,6 +131,17 @@ public class SongSharedPrefrenceManager {
     public boolean getFirstIn() {
 
         return firstInSharedPreferences.getBoolean(KEY_FIRST_IN, true);
+    }
+
+    public void setNightMode(int mode) {
+        SharedPreferences.Editor editor = firstInSharedPreferences.edit();
+        editor.putInt(KEY_Night_MODE, mode);
+        editor.apply();
+    }
+
+    public int getNightMode() {
+
+        return firstInSharedPreferences.getInt(KEY_Night_MODE, 0);
     }
 
     public abstract class SharedPreferenceLiveData<T> extends LiveData<T> {

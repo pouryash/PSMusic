@@ -1,4 +1,4 @@
-package com.example.ps.musicps;
+package com.example.ps.musicps.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -8,6 +8,8 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
+import com.example.ps.musicps.BuildConfig;
+import com.example.ps.musicps.R;
 import com.example.ps.musicps.databinding.ActivityAboutBinding;
 
 public class AboutActivity extends AppCompatActivity {

@@ -5,13 +5,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorNoAlbum"
-    tools:context=".AboutActivity">
+    tools:context=".View.AboutActivity">
 
 
     <ImageView
         android:id="@+id/arow_back_about"
         android:layout_width="35dp"
         android:layout_height="35dp"
+        android:tint="@color/colorBlack"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:layout_margin="@dimen/standardMargin"
         app:srcCompat="@drawable/ic_back_arrow_white"/>
@@ -54,6 +55,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/app_name_about"
         android:gravity="center"
+        android:textColor="@color/gray600"
         android:layout_centerHorizontal="true"
         android:textSize="@dimen/standardTextSize_15"
         android:text="@string/version"/>

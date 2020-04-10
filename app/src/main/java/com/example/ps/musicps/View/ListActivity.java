@@ -401,7 +401,7 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
             }
             if (songViewModels.size() == 0 && (musiPlayerHelper.mediaPlayer != null && !musiPlayerHelper.mediaPlayer.isPlaying())
                     || musiPlayerHelper.mediaPlayer == null) {
-                if (((MyApplication)getApplication()).getState() == MyApplication.LIST_STATE)
+                if (((MyApplication) getApplication()).getState() == MyApplication.LIST_STATE)
                     Toast.makeText(this, R.string.Songs_Not_Found_List, Toast.LENGTH_LONG).show();
                 else
                     Toast.makeText(this, R.string.Faverate_Song_Empty, Toast.LENGTH_LONG).show();
@@ -894,6 +894,11 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.song_list_activity_menu, menu);
+        if (getIntent().getBooleanExtra("isFaverateClicked", false)) {
+            setTitle(getResources().getString(R.string.favourites));
+            binding.toolbarSongList.getMenu().getItem(0).setVisible(false);
+            binding.toolbarSongList.getMenu().getItem(1).setVisible(false);
+        }
         return true;
     }
 
