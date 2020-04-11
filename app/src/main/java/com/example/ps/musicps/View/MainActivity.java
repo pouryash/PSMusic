@@ -32,6 +32,8 @@ import com.example.ps.musicps.viewmodels.SongViewModel;
 
 import javax.inject.Inject;
 
+import jp.wasabeef.blurry.Blurry;
+
 public class MainActivity extends AppCompatActivity {
 
     ActivityMainBinding binding;
@@ -70,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
 
         setUpMainImage(sharedPrefrenceManager.getSong().getSongImageUri());
 
-        binding.cvAllSongMain.setOnClickListener(view -> {
+        binding.relAllSongMain.setOnClickListener(view -> {
             MyApplication.canPlayFaverate = false;
             Intent intent = new Intent(MainActivity.this, ListActivity.class);
             intent.putExtra("isListClicked", true);
@@ -79,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
             ((MyApplication)getApplicationContext()).setState(MyApplication.LIST_STATE);
         });
 
-        binding.cvFaverateMain.setOnClickListener(view -> {
+        binding.relFaverateMain.setOnClickListener(view -> {
             MyApplication.canPlayFaverate = sharedPrefrenceManager.getSong().getIsFaverate() == 1;
             Intent intent = new Intent(MainActivity.this, ListActivity.class);
             intent.putExtra("isFaverateClicked", true);
@@ -88,12 +90,12 @@ public class MainActivity extends AppCompatActivity {
             ((MyApplication)getApplicationContext()).setState(MyApplication.FAVERATE_STATE);
         });
 
-        binding.cvAboutMain.setOnClickListener(view -> {
+        binding.relAboutMain.setOnClickListener(view -> {
             Intent intent = new Intent(MainActivity.this, AboutActivity.class);
             startActivity(intent);
         });
 
-        binding.cvSettingMain.setOnClickListener(view -> {
+        binding.relSettingMain.setOnClickListener(view -> {
             Intent intent = new Intent(MainActivity.this, SettingActivity.class);
             startActivity(intent);
         });
@@ -117,6 +119,10 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target, DataSource dataSource, boolean isFirstResource) {
                         binding.ivSongMain.setPadding(0, 0, 0, 0);
+                        Blurry.with(getApplicationContext())
+                                .sampling(8)
+                                .from(resource)
+                                .into(binding.ivSongBackgroundMain);
                         return false;
                     }
                 })

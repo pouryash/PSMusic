@@ -91,5 +91,7 @@ dependencies {
     implementation 'com.github.jd-alexander:LikeButton:0.2.3'
     //shape
     implementation 'com.github.florent37:shapeofview:1.4.6'
+    //blure
+    implementation 'jp.wasabeef:blurry:3.0.0'
 
 }

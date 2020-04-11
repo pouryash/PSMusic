@@ -1194,7 +1194,8 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
 
     @Override
     public void onFocusLoss() {
-        binding.panel.ivPlayPauseCollpase.performClick();
+        if (musiPlayerHelper.mediaPlayer != null && musiPlayerHelper.mediaPlayer.isPlaying())
+            binding.panel.ivPlayPauseCollpase.performClick();
     }
 }
 

@@ -22,5 +22,6 @@
     <string name="default_dark_mode">Default</string>
     <string name="off">off</string>
     <string name="on">on</string>
+    <string name="library">Library</string>
 
 </resources>

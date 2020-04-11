@@ -5,7 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:weightSum="2"
     tools:context=".View.MainActivity">
 
     <ImageView
@@ -14,238 +13,241 @@
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:scaleType="fitXY"
+        tools:background="@color/colorGray"
         tools:padding="36dp"
-        tools:src="@drawable/ic_no_album_128"
-        tools:background="@color/colorGray">
+        tools:src="@drawable/ic_no_album_128">
 
     </ImageView>
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1">
+        android:layout_height="wrap_content"
+        android:layout_weight="1.2">
 
-        <LinearLayout
-            android:id="@+id/lin_divider_horizental_top_main"
-            android:layout_width="match_parent"
-            android:layout_height="0.5dp"
-            android:layout_centerInParent="true"
-            android:layout_alignParentTop="true"
-            android:background="@color/gray600"
-            android:translationZ="100dp"
-            android:orientation="horizontal"
-            />
 
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cv_allSong_main"
+        <ImageView
+            android:id="@+id/iv_song_background_main"
             android:layout_width="match_parent"
-            android:layout_toStartOf="@id/lin_divider_vertical_main"
-            android:layout_above="@id/lin_divider_horizental_main"
             android:layout_height="match_parent"
-            android:clickable="true"
-            android:foreground="?selectableItemBackgroundBorderless"
-            tools:cardBackgroundColor="#80000000"
-            android:focusable="true">
+            android:rotation="180"
+            android:scaleType="centerCrop"
+            tools:background="@color/colorGray"
+            tools:padding="36dp"
+            tools:src="@drawable/ic_no_album_128" />
+
+        <com.github.florent37.shapeofview.shapes.RoundRectView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:shape_roundRect_topRightRadius="60dp">
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:background="#80D1D9FF"
+                android:paddingTop="@dimen/standardMargin_X2">
 
-               <LinearLayout
-                   android:layout_width="match_parent"
-                   android:layout_height="wrap_content"
-                   android:layout_centerInParent="true"
-                   android:orientation="vertical">
+                <TextView
+                    android:id="@+id/tv_library_main"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:paddingStart="@dimen/standardMargin"
+                    android:text="@string/library"
+                    android:textColor="@color/colorTextMain"
+                    android:textSize="@dimen/standardTextSize_20"
+                    android:textStyle="normal" />
 
-                   <ImageView
-                       android:id="@+id/iv_AllSong_Main"
-                       android:layout_width="60dp"
-                       android:layout_height="60dp"
-                       android:layout_gravity="center"
-                       android:tint="@color/colorAccent"
-                       app:srcCompat="@drawable/ic_queue_music_black_24dp" />
-
-                   <TextView
-                       android:layout_width="match_parent"
-                       android:layout_height="wrap_content"
-                       android:text="@string/all_songs"
-                       android:gravity="center"
-                       android:padding="@dimen/standardMargin"
-                       android:textStyle="bold"
-                       android:textColor="@color/colorTextMain"
-                       android:textSize="@dimen/standardTextSize_18"
-                       />
-
-
-               </LinearLayout>
-
-            </RelativeLayout>
-
-        </androidx.cardview.widget.CardView>
-
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cv_about_main"
-            android:layout_width="match_parent"
-            android:layout_toStartOf="@id/lin_divider_vertical_main"
-            android:layout_below="@id/lin_divider_horizental_main"
-            android:layout_height="match_parent"
-            android:clickable="true"
-            android:foreground="?selectableItemBackgroundBorderless"
-            tools:cardBackgroundColor="#80000000"
-            android:focusable="true">
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <LinearLayout
+                <ScrollView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:orientation="vertical">
+                    android:layout_below="@id/tv_library_main">
 
-                    <ImageView
-                        android:id="@+id/iv_about_Main"
-                        android:layout_width="60dp"
-                        android:layout_height="60dp"
-                        android:layout_gravity="center"
-                        android:tint="#FF9800"
-                        app:srcCompat="@drawable/ic_info_outline_black_24dp" />
-
-                    <TextView
+                    <RelativeLayout
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/about"
-                        android:gravity="center"
-                        android:padding="@dimen/standardMargin"
-                        android:textStyle="bold"
-                        android:textColor="@color/colorTextMain"
-                        android:textSize="@dimen/standardTextSize_18"
-                        />
+                        android:layout_height="wrap_content">
 
+                        <RelativeLayout
+                            android:id="@+id/rel_all_song_main"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/standardMargin_X2"
+                            android:background="?attr/selectableItemBackground"
+                            android:gravity="start"
+                            android:paddingTop="@dimen/standardMargin"
+                            android:paddingBottom="@dimen/standardMargin"
+                            android:paddingStart="@dimen/standardMargin_X2"
+                            android:paddingEnd="@dimen/standardMargin_X2">
 
-                </LinearLayout>
+                            <ImageView
+                                android:id="@+id/iv_AllSong_Main"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_centerVertical="true"
+                                android:layout_gravity="center"
+                                android:tint="@color/colorAccent"
+                                app:srcCompat="@drawable/ic_queue_music_black_24dp" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerVertical="true"
+                                android:layout_toEndOf="@id/iv_AllSong_Main"
+                                android:padding="@dimen/standardMargin"
+                                android:text="@string/all_songs"
+                                android:textColor="@color/colorTextMain"
+                                android:textSize="@dimen/standardTextSize_14"
+                                android:textStyle="normal" />
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentEnd="true"
+                                android:layout_centerVertical="true"
+                                android:layout_gravity="center"
+                                android:rotation="180"
+                                app:srcCompat="@drawable/ic_back_arrow_white" />
+
+                        </RelativeLayout>
+
+                        <RelativeLayout
+                            android:id="@+id/rel_faverate_main"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@id/rel_all_song_main"
+                            android:background="?attr/selectableItemBackground"
+                            android:gravity="start"
+                            android:paddingTop="@dimen/standardMargin"
+                            android:paddingBottom="@dimen/standardMargin"
+                            android:paddingStart="@dimen/standardMargin_X2"
+                            android:paddingEnd="@dimen/standardMargin_X2">
+
+                            <ImageView
+                                android:id="@+id/iv_Faverate_Main"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_centerVertical="true"
+                                android:layout_gravity="center"
+                                android:tint="@color/colorRed"
+                                app:srcCompat="@drawable/ic_favorite_border_black_24dp" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerVertical="true"
+                                android:layout_toEndOf="@id/iv_Faverate_Main"
+                                android:padding="@dimen/standardMargin"
+                                android:text="@string/favourites"
+                                android:textColor="@color/colorTextMain"
+                                android:textSize="@dimen/standardTextSize_14"
+                                android:textStyle="normal" />
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentEnd="true"
+                                android:layout_centerVertical="true"
+                                android:layout_gravity="center"
+                                android:rotation="180"
+                                app:srcCompat="@drawable/ic_back_arrow_white" />
+
+                        </RelativeLayout>
+
+                        <RelativeLayout
+                            android:id="@+id/rel_setting_main"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@id/rel_faverate_main"
+                            android:background="?attr/selectableItemBackground"
+                            android:gravity="start"
+                            android:paddingTop="@dimen/standardMargin"
+                            android:paddingBottom="@dimen/standardMargin"
+                            android:paddingStart="@dimen/standardMargin_X2"
+                            android:paddingEnd="@dimen/standardMargin_X2">
+
+                            <ImageView
+                                android:id="@+id/iv_setting_Main"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_centerVertical="true"
+                                android:layout_gravity="center"
+                                android:tint="@color/gray700"
+                                app:srcCompat="@drawable/ic_settings_black_24dp" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerVertical="true"
+                                android:layout_toEndOf="@id/iv_setting_Main"
+                                android:padding="@dimen/standardMargin"
+                                android:text="@string/setting"
+                                android:textColor="@color/colorTextMain"
+                                android:textSize="@dimen/standardTextSize_14"
+                                android:textStyle="normal" />
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentEnd="true"
+                                android:layout_centerVertical="true"
+                                android:layout_gravity="center"
+                                android:rotation="180"
+                                app:srcCompat="@drawable/ic_back_arrow_white" />
+
+                        </RelativeLayout>
+
+                        <RelativeLayout
+                            android:id="@+id/rel_about_main"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@id/rel_setting_main"
+                            android:background="?attr/selectableItemBackground"
+                            android:gravity="start"
+                            android:paddingTop="@dimen/standardMargin"
+                            android:paddingBottom="@dimen/standardMargin"
+                            android:paddingStart="@dimen/standardMargin_X2"
+                            android:paddingEnd="@dimen/standardMargin_X2">
+
+                            <ImageView
+                                android:id="@+id/iv_about_Main"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_centerVertical="true"
+                                android:layout_gravity="center"
+                                android:tint="#FF9800"
+                                app:srcCompat="@drawable/ic_info_outline_black_24dp" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerVertical="true"
+                                android:layout_toEndOf="@id/iv_about_Main"
+                                android:padding="@dimen/standardMargin"
+                                android:text="@string/about"
+                                android:textColor="@color/colorTextMain"
+                                android:textSize="@dimen/standardTextSize_14"
+                                android:textStyle="normal" />
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentEnd="true"
+                                android:layout_centerVertical="true"
+                                android:layout_gravity="center"
+                                android:rotation="180"
+                                app:srcCompat="@drawable/ic_back_arrow_white" />
+
+                        </RelativeLayout>
+
+                    </RelativeLayout>
+
+                </ScrollView>
+
 
             </RelativeLayout>
 
-        </androidx.cardview.widget.CardView>
 
+        </com.github.florent37.shapeofview.shapes.RoundRectView>
 
-        <LinearLayout
-            android:id="@+id/lin_divider_vertical_main"
-            android:layout_width="0.5dp"
-            android:layout_height="match_parent"
-            android:layout_centerInParent="true"
-            android:background="@color/colorWhite"
-            android:orientation="vertical"
-            />
-
-        <LinearLayout
-            android:id="@+id/lin_divider_horizental_main"
-            android:layout_width="match_parent"
-            android:layout_height="0.5dp"
-            android:layout_centerInParent="true"
-            android:background="@color/colorWhite"
-            android:orientation="horizontal"
-            />
-
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cv_faverate_main"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            tools:cardBackgroundColor="#80000000"
-            android:layout_alignParentEnd="true"
-            android:clickable="true"
-            android:focusable="true"
-            android:foreground="?selectableItemBackgroundBorderless"
-            android:layout_above="@id/lin_divider_horizental_main"
-            android:layout_toEndOf="@id/lin_divider_vertical_main">
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_centerInParent="true">
-
-                    <ImageView
-                        android:id="@+id/iv_Faverate_Main"
-                        android:layout_width="60dp"
-                        android:layout_height="60dp"
-                        android:padding="@dimen/smallMargin"
-                        android:layout_gravity="center"
-                        android:tint="@color/colorRed"
-                        app:srcCompat="@drawable/ic_favorite_border_black_24dp" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/favourites"
-                        android:gravity="center"
-                        android:padding="@dimen/standardMargin"
-                        android:textStyle="bold"
-                        android:textColor="@color/colorTextMain"
-                        android:textSize="@dimen/standardTextSize_18"
-                        android:layout_below="@id/iv_Faverate_Main"/>
-
-
-                </LinearLayout>
-
-            </RelativeLayout>
-
-        </androidx.cardview.widget.CardView>
-
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cv_setting_main"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_alignParentEnd="true"
-            android:clickable="true"
-            android:focusable="true"
-            tools:cardBackgroundColor="#80000000"
-            android:foreground="?selectableItemBackgroundBorderless"
-            android:layout_below="@id/lin_divider_horizental_main"
-            android:layout_toEndOf="@id/lin_divider_vertical_main">
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_centerInParent="true">
-
-                    <ImageView
-                        android:id="@+id/iv_setting_Main"
-                        android:layout_width="60dp"
-                        android:layout_height="60dp"
-                        android:padding="@dimen/smallMargin"
-                        android:layout_gravity="center"
-                        android:tint="@color/gray500"
-                        app:srcCompat="@drawable/ic_settings_black_24dp" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/setting"
-                        android:gravity="center"
-                        android:padding="@dimen/standardMargin"
-                        android:textStyle="bold"
-                        android:textColor="@color/colorTextMain"
-                        android:textSize="@dimen/standardTextSize_18"
-                        android:layout_below="@id/iv_Faverate_Main"/>
-
-
-                </LinearLayout>
-
-            </RelativeLayout>
-
-        </androidx.cardview.widget.CardView>
 
     </RelativeLayout>
 

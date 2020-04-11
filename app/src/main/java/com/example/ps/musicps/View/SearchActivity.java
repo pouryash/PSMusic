@@ -30,6 +30,7 @@ import android.widget.SeekBar;
 import android.widget.Toast;
 
 import com.example.ps.musicps.Adapter.OnSongAdapter;
+import com.example.ps.musicps.Commen.AudioFocusControler;
 import com.example.ps.musicps.Commen.Commen;
 import com.example.ps.musicps.Commen.MyApplication;
 import com.example.ps.musicps.Commen.OnAppCleared;
@@ -65,7 +66,7 @@ import java.util.TimerTask;
 import javax.inject.Inject;
 
 public class SearchActivity extends AppCompatActivity implements OnSongAdapter, MusiPlayerHelper.onMediaPlayerStateChanged,
-        MusicService.Callbacks {
+        MusicService.Callbacks, AudioFocusControler.onAudioFocusChange {
 
     ActivitySearchBinding binding;
     FirebaseAnalytics firebaseAnalytics;
@@ -699,7 +700,7 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
     }
 
     private void init() {
-
+        AudioFocusControler.onAudioFocusChange = this;
         component = DaggerSongSearchComponent.builder().searchActivityModule(new SearchActivityModule(this)).build();
         component.inject(this);
         serviceConnectionBinder = DaggerMusicServiceComponent.builder()
@@ -940,5 +941,11 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
     @Override
     public void onPreviousButtonClicked() {
         binding.panel.ivPreviousExpand.performClick();
+    }
+
+    @Override
+    public void onFocusLoss() {
+        if (musiPlayerHelper.mediaPlayer != null && musiPlayerHelper.mediaPlayer.isPlaying())
+            binding.panel.ivPlayPauseCollpase.performClick();
     }
 }
