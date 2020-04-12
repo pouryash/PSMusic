@@ -112,7 +112,9 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
                         binding.ivSongMain.setPadding(200, 256, 200, 256);
-                        binding.ivSongMain.setBackgroundColor(Color.parseColor("#d1d9ff"));
+                        binding.ivSongMain.setBackgroundColor(getResources().getColor(R.color.colorNoAlbum));
+                        binding.ivSongBackgroundMain.setBackgroundColor(getResources().getColor(R.color.gray300));
+
                         return false;
                     }
 

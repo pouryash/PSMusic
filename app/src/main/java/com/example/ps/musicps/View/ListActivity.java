@@ -187,8 +187,14 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
     @Override
     public void onPermissionsGranted(int requestCode) {
         boolean isFaverateClicked = getIntent().getBooleanExtra("isFaverateClicked", false);
+        boolean isServiceIntent = getIntent().getBooleanExtra("serviceIntent", false);
         initialize();
         setupView();
+        if (isServiceIntent) {
+            ((MyApplication) getApplication()).setState(MyApplication.LIST_STATE);
+            songViewModel.getSongs();
+            return;
+        }
         if (isFaverateClicked)
             songViewModel.getFaverateSongs();
         else
@@ -239,6 +245,11 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
             this.setIntent(intent);
             externalSong = new Song();
         }
+        checkListType(intent);
+    }
+
+    private void checkListType(Intent intent) {
+
         if (intent.getBooleanExtra("isFaverateClicked", false)) {
             songViewModel.getFaverateSongs();
             setTitle(getResources().getString(R.string.favourites));
@@ -432,12 +443,20 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
         binding.panel.ivFaverateExpand.setOnLikeListener(new OnLikeListener() {
             @Override
             public void liked(LikeButton likeButton) {
-                songViewModel.updateFaverateSong(1, songPanelViewModel.getId());
+                Song song = songViewModelList.get(songPanelViewModel.getId()).getViewModelSong();
+                song.setIsFaverate(1);
+                sharedPrefrenceManager.saveSong(song);
+                songViewModel.updateFaverateSong(1, song.getId());
+                if (binding.ivNoItems.getVisibility() == View.VISIBLE)
+                    binding.ivNoItems.setVisibility(View.INVISIBLE);
             }
 
             @Override
             public void unLiked(LikeButton likeButton) {
-                songViewModel.updateFaverateSong(0, songPanelViewModel.getId());
+                Song song = songViewModelList.get(songPanelViewModel.getId()).getViewModelSong();
+                song.setIsFaverate(0);
+                sharedPrefrenceManager.saveSong(song);
+                songViewModel.updateFaverateSong(0, song.getId());
             }
         });
 

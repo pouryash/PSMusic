@@ -37,8 +37,7 @@
 
         <com.github.florent37.shapeofview.shapes.RoundRectView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:shape_roundRect_topRightRadius="60dp">
+            android:layout_height="match_parent">
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -80,8 +79,8 @@
 
                             <ImageView
                                 android:id="@+id/iv_AllSong_Main"
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
+                                android:layout_width="32dp"
+                                android:layout_height="32dp"
                                 android:layout_centerVertical="true"
                                 android:layout_gravity="center"
                                 android:tint="@color/colorAccent"
@@ -95,7 +94,7 @@
                                 android:padding="@dimen/standardMargin"
                                 android:text="@string/all_songs"
                                 android:textColor="@color/colorTextMain"
-                                android:textSize="@dimen/standardTextSize_14"
+                                android:textSize="@dimen/standardTextSize_15"
                                 android:textStyle="normal" />
 
                             <ImageView
@@ -123,8 +122,8 @@
 
                             <ImageView
                                 android:id="@+id/iv_Faverate_Main"
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
+                                android:layout_width="32dp"
+                                android:layout_height="32dp"
                                 android:layout_centerVertical="true"
                                 android:layout_gravity="center"
                                 android:tint="@color/colorRed"
@@ -138,7 +137,7 @@
                                 android:padding="@dimen/standardMargin"
                                 android:text="@string/favourites"
                                 android:textColor="@color/colorTextMain"
-                                android:textSize="@dimen/standardTextSize_14"
+                                android:textSize="@dimen/standardTextSize_15"
                                 android:textStyle="normal" />
 
                             <ImageView
@@ -166,8 +165,8 @@
 
                             <ImageView
                                 android:id="@+id/iv_setting_Main"
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
+                                android:layout_width="32dp"
+                                android:layout_height="32dp"
                                 android:layout_centerVertical="true"
                                 android:layout_gravity="center"
                                 android:tint="@color/gray700"
@@ -181,7 +180,7 @@
                                 android:padding="@dimen/standardMargin"
                                 android:text="@string/setting"
                                 android:textColor="@color/colorTextMain"
-                                android:textSize="@dimen/standardTextSize_14"
+                                android:textSize="@dimen/standardTextSize_15"
                                 android:textStyle="normal" />
 
                             <ImageView
@@ -209,8 +208,8 @@
 
                             <ImageView
                                 android:id="@+id/iv_about_Main"
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
+                                android:layout_width="32dp"
+                                android:layout_height="32dp"
                                 android:layout_centerVertical="true"
                                 android:layout_gravity="center"
                                 android:tint="#FF9800"
@@ -224,7 +223,7 @@
                                 android:padding="@dimen/standardMargin"
                                 android:text="@string/about"
                                 android:textColor="@color/colorTextMain"
-                                android:textSize="@dimen/standardTextSize_14"
+                                android:textSize="@dimen/standardTextSize_15"
                                 android:textStyle="normal" />
 
                             <ImageView

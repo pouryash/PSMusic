@@ -35,7 +35,6 @@ import com.example.ps.musicps.Commen.SongSharedPrefrenceManager;
 import com.example.ps.musicps.Di.component.DaggerSongViewModelComponent;
 import com.example.ps.musicps.Di.component.SongViewModelComponent;
 import com.example.ps.musicps.Di.module.SongAdapterModule;
-import com.example.ps.musicps.Di.module.SongSearchAdapterModule;
 import com.example.ps.musicps.Model.Song;
 import com.example.ps.musicps.R;
 import com.example.ps.musicps.Repository.SongRepository;
