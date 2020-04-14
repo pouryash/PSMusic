@@ -6,6 +6,7 @@ import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.content.FileProvider;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModel;
 
 import android.Manifest;
 import android.app.Dialog;
@@ -251,6 +252,7 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
     private void checkListType(Intent intent) {
 
         if (intent.getBooleanExtra("isFaverateClicked", false)) {
+            this.setIntent(intent);
             songViewModel.getFaverateSongs();
             setTitle(getResources().getString(R.string.favourites));
             if (binding.toolbarSongList.getMenu().size() > 0) {
@@ -259,6 +261,7 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
             }
             binding.appBarList.setExpanded(true);
         } else if (intent.getBooleanExtra("isListClicked", false)) {
+            this.setIntent(intent);
             songViewModel.getSongs();
             setTitle(getResources().getString(R.string.app_name));
             if (binding.toolbarSongList.getMenu().size() > 0) {
@@ -294,8 +297,9 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
                 binding.panel.ivPlayPauseCollpase.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_play_24px, null));
                 binding.panel.ivPlayPayseExpand.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_play, null));
             }
-            if (songPanelViewModel.getId() != sharedPrefrenceManager.getSong().getId())
-                setupPanel(sharedPrefrenceManager.getSong());
+//            if (songPanelViewModel.getId() != sharedPrefrenceManager.getSong().getId())
+            setupPanel(sharedPrefrenceManager.getSong());
+            songViewModel.getSongs();
         }
 
         if (binding.slidingPanel.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED) {
@@ -329,8 +333,8 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
 
     private void setupPanel(Song song) {
 
-        if (song.getId() == songPanelViewModel.getId() && song.getTrackFile().equals(songPanelViewModel.getPath()))
-            return;
+//        if (song.getId() == songPanelViewModel.getId() && song.getTrackFile().equals(songPanelViewModel.getPath()))
+//            return;
 
         if (binding.slidingPanel.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED) {
             binding.panel.rlSlidePanelTop.setAlpha(0);
@@ -443,7 +447,7 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
         binding.panel.ivFaverateExpand.setOnLikeListener(new OnLikeListener() {
             @Override
             public void liked(LikeButton likeButton) {
-                Song song = songViewModelList.get(songPanelViewModel.getId()).getViewModelSong();
+                Song song = songViewModel.getSongByPath(songPanelViewModel.getPath());
                 song.setIsFaverate(1);
                 sharedPrefrenceManager.saveSong(song);
                 songViewModel.updateFaverateSong(1, song.getId());
@@ -453,7 +457,7 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
 
             @Override
             public void unLiked(LikeButton likeButton) {
-                Song song = songViewModelList.get(songPanelViewModel.getId()).getViewModelSong();
+                Song song = songViewModel.getSongByPath(songPanelViewModel.getPath());
                 song.setIsFaverate(0);
                 sharedPrefrenceManager.saveSong(song);
                 songViewModel.updateFaverateSong(0, song.getId());

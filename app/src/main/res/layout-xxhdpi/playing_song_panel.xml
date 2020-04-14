@@ -179,7 +179,6 @@
                 android:layout_centerHorizontal="true"
                 app:cardCornerRadius="10dp"
                 app:cardElevation="8dp"
-                android:layout_marginTop="@dimen/standardMargin"
                 app:cardPreventCornerOverlap="false">
 
                 <ImageView

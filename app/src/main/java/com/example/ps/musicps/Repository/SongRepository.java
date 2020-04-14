@@ -230,8 +230,8 @@ public class SongRepository {
 
     }
 
-    public void updateFaverateSong(int faverate, int id){
-        dbRepository.updateFaverateSong(faverate, id);
+    public int updateFaverateSong(int faverate, int id){
+       return dbRepository.updateFaverateSong(faverate, id);
     }
 
     public void deleteSong(int id) {
@@ -241,6 +241,7 @@ public class SongRepository {
     public Song getSong(String id) {
         return dbRepository.getSong(id);
     }
+
     public Song getSongByPath(String path) {
         return dbRepository.getSongByPath(path);
     }

@@ -3,7 +3,7 @@
     <color name="colorPrimary">#111015</color>
     <color name="colorPrimaryDark">#1d1e23</color>
     <color name="colorToolbar">#1d1e23</color>
-    <color name="colorAccent">#3C69AC</color>
+    <color name="colorAccent">#1976d2</color>
     <color name="colorWhite">#ffffff</color>
     <color name="colorBlack">#000000</color>
     <color name="colorGray">#AEAEAE</color>
@@ -16,6 +16,7 @@
     <color name="colorInverse">#fff</color>
     <color name="colorNoAlbum">#d1d9ff</color>
     <color name="colorGreen">#4CAF50</color>
+    <color name="colorDialog">@color/gray800</color>
 
 
     <!-- gray family-->

@@ -17,8 +17,7 @@
         android:layout_marginEnd="@dimen/standardMargin"
         android:layout_marginBottom="@dimen/standardMargin_X2"
         app:cardElevation="5dp"
-        app:cardBackgroundColor="@color/colorWhite"
-        android:background="@color/colorWhite"
+        app:cardBackgroundColor="@color/colorDialog"
         android:orientation="vertical">
 
 
@@ -36,7 +35,7 @@
                 android:layout_marginTop="@dimen/standardMargin_X2"
                 android:layout_marginBottom="@dimen/standardMargin_X2"
                 android:text="@string/songInfoTitle"
-                android:textColor="@color/colorBlack"
+                android:textColor="@color/colorTextMain"
                 android:textSize="@dimen/standardTextSize_14"
                 />
             <TextView
@@ -50,7 +49,7 @@
                 android:layout_alignStart="@id/tv_duration_value_SongInfoDialog"
                 android:singleLine="true"
                 android:ellipsize="end"
-                android:textColor="@color/colorBlack"
+                android:textColor="@color/colorTextMain"
                 android:textStyle="bold"
                 android:text="@{songInfo.title}"
                 android:textSize="@dimen/standardTextSize_14"
@@ -67,7 +66,7 @@
                 android:layout_marginTop="@dimen/standardMargin"
                 android:layout_marginBottom="@dimen/standardMargin_X2"
                 android:text="@string/songInfoAlbumName"
-                android:textColor="@color/colorBlack"
+                android:textColor="@color/colorTextMain"
                 android:textSize="@dimen/standardTextSize_14"
                 />
             <TextView
@@ -82,7 +81,7 @@
                 android:layout_alignStart="@id/tv_duration_value_SongInfoDialog"
                 android:layout_marginTop="@dimen/standardMargin"
                 android:layout_marginBottom="@dimen/standardMargin_X2"
-                android:textColor="@color/colorBlack"
+                android:textColor="@color/colorTextMain"
                 android:textStyle="bold"
                 android:text="@{songInfo.album}"
                 android:textSize="@dimen/standardTextSize_14"
@@ -99,7 +98,7 @@
                 android:layout_marginTop="@dimen/standardMargin"
                 android:layout_marginBottom="@dimen/standardMargin_X2"
                 android:text="@string/songInfoDuration"
-                android:textColor="@color/colorBlack"
+                android:textColor="@color/colorTextMain"
                 android:textSize="@dimen/standardTextSize_15"
                 />
             <TextView
@@ -114,7 +113,7 @@
                 android:layout_marginStart="@dimen/standardMargin_X2"
                 android:layout_marginTop="@dimen/standardMargin"
                 android:layout_marginBottom="@dimen/standardMargin_X2"
-                android:textColor="@color/colorBlack"
+                android:textColor="@color/colorTextMain"
                 android:textStyle="bold"
                 android:text="@{songInfo.duration}"
                 android:textSize="@dimen/standardTextSize_14"
@@ -131,7 +130,7 @@
                 android:layout_marginTop="@dimen/standardMargin"
                 android:layout_marginBottom="@dimen/standardMargin_X2"
                 android:text="@string/songInfoSize"
-                android:textColor="@color/colorBlack"
+                android:textColor="@color/colorTextMain"
                 android:textSize="@dimen/standardTextSize_14"
                 />
             <TextView
@@ -143,7 +142,7 @@
                 android:layout_gravity="center"
                 android:layout_marginTop="@dimen/standardMargin"
                 android:layout_marginBottom="@dimen/standardMargin_X2"
-                android:textColor="@color/colorBlack"
+                android:textColor="@color/colorTextMain"
                 android:layout_alignStart="@id/tv_duration_value_SongInfoDialog"
                 android:textStyle="bold"
                 android:ellipsize="end"
@@ -162,7 +161,7 @@
                 android:layout_marginTop="@dimen/standardMargin"
                 android:layout_marginBottom="@dimen/standardMargin_X2"
                 android:text="@string/songInfoPath"
-                android:textColor="@color/colorBlack"
+                android:textColor="@color/colorTextMain"
                 android:textSize="@dimen/standardTextSize_14"
                 />
             <TextView
@@ -176,7 +175,7 @@
                 android:layout_alignStart="@id/tv_duration_value_SongInfoDialog"
                 android:layout_marginTop="@dimen/standardMargin"
                 android:layout_marginBottom="@dimen/standardMargin_X2"
-                android:textColor="@color/colorBlack"
+                android:textColor="@color/colorTextMain"
                 android:textStyle="bold"
                 android:ellipsize="end"
                 android:text="@{songInfo.path}"

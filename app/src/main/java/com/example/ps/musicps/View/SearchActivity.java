@@ -71,7 +71,7 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
     ActivitySearchBinding binding;
     FirebaseAnalytics firebaseAnalytics;
     InputMethodManager imgr;
-    String searchTerm;
+    String searchTerm = "";
     SongInfoDialogBinding songInfoBinding;
     Dialog infoDialog;
     float upX;
@@ -358,12 +358,18 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
         binding.panel.ivFaverateExpand.setOnLikeListener(new OnLikeListener() {
             @Override
             public void liked(LikeButton likeButton) {
-                songViewModel.updateFaverateSong(1, songPanelViewModel.getId());
+                Song song = songViewModel.getSongByPath(songPanelViewModel.getPath());
+                song.setIsFaverate(1);
+                sharedPrefrenceManager.saveSong(song);
+                songViewModel.updateFaverateSong(1, song.getId());
             }
 
             @Override
             public void unLiked(LikeButton likeButton) {
-                songViewModel.updateFaverateSong(0, songPanelViewModel.getId());
+                Song song = songViewModel.getSongByPath(songPanelViewModel.getPath());
+                song.setIsFaverate(0);
+                sharedPrefrenceManager.saveSong(song);
+                songViewModel.updateFaverateSong(0, song.getId());
             }
         });
 
@@ -376,7 +382,7 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
                 share.putExtra(Intent.EXTRA_STREAM, uri);
                 share.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 startActivity(Intent.createChooser(share, "Share Sound File"));
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
                 Toast.makeText(SearchActivity.this, "cant share this file, something wrong", Toast.LENGTH_LONG).show();
             }
@@ -399,6 +405,8 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
 
             SearchActivity.this.songViewModelList.clear();
             SearchActivity.this.songViewModelList.addAll(songViewModels);
+            if (songViewModels.size() > 0)
+                songViewModel.getSongSearchAdapter().getFilter().filter(searchTerm);
 
         });
 
@@ -746,12 +754,13 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
         if (binding.slidingPanel.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED) {
             binding.slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
         } else {
-            if (serviceConnectionBinder.isServiceConnect && musiPlayerHelper.mediaPlayer != null) {
-                serviceConnectionBinder.getMusicService().stopSelf();
-                unbindService(serviceConnectionBinder.getServiceConnection());
-                serviceConnectionBinder.getMusicService().removeNotification();
-                stopService(serviceIntent);
-            }
+
+                if (serviceConnectionBinder.isServiceConnect && musiPlayerHelper.mediaPlayer != null) {
+                    serviceConnectionBinder.getMusicService().stopSelf();
+                    unbindService(serviceConnectionBinder.getServiceConnection());
+                    serviceConnectionBinder.getMusicService().removeNotification();
+                    stopService(serviceIntent);
+                }
             super.onBackPressed();
         }
         //for on resume in listActivity because onDestroy called after that

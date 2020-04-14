@@ -7,7 +7,7 @@
     android:layout_marginStart="@dimen/standardMargin"
     android:layout_marginEnd="@dimen/standardMargin"
     android:layout_marginBottom="@dimen/standardMargin_X2"
-    app:cardBackgroundColor="@color/colorWhite"
+    app:cardBackgroundColor="@color/colorDialog"
     app:cardElevation="5dp"
     android:orientation="vertical">
 
@@ -22,10 +22,11 @@
            android:layout_width="wrap_content"
            android:layout_height="wrap_content"
            android:layout_marginStart="@dimen/standardMargin_X2"
+           android:layout_marginEnd="@dimen/standardMargin_X2"
            android:layout_marginTop="@dimen/standardMargin_X2"
            android:layout_marginBottom="@dimen/standardMargin_X2"
            android:text="Scan for song"
-           android:textColor="@color/colorBlack"
+           android:textColor="@color/colorTextMain"
            android:textSize="@dimen/standardTextSize_16" />
 
 
@@ -48,7 +49,7 @@
                android:background="?attr/selectableItemBackground"
                android:layout_gravity="center"
                android:layout_margin="@dimen/smallMargin"
-               android:text="No"
+               android:text="@string/no"
                android:clickable="true"
                android:focusable="true"
                android:textStyle="bold"
@@ -74,7 +75,7 @@
                android:background="?attr/selectableItemBackground"
                android:layout_gravity="center"
                android:layout_margin="@dimen/smallMargin"
-               android:text="Yes"
+               android:text="@string/yes"
                android:clickable="true"
                android:focusable="true"
                android:textStyle="bold"

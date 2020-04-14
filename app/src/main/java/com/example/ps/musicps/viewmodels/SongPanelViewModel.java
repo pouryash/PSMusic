@@ -15,6 +15,7 @@ import androidx.databinding.BindingAdapter;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
@@ -51,7 +52,6 @@ public class SongPanelViewModel extends BaseObservable {
         this.imageUri = song.getSongImageUri();
     }
 
-
     @BindingAdapter({"bind:imgaeUriPanel"})
     public static void songImageLoad(ImageView iv, String uri) {
         int res;
@@ -63,7 +63,7 @@ public class SongPanelViewModel extends BaseObservable {
 
         if (uri != null) {
             Glide.with(iv.getContext()).asBitmap().load(Uri.parse(uri))
-                    .apply(new RequestOptions().placeholder(res))
+                    .apply(new RequestOptions().placeholder(res).diskCacheStrategy(DiskCacheStrategy.AUTOMATIC))
                     .listener(new RequestListener<Bitmap>() {
                         @Override
                         public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {

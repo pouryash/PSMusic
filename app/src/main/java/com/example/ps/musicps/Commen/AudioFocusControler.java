@@ -35,6 +35,7 @@ public class AudioFocusControler implements AudioManager.OnAudioFocusChangeListe
                     .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
                     .build();
 
+
             focusRequest = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
                     .setAudioAttributes(playbackAttributes)
                     .setAcceptsDelayedFocusGain(true)
@@ -88,6 +89,9 @@ public class AudioFocusControler implements AudioManager.OnAudioFocusChangeListe
                 break;
             case AudioManager.AUDIOFOCUS_REQUEST_FAILED:
                 Log.e(TAG, "AUDIOFOCUS_REQUEST_FAILED");
+                break;
+            case AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE:
+                Log.e(TAG, "AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE");
                 break;
         }
 

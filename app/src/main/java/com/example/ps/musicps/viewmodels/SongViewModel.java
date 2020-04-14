@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -21,6 +22,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
@@ -98,6 +100,8 @@ public class SongViewModel extends BaseObservable {
 
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext(), LinearLayoutManager.VERTICAL, false));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setItemViewCacheSize(10);
         recyclerView.setAdapter(songAdapter);
 
         SongAdapter finalSongAdapter = songAdapter;
@@ -123,6 +127,7 @@ public class SongViewModel extends BaseObservable {
             songViewModels.clear();
             songViewModels.addAll(songViewModellist);
             finalSongAdapter.notifyDataSetChanged();
+
         });
 
     }
@@ -131,7 +136,7 @@ public class SongViewModel extends BaseObservable {
     public static void loadImage(ImageView iv, String uri, Context context) {
         if (uri != null) {
             Glide.with(iv.getContext()).asBitmap().load(Uri.parse(uri))
-                    .apply(new RequestOptions().placeholder(R.drawable.ic_no_album))
+                    .apply(new RequestOptions().placeholder(R.drawable.ic_no_album).diskCacheStrategy(DiskCacheStrategy.AUTOMATIC))
                     .listener(new RequestListener<Bitmap>() {
                         @Override
                         public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
@@ -206,7 +211,9 @@ public class SongViewModel extends BaseObservable {
     }
 
     public void updateFaverateSong(int faverate, int id) {
-        songRepository.updateFaverateSong(faverate, id);
+       int isUpdate = songRepository.updateFaverateSong(faverate, id);
+       if (isUpdate == 1)
+           getSongs();
     }
 
     @Bindable

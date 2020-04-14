@@ -2,6 +2,7 @@ package com.example.ps.musicps.View;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.navigation.Navigation;
 
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -16,6 +17,7 @@ import android.view.WindowManager;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
@@ -107,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
             uri = "";
 
         Glide.with(binding.ivSongMain.getContext()).asBitmap().load(Uri.parse(uri))
-                .apply(new RequestOptions().placeholder(R.drawable.ic_no_album_128))
+                .apply(new RequestOptions().placeholder(R.drawable.ic_no_album_128).diskCacheStrategy(DiskCacheStrategy.AUTOMATIC))
                 .listener(new RequestListener<Bitmap>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {

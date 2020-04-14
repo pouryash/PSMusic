@@ -22,7 +22,9 @@ import android.provider.Settings;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.graphics.drawable.DrawableCompat;
 
+import com.example.ps.musicps.Helper.DialogHelper;
 import com.example.ps.musicps.Model.Song;
+import com.example.ps.musicps.View.Dialog.CustomeAlertDialogClass;
 import com.example.ps.musicps.viewmodels.SongViewModel;
 
 import java.io.File;
@@ -193,29 +195,19 @@ public class Commen {
 
     public void writeSettingAlertMessage(final Activity context) {
 
-        final AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setMessage("We need write Setting permision, do you want to enable it?")
-                .setCancelable(false)
-                .setPositiveButton("yes", new DialogInterface.OnClickListener() {
-                    public void onClick(final DialogInterface dialog, final int id) {
-                        Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
-                        context.startActivityForResult(intent, WRITE_SETTINGS_REQUEST);
-                    }
-                })
-                .setNegativeButton("no", new DialogInterface.OnClickListener() {
-                    public void onClick(final DialogInterface dialog, final int id) {
-                        dialog.cancel();
-                    }
-                });
-        final AlertDialog alert = builder.create();
-        alert.setOnShowListener(new DialogInterface.OnShowListener() {
+        DialogHelper.alertDialog((Activity) context, 0, "We need write Setting permision, do you want to enable it?", new CustomeAlertDialogClass.onAlertDialogCliscked() {
             @Override
-            public void onShow(DialogInterface dialogInterface) {
-                alert.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.BLACK);
-                alert.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.BLACK);
+            public void onPosetive() {
+                Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
+                context.startActivityForResult(intent, WRITE_SETTINGS_REQUEST);
+            }
+
+            @Override
+            public void onNegetive() {
+
             }
         });
-        alert.show();
+
     }
 
 }

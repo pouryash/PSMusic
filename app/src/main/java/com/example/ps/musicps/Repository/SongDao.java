@@ -5,6 +5,7 @@ import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
+import androidx.room.Update;
 
 import com.example.ps.musicps.Model.Song;
 
@@ -50,5 +51,8 @@ public interface SongDao {
     void updateSongLocation(String location, int id);
 
     @Query("UPDATE tbl_song SET isFaverate =:faverate WHERE id LIKE :id")
-    void updateFaverateSong(int faverate, int id);
+    int updateFaverateSong(int faverate, int id);
+
+    @Update
+    void updateFaverate(Song... song);
 }

@@ -2,7 +2,9 @@ package com.example.ps.musicps.Commen;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.lifecycle.LiveData;
 
 import com.example.ps.musicps.Model.Song;
@@ -141,7 +143,12 @@ public class SongSharedPrefrenceManager {
 
     public int getNightMode() {
 
-        return firstInSharedPreferences.getInt(KEY_Night_MODE, 0);
+        int nightMode = firstInSharedPreferences.getInt(KEY_Night_MODE, 0);
+
+        if (nightMode == 0)
+            return AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM;
+        else
+            return nightMode;
     }
 
     public abstract class SharedPreferenceLiveData<T> extends LiveData<T> {

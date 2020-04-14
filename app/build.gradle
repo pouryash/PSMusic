@@ -24,8 +24,8 @@ android {
         applicationId "com.example.ps.musicps"
         minSdkVersion 17
         targetSdkVersion 29
-        versionCode 7
-        versionName "1.1.0"
+        versionCode 8
+        versionName "1.2.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
         signingConfig signingConfigs.config
@@ -93,5 +93,8 @@ dependencies {
     implementation 'com.github.florent37:shapeofview:1.4.6'
     //blure
     implementation 'jp.wasabeef:blurry:3.0.0'
+    //navigation component
+    implementation 'androidx.navigation:navigation-fragment:2.2.1'
+    implementation 'androidx.navigation:navigation-ui:2.2.1'
 
 }

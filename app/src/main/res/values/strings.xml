@@ -23,5 +23,8 @@
     <string name="off">off</string>
     <string name="on">on</string>
     <string name="library">Library</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="tick">✓</string>
 
 </resources>

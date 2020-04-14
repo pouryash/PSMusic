@@ -42,7 +42,7 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="#80D1D9FF"
+                android:background="#80FFFFFF"
                 android:paddingTop="@dimen/standardMargin_X2">
 
                 <TextView
@@ -52,7 +52,7 @@
                     android:gravity="center"
                     android:paddingStart="@dimen/standardMargin"
                     android:text="@string/library"
-                    android:textColor="@color/colorTextMain"
+                    android:textColor="@color/colorBlack"
                     android:textSize="@dimen/standardTextSize_20"
                     android:textStyle="normal" />
 
@@ -93,7 +93,7 @@
                                 android:layout_toEndOf="@id/iv_AllSong_Main"
                                 android:padding="@dimen/standardMargin"
                                 android:text="@string/all_songs"
-                                android:textColor="@color/colorTextMain"
+                                android:textColor="@color/colorBlack"
                                 android:textSize="@dimen/standardTextSize_15"
                                 android:textStyle="normal" />
 
@@ -104,6 +104,7 @@
                                 android:layout_centerVertical="true"
                                 android:layout_gravity="center"
                                 android:rotation="180"
+                                android:tint="@color/colorBlack"
                                 app:srcCompat="@drawable/ic_back_arrow_white" />
 
                         </RelativeLayout>
@@ -136,7 +137,7 @@
                                 android:layout_toEndOf="@id/iv_Faverate_Main"
                                 android:padding="@dimen/standardMargin"
                                 android:text="@string/favourites"
-                                android:textColor="@color/colorTextMain"
+                                android:textColor="@color/colorBlack"
                                 android:textSize="@dimen/standardTextSize_15"
                                 android:textStyle="normal" />
 
@@ -147,6 +148,7 @@
                                 android:layout_centerVertical="true"
                                 android:layout_gravity="center"
                                 android:rotation="180"
+                                android:tint="@color/colorBlack"
                                 app:srcCompat="@drawable/ic_back_arrow_white" />
 
                         </RelativeLayout>
@@ -179,7 +181,7 @@
                                 android:layout_toEndOf="@id/iv_setting_Main"
                                 android:padding="@dimen/standardMargin"
                                 android:text="@string/setting"
-                                android:textColor="@color/colorTextMain"
+                                android:textColor="@color/colorBlack"
                                 android:textSize="@dimen/standardTextSize_15"
                                 android:textStyle="normal" />
 
@@ -190,6 +192,7 @@
                                 android:layout_centerVertical="true"
                                 android:layout_gravity="center"
                                 android:rotation="180"
+                                android:tint="@color/colorBlack"
                                 app:srcCompat="@drawable/ic_back_arrow_white" />
 
                         </RelativeLayout>
@@ -222,7 +225,7 @@
                                 android:layout_toEndOf="@id/iv_about_Main"
                                 android:padding="@dimen/standardMargin"
                                 android:text="@string/about"
-                                android:textColor="@color/colorTextMain"
+                                android:textColor="@color/colorBlack"
                                 android:textSize="@dimen/standardTextSize_15"
                                 android:textStyle="normal" />
 
@@ -233,6 +236,7 @@
                                 android:layout_centerVertical="true"
                                 android:layout_gravity="center"
                                 android:rotation="180"
+                                android:tint="@color/colorBlack"
                                 app:srcCompat="@drawable/ic_back_arrow_white" />
 
                         </RelativeLayout>
