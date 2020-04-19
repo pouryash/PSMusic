@@ -15,6 +15,7 @@ import androidx.databinding.BindingAdapter;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
@@ -41,6 +42,7 @@ public class SongPanelViewModel extends BaseObservable {
     private int audioManagerMax;
     private int audioManagerProgress;
     private boolean isSoundOn = true;
+    private boolean faverate = false;
 
     public SongPanelViewModel(Song song) {
         this.songName = song.getSongName();
@@ -49,7 +51,6 @@ public class SongPanelViewModel extends BaseObservable {
         this.path = song.getTrackFile();
         this.imageUri = song.getSongImageUri();
     }
-
 
     @BindingAdapter({"bind:imgaeUriPanel"})
     public static void songImageLoad(ImageView iv, String uri) {
@@ -62,7 +63,7 @@ public class SongPanelViewModel extends BaseObservable {
 
         if (uri != null) {
             Glide.with(iv.getContext()).asBitmap().load(Uri.parse(uri))
-                    .apply(new RequestOptions().placeholder(res))
+                    .apply(new RequestOptions().placeholder(res).diskCacheStrategy(DiskCacheStrategy.AUTOMATIC))
                     .listener(new RequestListener<Bitmap>() {
                         @Override
                         public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
@@ -108,7 +109,6 @@ public class SongPanelViewModel extends BaseObservable {
                 .into(iv);
     }
 
-
     @Inject
     public SongPanelViewModel(Context context) {
         this.context = context;
@@ -140,6 +140,16 @@ public class SongPanelViewModel extends BaseObservable {
     public void setImageUri(String imageUri) {
         this.imageUri = imageUri;
         notifyPropertyChanged(BR.imageUri);
+    }
+
+    @Bindable
+    public boolean isFaverate() {
+        return faverate;
+    }
+
+    public void setFaverate(boolean faverate) {
+        this.faverate = faverate;
+        notifyPropertyChanged(BR.faverate);
     }
 
     @Bindable

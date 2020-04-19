@@ -9,5 +9,14 @@
     <string name="songInfoDuration">Duration:</string>
     <string name="appwidget_text">EXAMPLE</string>
     <string name="add_widget">Add widget</string>
+    <string name="favourites">Favourites</string>
+    <string name="all_songs">All Songs</string>
+    <string name="setting">Setting</string>
+    <string name="about">About</string>
+    <string name="version">version</string>
+    <string name="Songs_Not_Found_List">No songs found, try again later</string>
+    <string name="Faverate_Song_Empty">Your Faverate List Is Empty</string>
+    <string name="Scan_Complete">scan for song is successfuly complete</string>
+    <string name="default_dark_mode">Default</string>
 
 </resources>

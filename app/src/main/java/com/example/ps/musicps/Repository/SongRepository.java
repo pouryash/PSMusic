@@ -139,6 +139,7 @@ public class SongRepository {
         MutableLiveData<List<Song>> modelMutableLiveData = new MutableLiveData<>();
 
         dbRepository.getSongs().observeForever(songs -> {
+            list.clear();
             Observable.fromArray(songs)
                     .flatMapIterable(songs1 -> songs1)
                     .map(song -> {
@@ -181,6 +182,58 @@ public class SongRepository {
 
     }
 
+    public LiveData<List<Song>> getFaverateSongs() {
+        List<Song> list = new ArrayList<>();
+        MutableLiveData<List<Song>> modelMutableLiveData = new MutableLiveData<>();
+
+        dbRepository.getFaverateSongs().observeForever(songs -> {
+            list.clear();
+            Observable.fromArray(songs)
+                    .flatMapIterable(songs1 -> songs1)
+                    .map(song -> {
+                        File songFile = new File(song.getTrackFile());
+                        if (songFile.exists()){
+                            return song;
+                        }else {
+                            dbRepository.deleteSong(song);
+                            return new Song();
+                        }
+
+                    })
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Observer<Song>() {
+                        @Override
+                        public void onSubscribe(Disposable d) {
+
+                        }
+
+                        @Override
+                        public void onNext(Song song) {
+                            list.add(song);
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+
+                        }
+
+                        @Override
+                        public void onComplete() {
+                            modelMutableLiveData.postValue(list);
+                        }
+                    });
+
+        });
+
+        return modelMutableLiveData;
+
+    }
+
+    public int updateFaverateSong(int faverate, int id){
+       return dbRepository.updateFaverateSong(faverate, id);
+    }
+
     public void deleteSong(int id) {
         dbRepository.deleteById(id);
     }
@@ -189,12 +242,20 @@ public class SongRepository {
         return dbRepository.getSong(id);
     }
 
+    public Song getSongByPath(String path) {
+        return dbRepository.getSongByPath(path);
+    }
+
     public Song getMinSong(String id) {
         return dbRepository.getMinSong(id);
     }
 
     public Song getMaxSong(String id) {
         return dbRepository.getMaxSong(id);
+    }
+
+    public boolean isSongExist(String path) {
+        return dbRepository.isSongExist(path);
     }
 
     public int getSize(){

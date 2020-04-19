@@ -38,7 +38,7 @@ public class SplashScreen extends AppCompatActivity {
         super.onResume();
         shouldLaunch = true;
         if (isTimerFinished) {
-            startActivity(new Intent(SplashScreen.this, ListActivity.class));
+            startActivity(new Intent(SplashScreen.this, MainActivity.class));
             SplashScreen.this.finish();
         }
     }
@@ -48,7 +48,7 @@ public class SplashScreen extends AppCompatActivity {
             @Override
             public void run() {
                 if (shouldLaunch) {
-                    startActivity(new Intent(SplashScreen.this, ListActivity.class));
+                    startActivity(new Intent(SplashScreen.this, MainActivity.class));
                     SplashScreen.this.finish();
                 }
                 isTimerFinished = true;

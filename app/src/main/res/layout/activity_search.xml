@@ -85,6 +85,7 @@
                 android:layout_below="@+id/toolbar_Search"
                 android:clipToPadding="false"
                 android:paddingBottom="64dp"
+                tools:listitem="@layout/song_row"
                 bind:context="@{songViewModel.context}"
                 bind:recyclerBinder="@{songViewModel.mutableSongViewModelList}"
                 bind:songAdapter="@{songViewModel.songSearchAdapter}"

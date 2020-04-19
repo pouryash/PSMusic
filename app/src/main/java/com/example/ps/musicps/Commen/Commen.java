@@ -5,6 +5,7 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -13,15 +14,24 @@ import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.os.Handler;
+import android.provider.MediaStore;
 import android.provider.Settings;
+
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.graphics.drawable.DrawableCompat;
-import com.example.ps.musicps.Model.Song;
 
+import com.example.ps.musicps.Helper.DialogHelper;
+import com.example.ps.musicps.Model.Song;
+import com.example.ps.musicps.View.Dialog.CustomeAlertDialogClass;
+import com.example.ps.musicps.viewmodels.SongViewModel;
+
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -40,6 +50,30 @@ public class Commen {
         return instance;
     }
 
+    public static void deleteCache(Context context) {
+        try {
+            File dir = context.getCacheDir();
+            deleteDir(dir);
+        } catch (Exception e) { e.printStackTrace();}
+    }
+
+    public static boolean deleteDir(File dir) {
+        if (dir != null && dir.isDirectory()) {
+            String[] children = dir.list();
+            for (int i = 0; i < children.length; i++) {
+                boolean success = deleteDir(new File(dir, children[i]));
+                if (!success) {
+                    return false;
+                }
+            }
+            return dir.delete();
+        } else if(dir!= null && dir.isFile()) {
+            return dir.delete();
+        } else {
+            return false;
+        }
+    }
+
     public static Bitmap getBitmapFromVectorDrawable(Context context, Drawable drawableId) {
         Drawable drawable = drawableId;
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
@@ -53,6 +87,50 @@ public class Commen {
         drawable.draw(canvas);
 
         return bitmap;
+    }
+
+    public static Uri getImageByteUri(byte[] bytes, int length, Context context) {
+        Uri albumUri = Uri.EMPTY;
+        if (bytes != null) {
+
+            Bitmap songBitmapAlbum = BitmapFactory
+                    .decodeByteArray(bytes, 0, length);
+
+            String paths = MediaStore.Images.Media.insertImage
+                    (context.getContentResolver(), songBitmapAlbum, "Title", null);
+            if (paths != null) {
+                albumUri = Uri.parse(paths);
+            }
+        }
+        return albumUri;
+    }
+
+    public static int getListItemIndex(List<SongViewModel> modelList, int id) {
+        for (int i = 0; i < modelList.size(); i++) {
+            if (modelList.get(i).getId() == id) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public static String getRealPathFromURI(Context context, Uri contentUri) {
+        Cursor cursor = null;
+
+        try {
+            String[] proj = {MediaStore.Images.Media.DATA};
+            cursor = context.getContentResolver().query(contentUri, proj, null, null, null);
+            cursor.moveToFirst();
+            int column_index = cursor.getColumnIndex(proj[0]);
+            String path = cursor.getString(column_index);
+            return path;
+        } catch (Exception e) {
+            return null;
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
     }
 
     public static Bitmap decodeUriToBitmap(Context mContext, Uri sendUri) {
@@ -70,6 +148,7 @@ public class Commen {
         }
         return getBitmap;
     }
+
     static {
         instance = new Commen();
     }
@@ -116,29 +195,19 @@ public class Commen {
 
     public void writeSettingAlertMessage(final Activity context) {
 
-        final AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setMessage("We need write Setting permision, do you want to enable it?")
-                .setCancelable(false)
-                .setPositiveButton("yes", new DialogInterface.OnClickListener() {
-                    public void onClick(final DialogInterface dialog, final int id) {
-                        Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
-                        context.startActivityForResult(intent, WRITE_SETTINGS_REQUEST);
-                    }
-                })
-                .setNegativeButton("no", new DialogInterface.OnClickListener() {
-                    public void onClick(final DialogInterface dialog, final int id) {
-                        dialog.cancel();
-                    }
-                });
-        final AlertDialog alert = builder.create();
-        alert.setOnShowListener(new DialogInterface.OnShowListener() {
+        DialogHelper.alertDialog((Activity) context, 0, "We need write Setting permision, do you want to enable it?", new CustomeAlertDialogClass.onAlertDialogCliscked() {
             @Override
-            public void onShow(DialogInterface dialogInterface) {
-                alert.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.BLACK);
-                alert.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.BLACK);
+            public void onPosetive() {
+                Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
+                context.startActivityForResult(intent, WRITE_SETTINGS_REQUEST);
+            }
+
+            @Override
+            public void onNegetive() {
+
             }
         });
-        alert.show();
+
     }
 
 }

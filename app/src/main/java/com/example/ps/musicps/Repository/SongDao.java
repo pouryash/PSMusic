@@ -5,6 +5,7 @@ import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
+import androidx.room.Update;
 
 import com.example.ps.musicps.Model.Song;
 
@@ -34,6 +35,9 @@ public interface SongDao {
     @Query("SELECT * FROM tbl_song WHERE trackFile = :path")
     Song getSongByPath(String path);
 
+    @Query("SELECT * FROM tbl_song WHERE isFaverate Like 1")
+    LiveData<List<Song>> getFaverateSong();
+
     @Insert
     void insertSong(Song song);
 
@@ -44,5 +48,11 @@ public interface SongDao {
     void deleteById(int id);
 
     @Query("UPDATE tbl_song SET trackFile =:location WHERE id LIKE :id")
-    void updateSong(String location, int id);
+    void updateSongLocation(String location, int id);
+
+    @Query("UPDATE tbl_song SET isFaverate =:faverate WHERE id LIKE :id")
+    int updateFaverateSong(int faverate, int id);
+
+    @Update
+    void updateFaverate(Song... song);
 }

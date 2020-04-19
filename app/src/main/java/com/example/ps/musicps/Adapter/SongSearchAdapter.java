@@ -17,6 +17,7 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.PopupMenu;
 import com.crashlytics.android.Crashlytics;
+import com.example.ps.musicps.Helper.DialogHelper;
 import com.example.ps.musicps.Helper.SongsConfigHelper;
 import com.example.ps.musicps.Model.SongInfo;
 import com.example.ps.musicps.View.Dialog.CustomeAlertDialogClass;
@@ -148,36 +149,23 @@ public class SongSearchAdapter extends RecyclerView.Adapter<SongSearchAdapter.So
 
                         case R.id.menu_Delete:
 
-                            CustomeAlertDialogClass customeAlertDialog = new
-                                    CustomeAlertDialogClass((Activity) context,
-                                    "Do you want to delete this Song?",
-                                    new CustomeAlertDialogClass.onAlertDialogCliscked() {
-                                        @Override
-                                        public void onPosetive() {
-                                            if (songsConfigHelper.deleteSong(songViewModel.getTrackFile())) {
-                                                songListFiltered.remove(position);
-                                                notifyItemRemoved(position);
-                                                notifyItemRangeRemoved(position, songListFiltered.size());
-                                                notifyDataSetChanged();
-                                                onSearchAdpSong.onSongRemoved(songViewModel.getId(), songListFiltered.size());
-                                            }
+                            DialogHelper.alertDialog((Activity) context, 0, "Do you want to delete this Song?", new CustomeAlertDialogClass.onAlertDialogCliscked() {
+                                @Override
+                                public void onPosetive() {
+                                    if (songsConfigHelper.deleteSong(songViewModel.getTrackFile())) {
+                                        songListFiltered.remove(position);
+                                        notifyItemRemoved(position);
+                                        notifyItemRangeRemoved(position, songListFiltered.size());
+                                        notifyDataSetChanged();
+                                        onSearchAdpSong.onSongRemoved(songViewModel.getId(), songListFiltered.size());
+                                    }
+                                }
 
-                                        }
+                                @Override
+                                public void onNegetive() {
 
-                                        @Override
-                                        public void onNegetive() {
-
-                                        }
-                                    });
-                            WindowManager.LayoutParams lp = customeAlertDialog.getWindow().getAttributes();
-                            lp.dimAmount = 0.7f;
-                            lp.gravity = Gravity.BOTTOM;
-                            customeAlertDialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
-                            customeAlertDialog.show();
-                            customeAlertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-                            customeAlertDialog.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
-                            customeAlertDialog.setCanceledOnTouchOutside(false);
-
+                                }
+                            });
 
                             break;
                         case R.id.menu_Rington:
@@ -215,7 +203,8 @@ public class SongSearchAdapter extends RecyclerView.Adapter<SongSearchAdapter.So
                     song.setArtistName(songListFiltered.get(position).getArtistName());
                     song.setAlbumName(songListFiltered.get(position).getAlbumName());
                     song.setSongName(songListFiltered.get(position).getSongName());
-                    onSearchAdpSong.onSongClicked(song);
+                    song.setIsFaverate(songListFiltered.get(position).getFaverate());
+                    onSearchAdpSong.onSongClicked(song, true);
                 }
             });
 

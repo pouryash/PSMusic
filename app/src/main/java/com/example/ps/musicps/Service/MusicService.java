@@ -106,6 +106,7 @@ public class MusicService extends Service implements MusiPlayerHelper.onMediaPla
             intentContent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
         } else {
             intentContent = new Intent(this, ListActivity.class);
+            intentContent.putExtra("serviceIntent",true);
             intentContent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
         }
         contentPendingIntent = PendingIntent.getActivity(this, 0, intentContent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -163,7 +164,11 @@ public class MusicService extends Service implements MusiPlayerHelper.onMediaPla
 
     private void onContentChanged() {
 
-        musicAlbum = Commen.decodeUriToBitmap(getApplicationContext(), Uri.parse(sharedPrefrenceManager.getSong().getSongImageUri()));
+        if(sharedPrefrenceManager.getSong().getSongImageUri() != null)
+            musicAlbum = Commen.decodeUriToBitmap(getApplicationContext(), Uri.parse(sharedPrefrenceManager.getSong().getSongImageUri()));
+        else
+            musicAlbum = null;
+
         if (musicAlbum == null)
             musicAlbum = BitmapFactory.decodeResource(getResources(), R.drawable.icon1);
         notification.setLargeIcon(musicAlbum);

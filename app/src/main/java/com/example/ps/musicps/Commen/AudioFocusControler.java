@@ -16,7 +16,7 @@ import javax.inject.Singleton;
 @Singleton
 public class AudioFocusControler implements AudioManager.OnAudioFocusChangeListener {
 
-    private static final String TAG = "AUDIOFOCUS" ;
+    private static final String TAG = "AUDIOFOCUS";
     public static onAudioFocusChange onAudioFocusChange;
     public AudioFocusRequest focusRequest;
 
@@ -25,7 +25,6 @@ public class AudioFocusControler implements AudioManager.OnAudioFocusChangeListe
     public AudioFocusControler(@Named("context") Context context) {
 
     }
-
 
     public void RequestAudio() {
 
@@ -36,7 +35,8 @@ public class AudioFocusControler implements AudioManager.OnAudioFocusChangeListe
                     .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
                     .build();
 
-            focusRequest = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_REQUEST_GRANTED)
+
+            focusRequest = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
                     .setAudioAttributes(playbackAttributes)
                     .setAcceptsDelayedFocusGain(true)
                     .setOnAudioFocusChangeListener(this)
@@ -54,6 +54,13 @@ public class AudioFocusControler implements AudioManager.OnAudioFocusChangeListe
         }
     }
 
+    public void abandonFocus() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            MyApplication.getAudioManager().abandonAudioFocusRequest(focusRequest);
+            return;
+        }
+        MyApplication.getAudioManager().abandonAudioFocus(AudioFocusControler.this);
+    }
 
     @Override
     public void onAudioFocusChange(int i) {
@@ -70,6 +77,7 @@ public class AudioFocusControler implements AudioManager.OnAudioFocusChangeListe
                 break;
             case AudioManager.AUDIOFOCUS_LOSS:
                 onAudioFocusChange.onFocusLoss();
+                abandonFocus();
                 Log.e(TAG, "AUDIOFOCUS_LOSS");
                 break;
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
@@ -81,6 +89,9 @@ public class AudioFocusControler implements AudioManager.OnAudioFocusChangeListe
                 break;
             case AudioManager.AUDIOFOCUS_REQUEST_FAILED:
                 Log.e(TAG, "AUDIOFOCUS_REQUEST_FAILED");
+                break;
+            case AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE:
+                Log.e(TAG, "AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE");
                 break;
         }
 

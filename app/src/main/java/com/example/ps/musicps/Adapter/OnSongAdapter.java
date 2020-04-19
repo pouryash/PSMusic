@@ -5,7 +5,7 @@ import com.example.ps.musicps.Model.SongInfo;
 
 public interface OnSongAdapter {
 
-        void onSongClicked(Song song);
+        void onSongClicked(Song song, boolean shouldExpand);
 
         void onSongRemoved(int id, int size);
 

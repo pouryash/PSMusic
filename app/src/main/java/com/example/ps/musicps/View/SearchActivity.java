@@ -3,6 +3,7 @@ package com.example.ps.musicps.View;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.content.res.AppCompatResources;
+import androidx.core.content.FileProvider;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.lifecycle.Observer;
 
@@ -13,6 +14,7 @@ import android.content.res.Configuration;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -28,6 +30,7 @@ import android.widget.SeekBar;
 import android.widget.Toast;
 
 import com.example.ps.musicps.Adapter.OnSongAdapter;
+import com.example.ps.musicps.Commen.AudioFocusControler;
 import com.example.ps.musicps.Commen.Commen;
 import com.example.ps.musicps.Commen.MyApplication;
 import com.example.ps.musicps.Commen.OnAppCleared;
@@ -49,8 +52,11 @@ import com.example.ps.musicps.viewmodels.SongInfoViewModel;
 import com.example.ps.musicps.viewmodels.SongPanelViewModel;
 import com.example.ps.musicps.viewmodels.SongViewModel;
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.like.LikeButton;
+import com.like.OnLikeListener;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -60,14 +66,15 @@ import java.util.TimerTask;
 import javax.inject.Inject;
 
 public class SearchActivity extends AppCompatActivity implements OnSongAdapter, MusiPlayerHelper.onMediaPlayerStateChanged,
-        MusicService.Callbacks {
+        MusicService.Callbacks, AudioFocusControler.onAudioFocusChange {
 
     ActivitySearchBinding binding;
     FirebaseAnalytics firebaseAnalytics;
     InputMethodManager imgr;
-    String searchTerm;
+    String searchTerm = "";
     SongInfoDialogBinding songInfoBinding;
     Dialog infoDialog;
+    float upX;
     @Inject
     SongInfoViewModel songInfoViewModel;
     @Inject
@@ -183,6 +190,9 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
         songPanelViewModel.setAlbumName(song.getAlbumName());
         songPanelViewModel.setDuration(song.getDuration());
         songPanelViewModel.setPath(song.getTrackFile());
+        boolean isFaverate = (song.getIsFaverate() == 1);
+        if (!MyApplication.isExternalSource)
+            songPanelViewModel.setFaverate(isFaverate);
 
 
         isSetupedPanel = true;
@@ -197,6 +207,13 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
             binding.panel.ivPlayPayseExpand.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_pause, null));
             seekBarProgressUpdater();
         }
+
+        if (MyApplication.isExternalSource) {
+            binding.panel.ivRepeatExpand.setEnabled(false);
+            binding.panel.ivRepeatExpand.setImageAlpha(75);
+            binding.panel.ivFaverateExpand.setEnabled(false);
+            binding.panel.ivFaverateExpand.setAlpha(0.70f);
+        }
     }
 
     public void longTouchBackward() {
@@ -208,11 +225,10 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
                         if (musiPlayerHelper.mediaPlayer.isLooping()) {
                             musiPlayerHelper.mediaPlayer.seekTo(0);
                         } else {
-//                            if (!isExternalSource) {
-                            binding.panel.ivPlayPayseExpand.performClick();
-//                            } else {
-//                                setupMediaPLayer();
-//                            }
+                            if (sharedPrefrenceManager.getPlayingState().equals("repeatList"))
+                                binding.panel.ivPreviousExpand.performClick();
+                            else if (sharedPrefrenceManager.getPlayingState().equals("repeatOne"))
+                                musiPlayerHelper.mediaPlayer.seekTo(0);
 
                         }
                     } else {
@@ -245,13 +261,11 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
                         if (musiPlayerHelper.mediaPlayer.isLooping()) {
                             musiPlayerHelper.mediaPlayer.seekTo(0);
                         } else {
-                            //TODO
-//                            if (!isExternalSource) {
-//                                    mPresenter.getSong(Commen.song.getId() + 1);
-                            binding.panel.ivNextExpand.performClick();
-//                            } else {
-//                                setupMediaPLayer();
-//                            }
+
+                            if (sharedPrefrenceManager.getPlayingState().equals("repeatList"))
+                                binding.panel.ivNextExpand.performClick();
+                            else if (sharedPrefrenceManager.getPlayingState().equals("repeatOne"))
+                                musiPlayerHelper.mediaPlayer.seekTo(0);
 
                         }
                     } else {
@@ -305,6 +319,15 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
 
     }
 
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        if (ev.getAction() == MotionEvent.ACTION_UP) {
+            upX = Math.round(ev.getX());
+        }
+        return super.dispatchTouchEvent(ev);
+
+    }
+
     private void setupViews() {
         songViewModel.getSongs();
         imgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -332,6 +355,39 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
             }
         });
 
+        binding.panel.ivFaverateExpand.setOnLikeListener(new OnLikeListener() {
+            @Override
+            public void liked(LikeButton likeButton) {
+                Song song = songViewModel.getSongByPath(songPanelViewModel.getPath());
+                song.setIsFaverate(1);
+                sharedPrefrenceManager.saveSong(song);
+                songViewModel.updateFaverateSong(1, song.getId());
+            }
+
+            @Override
+            public void unLiked(LikeButton likeButton) {
+                Song song = songViewModel.getSongByPath(songPanelViewModel.getPath());
+                song.setIsFaverate(0);
+                sharedPrefrenceManager.saveSong(song);
+                songViewModel.updateFaverateSong(0, song.getId());
+            }
+        });
+
+        binding.panel.ivShareExpand.setOnClickListener(view -> {
+            try {
+                File file = new File(songPanelViewModel.getPath());
+                Uri uri = FileProvider.getUriForFile(SearchActivity.this, getApplicationContext().getPackageName() + ".provider", file);
+                Intent share = new Intent(Intent.ACTION_SEND);
+                share.setType("audio/*");
+                share.putExtra(Intent.EXTRA_STREAM, uri);
+                share.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                startActivity(Intent.createChooser(share, "Share Sound File"));
+            } catch (Exception e) {
+                e.printStackTrace();
+                Toast.makeText(SearchActivity.this, "cant share this file, something wrong", Toast.LENGTH_LONG).show();
+            }
+        });
+
         serviceConnectionBinder.setOnServiceConnectionChanged(new ServiceConnectionBinder.onServiceConnectionChanged() {
             @Override
             public void onServiceConnected() {
@@ -349,6 +405,8 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
 
             SearchActivity.this.songViewModelList.clear();
             SearchActivity.this.songViewModelList.addAll(songViewModels);
+            if (songViewModels.size() > 0)
+                songViewModel.getSongSearchAdapter().getFilter().filter(searchTerm);
 
         });
 
@@ -509,8 +567,9 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
                     if (isInLongTouch) {
                         isInLongTouch = false;
                         songViewModel.setCanClick(false);
+                        if (!(upX > view.getLeft()) || !(upX < view.getRight()) || (motionEvent.getY() > view.getTop()) || (motionEvent.getY() < view.getBottom() && motionEvent.getY() < 0))
+                            binding.panel.ivNextExpand.performClick();
                     }
-                    iscompleteFromChangeSong = true;
                 }
                 return false;
             }
@@ -534,8 +593,9 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
                     if (isInLongTouch) {
                         songViewModel.setCanClick(false);
                         isInLongTouch = false;
+                        if (!(upX > view.getLeft()) || !(upX < view.getRight()) || (motionEvent.getY() > view.getTop()) || (motionEvent.getY() < view.getBottom() && motionEvent.getY() < 0))
+                            binding.panel.ivPreviousExpand.performClick();
                     }
-                    iscompleteFromChangeSong = true;
                 }
                 return false;
             }
@@ -544,7 +604,10 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
         songObserver = new Observer<Song>() {
             @Override
             public void onChanged(Song song) {
-                onSongClicked(song);
+                if (song != null) {
+                    onSongClicked(song, false);
+                } else
+                    musiPlayerHelper.mediaPlayer.seekTo(0);
             }
         };
 
@@ -645,7 +708,7 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
     }
 
     private void init() {
-
+        AudioFocusControler.onAudioFocusChange = this;
         component = DaggerSongSearchComponent.builder().searchActivityModule(new SearchActivityModule(this)).build();
         component.inject(this);
         serviceConnectionBinder = DaggerMusicServiceComponent.builder()
@@ -691,12 +754,13 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
         if (binding.slidingPanel.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED) {
             binding.slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
         } else {
-            if (serviceConnectionBinder.isServiceConnect && musiPlayerHelper.mediaPlayer != null) {
-                serviceConnectionBinder.getMusicService().stopSelf();
-                unbindService(serviceConnectionBinder.getServiceConnection());
-                serviceConnectionBinder.getMusicService().removeNotification();
-                stopService(serviceIntent);
-            }
+
+                if (serviceConnectionBinder.isServiceConnect && musiPlayerHelper.mediaPlayer != null) {
+                    serviceConnectionBinder.getMusicService().stopSelf();
+                    unbindService(serviceConnectionBinder.getServiceConnection());
+                    serviceConnectionBinder.getMusicService().removeNotification();
+                    stopService(serviceIntent);
+                }
             super.onBackPressed();
         }
         //for on resume in listActivity because onDestroy called after that
@@ -725,7 +789,15 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
     }
 
     @Override
-    public void onSongClicked(Song song) {
+    public void onSongClicked(Song song, boolean shouldExpand) {
+
+        if (!binding.panel.ivRepeatExpand.isEnabled()) {
+            binding.panel.ivRepeatExpand.setEnabled(true);
+            binding.panel.ivRepeatExpand.setImageAlpha(255);
+            binding.panel.ivFaverateExpand.setEnabled(true);
+            binding.panel.ivFaverateExpand.setAlpha(1);
+            MyApplication.isExternalSource = false;
+        }
 
         if (serviceConnectionBinder.isServiceConnect && serviceConnectionBinder.getMusicService().isBind && musiPlayerHelper.mediaPlayer != null) {
             serviceConnectionBinder.getMusicService().stopSelf();
@@ -817,11 +889,11 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
         if (iscompleteFromChangeSong)
             iscompleteFromChangeSong = false;
 
-        if (!serviceConnectionBinder.isServiceConnect && !isFirstIn){
+        if (!serviceConnectionBinder.isServiceConnect && !isFirstIn) {
             serviceIntent = new Intent(SearchActivity.this, MusicService.class);
             startService(serviceIntent);
             bindService(serviceIntent, serviceConnectionBinder.getServiceConnection(), Context.BIND_AUTO_CREATE);
-        }else if (serviceConnectionBinder.getMusicService() != null && !serviceConnectionBinder.getMusicService().isBind && musiPlayerHelper.mediaPlayer != null) {
+        } else if (serviceConnectionBinder.getMusicService() != null && !serviceConnectionBinder.getMusicService().isBind && musiPlayerHelper.mediaPlayer != null) {
             serviceIntent = new Intent(SearchActivity.this, MusicService.class);
             startService(serviceIntent);
             bindService(serviceIntent, serviceConnectionBinder.getServiceConnection(), Context.BIND_AUTO_CREATE);
@@ -855,7 +927,7 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
                         Collections.shuffle(shuffleList);
                         curentShuffleSong = 0;
                     }
-                    onSongClicked(shuffleList.get(curentShuffleSong).getViewModelSong());
+                    onSongClicked(shuffleList.get(curentShuffleSong).getViewModelSong(), false);
 
                     break;
             }
@@ -878,5 +950,11 @@ public class SearchActivity extends AppCompatActivity implements OnSongAdapter, 
     @Override
     public void onPreviousButtonClicked() {
         binding.panel.ivPreviousExpand.performClick();
+    }
+
+    @Override
+    public void onFocusLoss() {
+        if (musiPlayerHelper.mediaPlayer != null && musiPlayerHelper.mediaPlayer.isPlaying())
+            binding.panel.ivPlayPauseCollpase.performClick();
     }
 }

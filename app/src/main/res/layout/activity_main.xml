@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".View.MainActivity">
+
+    <ImageView
+        android:id="@+id/iv_song_main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:scaleType="fitXY"
+        tools:background="@color/colorGray"
+        tools:padding="36dp"
+        tools:src="@drawable/ic_no_album_128">
+
+    </ImageView>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1.2">
+
+
+        <ImageView
+            android:id="@+id/iv_song_background_main"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:rotation="180"
+            android:scaleType="centerCrop"
+            tools:background="@color/colorGray"
+            tools:padding="36dp"
+            tools:src="@drawable/ic_no_album_128" />
+
+        <com.github.florent37.shapeofview.shapes.RoundRectView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#80FFFFFF"
+                android:paddingTop="@dimen/standardMargin_X2">
+
+                <TextView
+                    android:id="@+id/tv_library_main"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:paddingStart="@dimen/standardMargin"
+                    android:text="@string/library"
+                    android:textColor="@color/colorBlack"
+                    android:textSize="@dimen/standardTextSize_20"
+                    android:textStyle="normal" />
+
+                <ScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tv_library_main">
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <RelativeLayout
+                            android:id="@+id/rel_all_song_main"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/standardMargin_X2"
+                            android:background="?attr/selectableItemBackground"
+                            android:gravity="start"
+                            android:paddingTop="@dimen/standardMargin"
+                            android:paddingBottom="@dimen/standardMargin"
+                            android:paddingStart="@dimen/standardMargin_X2"
+                            android:paddingEnd="@dimen/standardMargin_X2">
+
+                            <ImageView
+                                android:id="@+id/iv_AllSong_Main"
+                                android:layout_width="32dp"
+                                android:layout_height="32dp"
+                                android:layout_centerVertical="true"
+                                android:layout_gravity="center"
+                                android:tint="@color/colorAccent"
+                                app:srcCompat="@drawable/ic_queue_music_black_24dp" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerVertical="true"
+                                android:layout_toEndOf="@id/iv_AllSong_Main"
+                                android:padding="@dimen/standardMargin"
+                                android:text="@string/all_songs"
+                                android:textColor="@color/colorBlack"
+                                android:textSize="@dimen/standardTextSize_15"
+                                android:textStyle="normal" />
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentEnd="true"
+                                android:layout_centerVertical="true"
+                                android:layout_gravity="center"
+                                android:rotation="180"
+                                android:tint="@color/colorBlack"
+                                app:srcCompat="@drawable/ic_back_arrow_white" />
+
+                        </RelativeLayout>
+
+                        <RelativeLayout
+                            android:id="@+id/rel_faverate_main"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@id/rel_all_song_main"
+                            android:background="?attr/selectableItemBackground"
+                            android:gravity="start"
+                            android:paddingTop="@dimen/standardMargin"
+                            android:paddingBottom="@dimen/standardMargin"
+                            android:paddingStart="@dimen/standardMargin_X2"
+                            android:paddingEnd="@dimen/standardMargin_X2">
+
+                            <ImageView
+                                android:id="@+id/iv_Faverate_Main"
+                                android:layout_width="32dp"
+                                android:layout_height="32dp"
+                                android:layout_centerVertical="true"
+                                android:layout_gravity="center"
+                                android:tint="@color/colorRed"
+                                app:srcCompat="@drawable/ic_favorite_border_black_24dp" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerVertical="true"
+                                android:layout_toEndOf="@id/iv_Faverate_Main"
+                                android:padding="@dimen/standardMargin"
+                                android:text="@string/favourites"
+                                android:textColor="@color/colorBlack"
+                                android:textSize="@dimen/standardTextSize_15"
+                                android:textStyle="normal" />
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentEnd="true"
+                                android:layout_centerVertical="true"
+                                android:layout_gravity="center"
+                                android:rotation="180"
+                                android:tint="@color/colorBlack"
+                                app:srcCompat="@drawable/ic_back_arrow_white" />
+
+                        </RelativeLayout>
+
+                        <RelativeLayout
+                            android:id="@+id/rel_setting_main"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@id/rel_faverate_main"
+                            android:background="?attr/selectableItemBackground"
+                            android:gravity="start"
+                            android:paddingTop="@dimen/standardMargin"
+                            android:paddingBottom="@dimen/standardMargin"
+                            android:paddingStart="@dimen/standardMargin_X2"
+                            android:paddingEnd="@dimen/standardMargin_X2">
+
+                            <ImageView
+                                android:id="@+id/iv_setting_Main"
+                                android:layout_width="32dp"
+                                android:layout_height="32dp"
+                                android:layout_centerVertical="true"
+                                android:layout_gravity="center"
+                                android:tint="@color/gray700"
+                                app:srcCompat="@drawable/ic_settings_black_24dp" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerVertical="true"
+                                android:layout_toEndOf="@id/iv_setting_Main"
+                                android:padding="@dimen/standardMargin"
+                                android:text="@string/setting"
+                                android:textColor="@color/colorBlack"
+                                android:textSize="@dimen/standardTextSize_15"
+                                android:textStyle="normal" />
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentEnd="true"
+                                android:layout_centerVertical="true"
+                                android:layout_gravity="center"
+                                android:rotation="180"
+                                android:tint="@color/colorBlack"
+                                app:srcCompat="@drawable/ic_back_arrow_white" />
+
+                        </RelativeLayout>
+
+                        <RelativeLayout
+                            android:id="@+id/rel_about_main"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@id/rel_setting_main"
+                            android:background="?attr/selectableItemBackground"
+                            android:gravity="start"
+                            android:paddingTop="@dimen/standardMargin"
+                            android:paddingBottom="@dimen/standardMargin"
+                            android:paddingStart="@dimen/standardMargin_X2"
+                            android:paddingEnd="@dimen/standardMargin_X2">
+
+                            <ImageView
+                                android:id="@+id/iv_about_Main"
+                                android:layout_width="32dp"
+                                android:layout_height="32dp"
+                                android:layout_centerVertical="true"
+                                android:layout_gravity="center"
+                                android:tint="#FF9800"
+                                app:srcCompat="@drawable/ic_info_outline_black_24dp" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerVertical="true"
+                                android:layout_toEndOf="@id/iv_about_Main"
+                                android:padding="@dimen/standardMargin"
+                                android:text="@string/about"
+                                android:textColor="@color/colorBlack"
+                                android:textSize="@dimen/standardTextSize_15"
+                                android:textStyle="normal" />
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentEnd="true"
+                                android:layout_centerVertical="true"
+                                android:layout_gravity="center"
+                                android:rotation="180"
+                                android:tint="@color/colorBlack"
+                                app:srcCompat="@drawable/ic_back_arrow_white" />
+
+                        </RelativeLayout>
+
+                    </RelativeLayout>
+
+                </ScrollView>
+
+
+            </RelativeLayout>
+
+
+        </com.github.florent37.shapeofview.shapes.RoundRectView>
+
+
+    </RelativeLayout>
+
+</LinearLayout>

@@ -24,8 +24,8 @@ android {
         applicationId "com.example.ps.musicps"
         minSdkVersion 17
         targetSdkVersion 29
-        versionCode 7
-        versionName "1.1.0"
+        versionCode 9
+        versionName "1.2.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
         signingConfig signingConfigs.config
@@ -63,27 +63,38 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     implementation 'com.google.android.material:material:1.1.0'
     implementation 'androidx.cardview:cardview:1.0.0'
-    implementation 'androidx.recyclerview:recyclerview:1.1.0'
+    implementation 'androidx.recyclerview:recyclerview:1.2.0-alpha02'
     implementation 'com.android.volley:volley:1.1.1'
     implementation 'com.github.bumptech.glide:glide:4.8.0'
     implementation 'androidx.palette:palette:1.0.0'
-    implementation 'com.google.android.material:material:1.1.0'
+    implementation 'com.google.android.material:material:1.2.0-alpha05'
     //firebase
     implementation 'com.google.firebase:firebase-messaging:20.1.2'
     implementation 'com.google.firebase:firebase-core:17.2.3'
     implementation 'com.crashlytics.sdk.android:crashlytics:2.10.1'
     //dagger
-    implementation 'com.google.dagger:dagger:2.24'
-    annotationProcessor 'com.google.dagger:dagger-compiler:2.24'
+    implementation 'com.google.dagger:dagger:2.27'
+    annotationProcessor 'com.google.dagger:dagger-compiler:2.27'
     //rx
     implementation 'io.reactivex.rxjava2:rxjava:2.1.14'
     implementation 'io.reactivex.rxjava2:rxandroid:2.0.2'
     //databinding
-    annotationProcessor 'androidx.databinding:databinding-compiler:3.6.1'
+    annotationProcessor 'androidx.databinding:databinding-compiler:3.6.2'
     //Room db
     implementation 'android.arch.persistence.room:runtime:1.1.1'
     annotationProcessor 'android.arch.persistence.room:compiler:1.1.1'
     //slideingUpPanel
     implementation 'com.sothree.slidinguppanel:library:3.4.0'
+    //Mockito
+    testImplementation 'org.mockito:mockito-core:2.28.2'
+    //Like Animation
+    implementation 'com.github.jd-alexander:LikeButton:0.2.3'
+    //shape
+    implementation 'com.github.florent37:shapeofview:1.4.6'
+    //blure
+    implementation 'jp.wasabeef:blurry:3.0.0'
+    //navigation component
+    implementation 'androidx.navigation:navigation-fragment:2.2.1'
+    implementation 'androidx.navigation:navigation-ui:2.2.1'
 
 }
