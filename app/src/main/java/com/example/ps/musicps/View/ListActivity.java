@@ -7,6 +7,8 @@ import androidx.core.content.FileProvider;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
 
 import android.Manifest;
 import android.app.Dialog;
@@ -285,6 +287,7 @@ public class ListActivity extends RuntimePermissionsActivity implements OnSongAd
         if (serviceConnectionBinder != null && serviceConnectionBinder.isServiceConnect && musiPlayerHelper.mediaPlayer != null
                 && !serviceConnectionBinder.getMusicService().isBind && musiPlayerHelper.mediaPlayer.isPlaying()) {
             startService();
+
         }
 
         if (musiPlayerHelper != null && musiPlayerHelper.mediaPlayer != null) {

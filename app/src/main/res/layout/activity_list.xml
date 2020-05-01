@@ -2,6 +2,7 @@
 <layout xmlns:bind="http://schemas.android.com/apk/res-auto">
 
     <data>
+
         <variable
             name="song"
             type="com.example.ps.musicps.viewmodels.SongViewModel" />
@@ -44,9 +45,9 @@
                         android:id="@+id/toolbar_songList"
                         android:layout_width="match_parent"
                         android:layout_height="?attr/actionBarSize"
-                        app:titleTextColor="@color/colorTextMain"
                         android:background="@color/colorToolbar"
-                        app:layout_scrollFlags="scroll|enterAlways">
+                        app:layout_scrollFlags="scroll|enterAlways"
+                        app:titleTextColor="@color/colorTextMain">
 
 
                     </androidx.appcompat.widget.Toolbar>
@@ -72,11 +73,11 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:paddingBottom="70dp"
-                        tools:listitem="@layout/song_row"
-                        bind:viewModelList="@{song.userViewModelList1}"
-                        bind:songAdapter="@{song.songAdapter}"
                         bind:context="@{song.context}"
-                        bind:recyclerBinder="@{song.mutableSongViewModelList}"/>
+                        bind:recyclerBinder="@{song.mutableSongViewModelList}"
+                        bind:songAdapter="@{song.songAdapter}"
+                        bind:viewModelList="@{song.userViewModelList1}"
+                        tools:listitem="@layout/song_row" />
 
                 </RelativeLayout>
 
@@ -84,8 +85,9 @@
             </androidx.coordinatorlayout.widget.CoordinatorLayout>
         </RelativeLayout>
 
-        <include layout="@layout/playing_song_panel"
-            android:id="@+id/panel"/>
+        <include
+            android:id="@+id/panel"
+            layout="@layout/playing_song_panel" />
 
         <!--        <RelativeLayout-->
         <!--            android:layout_width="match_parent"-->
@@ -420,7 +422,6 @@
         <!--            </RelativeLayout>-->
 
         <!--        </RelativeLayout>-->
-
     </com.sothree.slidinguppanel.SlidingUpPanelLayout>
 
 </layout>

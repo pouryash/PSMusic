@@ -18,5 +18,7 @@
     <string name="Faverate_Song_Empty">Your Faverate List Is Empty</string>
     <string name="Scan_Complete">scan for song is successfuly complete</string>
     <string name="default_dark_mode">Default</string>
+    <string name="AdMobId">ca-app-pub-8549129410473182~2085595648</string>
+    <string name="AdMobUnitId">ca-app-pub-3940256099942544/6300978111</string>
 
 </resources>

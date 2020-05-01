@@ -16,6 +16,8 @@ import androidx.databinding.Bindable;
 import androidx.databinding.BindingAdapter;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -72,6 +74,7 @@ public class SongViewModel extends BaseObservable {
     @Inject
     public SongViewModel(Context context) {
         setContext(context);
+
         component = DaggerSongViewModelComponent.builder()
                 .songAdapterModule(new SongAdapterModule((OnSongAdapter) context, userViewModelList1, context))
                 .build();

@@ -27,6 +27,7 @@ android {
         versionCode 9
         versionName "1.2.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
         signingConfig signingConfigs.config
 
@@ -36,7 +37,13 @@ android {
             minifyEnabled true
             shrinkResources true
             zipAlignEnabled true
+            ext.enableCrashlytics = true
+            crunchPngs = true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            ext.enableCrashlytics = false
+            crunchPngs = false
         }
     }
     dataBinding {
@@ -49,6 +56,7 @@ android {
     viewBinding {
         enabled = true
     }
+
 }
 
 dependencies {
@@ -96,5 +104,8 @@ dependencies {
     //navigation component
     implementation 'androidx.navigation:navigation-fragment:2.2.1'
     implementation 'androidx.navigation:navigation-ui:2.2.1'
-
+    //viewModel
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
+    //MultiDex
+    implementation 'com.android.support:multidex:1.0.3'
 }
